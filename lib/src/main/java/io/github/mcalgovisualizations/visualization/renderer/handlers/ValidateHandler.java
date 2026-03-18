@@ -8,13 +8,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class ValidateHandler implements IAnimationHandler<Validate> {
     @Override
-    public AnimationPlan handle(Validate event, ISceneOps sceneOps) {
+    public AnimationPlan handle(Validate event) {
         return AnimationPlan.builder()
-                .step(2, _ -> sceneOps.showHologram(Component.text(
+                .step(2, sceneOps -> sceneOps.showHologram(Component.text(
                         "✔ Already in place!", NamedTextColor.GREEN)))
                 .step(15, ISceneOps::clearHologram)
                 .build();
     }
 }
-
-

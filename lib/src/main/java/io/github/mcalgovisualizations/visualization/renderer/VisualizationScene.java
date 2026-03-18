@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 
 import net.kyori.adventure.audience.Audience;
@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -17,15 +18,6 @@ import java.util.*;
 /**
  * Scene = Minestom world state.
  *
- * Owns:
- *  - entity creation/removal
- *  - stable identity mapping slot -> display entity
- *  - current visual flags (highlight)
- *
- * Does NOT own:
- *  - layout math
- *  - algorithm events
- *  - scheduling/tick loop
  */
 public final class VisualizationScene implements ISceneOps {
 
@@ -39,10 +31,8 @@ public final class VisualizationScene implements ISceneOps {
     }
 
     // Stable identity mapping (slot -> display wrapper/entity)
-    private final Map<Integer, MobDisplay> displaysBySlot =
+    private final Map<Integer, io.github.mcalgovisualizations.visualization.renderer.IDisplayValue> displaysBySlot =
             new HashMap<>();
-
-    private final Set<Integer> getHighlightedSlots = new HashSet<>();
 
     // Floating hologram above the visualization
     private HologramDisplay hologram;
@@ -80,7 +70,8 @@ public final class VisualizationScene implements ISceneOps {
             );
 
             // TODO : Move the creation of IDisplayValue somewhere else
-            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
+//            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
+            var dv = new BlockDisplay(instance, pos, Block.GRANITE, value.toString());
 
             displaysBySlot.put(i, dv);
 
@@ -212,7 +203,7 @@ public final class VisualizationScene implements ISceneOps {
     // Internals
     // -------------------------
 
-    private MobDisplay requireDisplay(int slot) {
+    private IDisplayValue requireDisplay(int slot) {
         var display = displaysBySlot.get(slot);
         if (display == null) {
             throw new IllegalStateException("No display for slot " + slot + ".");
@@ -220,7 +211,7 @@ public final class VisualizationScene implements ISceneOps {
         return display;
     }
 
-    private void safeRemove(MobDisplay display) {
+    private void safeRemove(IDisplayValue display) {
         if (display == null) return;
         try {
             display.remove();

@@ -18,21 +18,20 @@ public final class Dispatcher {
         handlers.put(eventType, handler);
     }
 
-    public AnimationPlan dispatch(IAlgorithmEvent event, ISceneOps sceneOps) {
+    public AnimationPlan dispatch(IAlgorithmEvent event) {
         Objects.requireNonNull(event, "event");
 
         var handler = handlers.get(event.getClass());
 
-        return invokeUnchecked(handler, event, sceneOps);
+        return invokeUnchecked(handler, event);
     }
 
     @SuppressWarnings("unchecked")
     private static <E extends IAlgorithmEvent> AnimationPlan invokeUnchecked(
             IAnimationHandler<?> raw,
-            IAlgorithmEvent event,
-            ISceneOps sceneOps
+            IAlgorithmEvent event
     ) {
-        return ((IAnimationHandler<E>) raw).handle((E) event, sceneOps);
+        return ((IAnimationHandler<E>) raw).handle((E) event);
     }
 }
 

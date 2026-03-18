@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.renderer.Displays;
 
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -27,7 +26,7 @@ import net.minestom.server.instance.Instance;
  *  9  → IRON_GOLEM (~2.7 m)
  * 10  → WARDEN     (~2.9 m)
  */
-public class MobDisplay implements IDisplayValue {
+public class IDisplayValue implements io.github.mcalgovisualizations.visualization.renderer.IDisplayValue {
 
     private static final EntityType[] MOB_LADDER = {
             EntityType.CHICKEN,    // 1
@@ -49,7 +48,7 @@ public class MobDisplay implements IDisplayValue {
     private final Entity textEntity;
     private Pos pos;
 
-    public MobDisplay(Instance instance, Pos pos, int value, String text) {
+    public IDisplayValue(Instance instance, Pos pos, int value, String text) {
         if (instance == null) throw new NullPointerException("instance cannot be null");
         if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
 

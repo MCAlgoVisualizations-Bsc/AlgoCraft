@@ -10,8 +10,6 @@ import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import java.util.ArrayList;
 import java.util.List;
 
-
-// TODO: remove insertion sort from AlgorithmStepper
 public class AlgorithmStepper<T extends Comparable<T>> {
 
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();

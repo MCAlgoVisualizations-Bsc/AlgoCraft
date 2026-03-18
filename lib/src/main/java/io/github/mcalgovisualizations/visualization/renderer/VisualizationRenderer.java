@@ -41,6 +41,7 @@ public final class VisualizationRenderer {
         dispatcher.register(Complete.class, new CompleteHandler());
         dispatcher.register(Message.class, new MessageHandler());
         dispatcher.register(Validate.class, new ValidateHandler());
+        dispatcher.register(NoOp.class, new NoOpHandler());
 
         final var layoutResult = this.layout.compute(initialData, origin);
         scene.onStart(layoutResult);
@@ -61,7 +62,7 @@ public final class VisualizationRenderer {
     }
 
     public void render(IAlgorithmEvent event) {
-        final var plan = dispatcher.dispatch(event, scene);
+        final var plan = dispatcher.dispatch(event);
         executor.add(plan);
         executor.startIfIdle();
     }

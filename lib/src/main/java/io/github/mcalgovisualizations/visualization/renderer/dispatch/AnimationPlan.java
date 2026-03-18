@@ -43,6 +43,10 @@ public final class AnimationPlan {
         return builder().step(0, op).build();
     }
 
+    public static AnimationPlan empty() {
+        return new AnimationPlan(Collections.emptyList());
+    }
+
     public static final class Builder {
         private final List<Step> steps = new ArrayList<>();
 
