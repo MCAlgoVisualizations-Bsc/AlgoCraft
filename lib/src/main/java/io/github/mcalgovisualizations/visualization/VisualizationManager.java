@@ -2,13 +2,10 @@ package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
-import io.github.mcalgovisualizations.visualization.layouts.CircleLayout;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
-import io.github.mcalgovisualizations.visualization.layouts.MatrixLayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
-import io.github.mcalgovisualizations.visualization.renderer.VisualizationRenderer;
+import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.InstanceContainer;
@@ -56,11 +53,11 @@ public class VisualizationManager {
         final ILayout layout = new FloatingLinearLayout();
         final var origin = getAreaLocation("sorting");
 
-        final var renderer = new VisualizationRenderer(instance, origin, layout);
+        final var renderer = new Renderer(instance, origin, layout);
         final var controller = new VisualizationController(playerAlgorithm, renderer, collection);
         controller.setAudience(player);
 
-        controller.onStart();
+        controller.startVisualization();
 
         playerSteppers.put(player.getUuid(), controller);
     }

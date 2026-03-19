@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 
 import net.kyori.adventure.audience.Audience;
@@ -10,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.*;
  * Scene = Minestom world state.
  *
  */
-public final class VisualizationScene implements ISceneOps {
+public final class Scene implements ISceneOps {
 
     private final Instance instance;
     private final Pos origin;
@@ -31,7 +30,7 @@ public final class VisualizationScene implements ISceneOps {
     }
 
     // Stable identity mapping (slot -> display wrapper/entity)
-    private final Map<Integer, io.github.mcalgovisualizations.visualization.renderer.IDisplayValue> displaysBySlot =
+    private final Map<Integer, IDisplayValue> displaysBySlot =
             new HashMap<>();
 
     // Floating hologram above the visualization
@@ -42,7 +41,7 @@ public final class VisualizationScene implements ISceneOps {
 
     private boolean started = false;
 
-    public VisualizationScene(@NotNull Instance instance, @NotNull Pos origin) {
+    public Scene(@NotNull Instance instance, @NotNull Pos origin) {
         this.instance = instance;
         this.origin = origin;
     }
@@ -70,8 +69,8 @@ public final class VisualizationScene implements ISceneOps {
             );
 
             // TODO : Move the creation of IDisplayValue somewhere else
-//            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
-            var dv = new BlockDisplay(instance, pos, Block.GRANITE, value.toString());
+            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
+            //var dv = new BlockDisplay(instance, pos, Block.GRANITE, value.toString());
 
             displaysBySlot.put(i, dv);
 

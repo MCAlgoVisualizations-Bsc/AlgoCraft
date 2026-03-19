@@ -14,6 +14,10 @@ public final class SwapHandler implements IAnimationHandler<Swap> {
                     sceneOps.showHologram(Component.text(
                             "↕ Swapping [" + event.xValue() + "] ↔ [" + event.yValue() + "]",
                             NamedTextColor.YELLOW));
+
+                    System.out.println("x: " + event.xValue() + " y: " + event.yValue());
+                    System.out.println("x: " + event.x() + " y: " + event.y());
+
                     sceneOps.setHighlighted(event.x(), true);
                     sceneOps.setHighlighted(event.y(), true);
                 })

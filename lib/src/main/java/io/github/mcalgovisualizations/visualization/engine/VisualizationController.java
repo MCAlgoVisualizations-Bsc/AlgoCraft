@@ -1,40 +1,33 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
-import io.github.mcalgovisualizations.visualization.algorithms.HistorySnapshot;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmStepper;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
-import io.github.mcalgovisualizations.visualization.algorithms.sorting.AlgorithmStepper;
-import io.github.mcalgovisualizations.visualization.models.Data;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.algorithms.AlgorithmStepper;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
-import io.github.mcalgovisualizations.visualization.renderer.VisualizationRenderer;
+import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import net.kyori.adventure.audience.Audience;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.
  */
 public class VisualizationController {
-
     private final AlgorithmStepper stepper;
-    private final VisualizationRenderer renderer;
+    private final Renderer renderer;
 
     private int ticksPerStep = 20;
     private boolean IS_RUNNING = false;
     private Task runningTask = null;
 
     public VisualizationController(
-            IPlayerSort algorithm,
-            VisualizationRenderer renderer,
-            SortingCollection<?> collection
+            @NotNull IPlayerSort algorithm,
+            @NotNull Renderer renderer,
+            @NotNull SortingCollection<?> collection
     ) {
-        this.stepper = new AlgorithmStepper(algorithm, collection);
+        this.stepper = new AlgorithmStepper<>(algorithm, collection);
         this.renderer = renderer;
     }
 
@@ -42,24 +35,14 @@ public class VisualizationController {
         renderer.setAudience(audience);
     }
 
-    public void onStart() {
+    public void startVisualization() {
         var event = stepper.onStart();
-        renderer.onStart(event);
-        //var values = collection.data().toArray(Data[]::new);
-
-        // we just need to display the initial values
-//        var snapshot = new HistorySnapshot<>(
-//                values,
-//                null
-//        );
-
-        // renderer.onStart(snapshot);
+        renderer.initialize(event);
     }
 
     public void start() {
         if(IS_RUNNING) return;
         IS_RUNNING = true;
-
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::step)
                 .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
@@ -72,7 +55,7 @@ public class VisualizationController {
             runningTask.cancel();
             runningTask = null;
         }
-        renderer.onStop();
+        renderer.Stop();
     }
 
     public void step() {
@@ -101,13 +84,13 @@ public class VisualizationController {
 
     public void cleanup() {
         stop();
-        renderer.onCleanup();
+        this.renderer.onCleanup();
+        this.stepper.onCleanup();
     }
 
     public void randomize() {
-//        stop();
-//        final var snapshot = stepper.randomize();
-//        renderer.hardReset(snapshot);
+        
+
     }
 
 }

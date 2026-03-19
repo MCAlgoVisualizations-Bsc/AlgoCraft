@@ -67,8 +67,6 @@ public final class Main {
         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2);
         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1);
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
-        // TODO : I cannot add multiple insertion sorts at in the instance, with different collections.
-
 
         // Register visualization control listeners (item interactions)
         registerListeners(instance);

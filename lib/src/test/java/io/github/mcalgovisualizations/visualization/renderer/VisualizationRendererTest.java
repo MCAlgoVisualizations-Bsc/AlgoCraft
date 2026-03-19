@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -15,7 +14,7 @@ public class VisualizationRendererTest {
     MinecraftServer server = MinecraftServer.init();
     private final Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
     private final Pos pos = Pos.ZERO;
-    private VisualizationRenderer renderer;
+    private Renderer renderer;
 
     @BeforeEach
     void beforeEach() {
