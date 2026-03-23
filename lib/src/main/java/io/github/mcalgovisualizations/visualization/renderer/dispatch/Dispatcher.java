@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,23 +12,31 @@ public final class Dispatcher {
 
     private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
 
-    public <E extends IAlgorithmEvent> void register(Class<E> eventType, IAnimationHandler<E> handler) {
+    public <E extends IAlgorithmEvent> void register(
+            @NotNull Class<E> eventType,
+            @NotNull IAnimationHandler<E> handler
+    ) {
         Objects.requireNonNull(eventType, "eventType");
         Objects.requireNonNull(handler, "handler");
         handlers.put(eventType, handler);
     }
 
-    public AnimationPlan dispatch(IAlgorithmEvent event) {
+    public AnimationPlan dispatch(@NotNull IAlgorithmEvent event) {
         Objects.requireNonNull(event, "event");
-        var handler = handlers.get(event.getClass());
+        final var handler = handlers.get(event.getClass());
+        if (handler == null) {
+            throw new IllegalStateException("No handler registered for event type " + event.getClass().getName());
+        }
         return invokeUnchecked(handler, event);
     }
 
     @SuppressWarnings("unchecked")
-    private static <E extends IAlgorithmEvent> AnimationPlan invokeUnchecked(
-            IAnimationHandler<?> raw,
-            IAlgorithmEvent event
+    private <E extends IAlgorithmEvent> AnimationPlan invokeUnchecked(
+            @NotNull IAnimationHandler<?> raw,
+            @NotNull IAlgorithmEvent event
     ) {
+        Objects.requireNonNull(raw, "raw");
+        Objects.requireNonNull(event, "event");
         return ((IAnimationHandler<E>) raw).handle((E) event);
     }
 }

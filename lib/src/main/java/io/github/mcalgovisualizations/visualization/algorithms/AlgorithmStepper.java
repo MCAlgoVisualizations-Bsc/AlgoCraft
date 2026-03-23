@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Random;
 
 public class AlgorithmStepper<T extends Comparable<T>> {
-    private final Random RANDOM = new Random();
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();
     private SortingCollection<T> collection; // TODO : Make an interface for this
     private final IPlayerSort algorithm;
