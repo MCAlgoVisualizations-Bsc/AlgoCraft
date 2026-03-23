@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
+import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
@@ -27,7 +28,7 @@ import static io.github.mcalgovisualizations.visualization.Tags.*;
 
 public class AlgoCraft {
 
-    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection) {
+    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout) {
     }
 
     private IAlgorithmUI ui = new AlgorithmUI();
@@ -71,12 +72,13 @@ public class AlgoCraft {
     public <T extends Comparable<T>> void registerAlgorithm(
             String id,
             Supplier<? extends IPlayerSort> ctor,
-            List<Data<T>> lst
+            List<Data<T>> lst,
+            ILayout layout
     ) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(ctor, "ctor");
 
-        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst)));
+        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout));
 
     }
 
@@ -104,7 +106,7 @@ public class AlgoCraft {
                 var algo_id = clickedItem.getTag(ALGO_ID_TAG);
                 if (algo_id == null) continue;
                 if (algo_id.equals(algorithm)) {
-                    visualizationManager.assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm);
+                    visualizationManager.assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm, algorithms.get(algorithm).layout);
                     ui.applyRunningLayout(player);
                     player.closeInventory();
                     return;

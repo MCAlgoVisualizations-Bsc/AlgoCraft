@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.items.VisualizationItems;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
+import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import net.minestom.server.MinecraftServer;
@@ -63,9 +64,9 @@ public final class Main {
                 new Data<>("e")
         ));
 
-        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1);
-        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2);
-        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1);
+        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout());
+        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout());
+        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout());
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
 
         // Register visualization control listeners (item interactions)

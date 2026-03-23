@@ -45,12 +45,12 @@ public class VisualizationManager {
             String type, // Todo - fix this so that it's not a string and either determined by the lib or the user.
             InstanceContainer instance,
             SortingCollection<?> collection,
-            IPlayerSort playerAlgorithm
+            IPlayerSort playerAlgorithm,
+            ILayout layout
     ) {
         // Clean up existing visualization
         removeVisualization(player);
 
-        final ILayout layout = new FloatingLinearLayout();
         final var origin = getAreaLocation("sorting");
 
         final var renderer = new Renderer(instance, origin, layout);
