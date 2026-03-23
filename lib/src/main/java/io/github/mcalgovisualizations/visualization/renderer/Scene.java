@@ -77,8 +77,27 @@ public final class Scene implements ISceneOps {
             dv.setInstance();
         }
 
-        // Create hologram floating 6 blocks above the origin
-        hologram = new HologramDisplay(instance, origin.add(8, 5, 0));
+        // Create hologram dynamicallyy floating above the center of the layout
+        if (layoutResults != null && layoutResults.length > 0) {
+            double sumX = 0.0;
+            double sumY = 0.0;
+            double sumZ = 0.0;
+            for (var lr : layoutResults) {
+                var p = lr.pos();
+                sumX += p.x();
+                sumY += p.y();
+                sumZ += p.z();
+            }
+            double centerX = sumX / layoutResults.length;
+            double centerY = sumY / layoutResults.length;
+            double centerZ = sumZ / layoutResults.length;
+
+            // Place hologram a few blocks above the average element Y (adjust offset as needed)
+            hologram = new HologramDisplay(instance, new Pos(centerX, centerY + 5.5, centerZ));
+        } else {
+            // Fallback: place hologram relative to origin
+            hologram = new HologramDisplay(instance, origin.add(8, 5, 0));
+        }
 
         // Add viewers after all displays have been created
         displaysBySlot.values().forEach(display -> viewers.forEach(display::addViewer));
