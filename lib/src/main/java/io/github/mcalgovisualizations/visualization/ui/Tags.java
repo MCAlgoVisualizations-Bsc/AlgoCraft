@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization;
+package io.github.mcalgovisualizations.visualization.ui;
 
 import net.minestom.server.tag.Tag;
 

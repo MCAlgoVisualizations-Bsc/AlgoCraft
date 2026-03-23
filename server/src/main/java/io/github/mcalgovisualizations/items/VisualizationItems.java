@@ -6,7 +6,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
-import static io.github.mcalgovisualizations.visualization.Tags.ALGO_SELECTOR_TAG;
+import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR_TAG;
 
 // could this be serialized?
 /**

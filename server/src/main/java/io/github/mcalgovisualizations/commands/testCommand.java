@@ -10,7 +10,7 @@ public class testCommand extends Command {
 
         addSyntax((sender, _) -> {
             if (sender instanceof Player)
-                a.selectAlgorithm((Player) sender);
+                a.printAll();
         });
     }
 }

@@ -82,4 +82,8 @@ public class AlgorithmStepper<T extends Comparable<T>> {
 
         return List.copyOf(data);
     }
+
+    public String getAlgoName() {
+        return algorithm.getName();
+    }
 }

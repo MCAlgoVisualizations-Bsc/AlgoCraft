@@ -111,4 +111,8 @@ public class VisualizationController {
         this.renderer.initialize(layout);
     }
 
+    @Override
+    public String toString() {
+        return stepper.getAlgoName();
+    }
 }
