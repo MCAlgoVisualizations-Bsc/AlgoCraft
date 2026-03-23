@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.ui;
 
-import io.github.mcalgovisualizations.visualization.InteractionType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -10,12 +9,10 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.recipe.display.SlotDisplay;
-import net.minestom.server.tag.Tag;
 
 import java.util.Set;
 
-import static io.github.mcalgovisualizations.visualization.Tags.*;
+import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 public class AlgorithmUI implements IAlgorithmUI {
     @Override

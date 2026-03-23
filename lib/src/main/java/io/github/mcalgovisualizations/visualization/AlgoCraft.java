@@ -22,7 +22,7 @@ import net.minestom.server.item.ItemStack;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static io.github.mcalgovisualizations.visualization.Tags.*;
+import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 
 public class AlgoCraft {
