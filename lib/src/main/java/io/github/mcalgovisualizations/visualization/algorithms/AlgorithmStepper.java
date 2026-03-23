@@ -30,12 +30,15 @@ public class AlgorithmStepper<T extends Comparable<T>> {
      */
     public List<Data<T>> getBackingCollection() {
         var out = List.copyOf(collection.data());
+
+        history.clear();
+        historyPointer = 0;
+
         algorithm.sort(collection);
         var parsedEvents = new ArrayList<>(collection.events());
         parsedEvents.add(new Complete(collection.size()));
 
         this.history.addAll(parsedEvents);
-        this.historyPointer = 0;
 
         return out;
     }
