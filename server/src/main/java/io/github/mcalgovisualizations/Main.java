@@ -95,8 +95,8 @@ public final class Main {
             Player player = event.getPlayer();
 
             // Give fly access to player
-            player.setAllowFlying(true);
             player.setGameMode(GameMode.ADVENTURE);
+            player.setAllowFlying(true);
 
             // Give only the algorithm selector and spawn item by default
             player.getInventory().setItemStack(0, VisualizationItems.algorithmSelectorItem());
