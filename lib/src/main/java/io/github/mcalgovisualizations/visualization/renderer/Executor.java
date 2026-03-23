@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -29,8 +30,8 @@ public final class Executor {
         this.scene = Objects.requireNonNull(scene, "scene");
     }
 
-    public void add(AnimationPlan plan) {
-        if (plan == null || plan.isEmpty()) return;
+    public void add(@NotNull AnimationPlan plan) {
+        if (plan.isEmpty()) return;
         queue.add(plan);
     }
 
