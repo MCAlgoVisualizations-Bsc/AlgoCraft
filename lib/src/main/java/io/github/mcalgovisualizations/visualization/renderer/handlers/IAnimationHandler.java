@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer.handlers;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 
 @FunctionalInterface

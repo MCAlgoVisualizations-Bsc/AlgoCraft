@@ -44,6 +44,12 @@ tasks.shadowJar {
     archiveClassifier.set("all")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
