@@ -1,6 +1,5 @@
-package io.github.mcalgovisualizations.events;
+package io.github.mcalgovisualizations.visualization.renderer.handlers;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;

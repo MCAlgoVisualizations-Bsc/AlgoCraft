@@ -1,7 +1,7 @@
 package io.github.mcalgovisualizations.visualization.models;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import org.jetbrains.annotations.NotNull;
 

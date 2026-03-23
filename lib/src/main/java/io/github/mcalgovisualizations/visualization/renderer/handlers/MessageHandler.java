@@ -1,6 +1,6 @@
-package io.github.mcalgovisualizations.events;
+package io.github.mcalgovisualizations.visualization.renderer.handlers;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

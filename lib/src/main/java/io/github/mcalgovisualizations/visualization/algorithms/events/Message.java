@@ -1,6 +1,5 @@
-package io.github.mcalgovisualizations.events;
+package io.github.mcalgovisualizations.visualization.algorithms.events;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public record Message(String message, MessageType type) implements IAlgorithmEvent {
