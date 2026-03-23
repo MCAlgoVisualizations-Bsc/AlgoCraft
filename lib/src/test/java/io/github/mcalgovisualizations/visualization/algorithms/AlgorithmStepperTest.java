@@ -3,9 +3,6 @@ package io.github.mcalgovisualizations.visualization.algorithms;
 import io.github.mcalgovisualizations.visualization.algorithms.events.*;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
