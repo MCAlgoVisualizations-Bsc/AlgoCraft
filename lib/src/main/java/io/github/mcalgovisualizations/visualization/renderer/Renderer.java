@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithms.events.*;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
@@ -10,7 +11,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 public final class Renderer {
