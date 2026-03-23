@@ -36,6 +36,7 @@ public class VisualizationController {
         renderer.setAudience(audience);
     }
 
+    @SuppressWarnings("unchecked")
     public void startVisualization() {
         var event = stepper.getBackingCollection();
         renderer.initialize(event);
