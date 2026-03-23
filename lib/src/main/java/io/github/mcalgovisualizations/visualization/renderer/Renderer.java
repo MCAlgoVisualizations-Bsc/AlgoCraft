@@ -35,12 +35,12 @@ public final class Renderer {
      * Stop animation activity but keep the scene alive so you can resume.
      * Typical use: controller.pause().
      */
-    public void Stop() {
+    public void stop() {
         if (!started) return;
         executor.pause();
     }
 
-    public void Resume() {
+    public void resume() {
         if (!started) return;
         executor.resume();
     }

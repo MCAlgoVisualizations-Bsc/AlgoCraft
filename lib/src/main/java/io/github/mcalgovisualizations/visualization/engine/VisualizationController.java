@@ -21,6 +21,7 @@ public class VisualizationController {
     private int ticksPerStep = 20;
     private boolean IS_RUNNING = false;
     private Task runningTask = null;
+    private boolean IS_INITIALIZED = false;
 
     public VisualizationController(
             @NotNull IPlayerSort algorithm,
@@ -38,11 +39,14 @@ public class VisualizationController {
     public void startVisualization() {
         var event = stepper.onStart();
         renderer.initialize(event);
+        this.IS_INITIALIZED = true;
     }
 
     public void start() {
+        if (!IS_INITIALIZED) throw new IllegalStateException("VisualizationController not initialized");
         if(IS_RUNNING) return;
         IS_RUNNING = true;
+
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::step)
                 .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
@@ -55,7 +59,7 @@ public class VisualizationController {
             runningTask.cancel();
             runningTask = null;
         }
-        renderer.Stop();
+        renderer.stop();
     }
 
     public void step() {
