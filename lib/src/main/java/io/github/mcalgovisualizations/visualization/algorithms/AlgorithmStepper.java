@@ -9,9 +9,10 @@ import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class AlgorithmStepper<T extends Comparable<T>> {
-
+    private final Random RANDOM = new Random(64);
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();
     private SortingCollection<T> collection; // TODO : Make an interface for this
     private final IPlayerSort algorithm;
@@ -28,7 +29,7 @@ public class AlgorithmStepper<T extends Comparable<T>> {
      * @return a copy of the backing collection.
      */
     public List<Data<T>> getBackingCollection() {
-        var out = Collections.unmodifiableList(collection.data());
+        var out = List.copyOf(collection.data());
         algorithm.sort(collection);
         var parsedEvents = new ArrayList<>(collection.events());
         parsedEvents.add(new Complete(collection.size()));
@@ -48,24 +49,23 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         // check for empty history?
         if(history.isEmpty()) return new NoOp();
         // check if we are already at the end of the history
-        if(historyPointer + 1 >= history.size()) return new NoOp();
-        historyPointer++;
-        return history.get(historyPointer);
+        if(historyPointer >= history.size()) return new NoOp();
+        return history.get(historyPointer++);
     }
 
     public IAlgorithmEvent back() {
         // check for empty history?
         if(history.isEmpty()) return new NoOp();
         // check if we are already at the beginning of the history
-        if ((historyPointer - 1) < 0) return new NoOp();
-        this.historyPointer--;
-        return history.get(historyPointer);
+        if (historyPointer <= 0) return new NoOp();
+        return history.get(historyPointer--);
     }
 
-    public List<Data<T>> randomizeCollection() {
+    public List<Data<T>> randomizeCollection(int seed) {
+        RANDOM.setSeed(seed);
         // create new collection with randomized data
         var data = new ArrayList<>(collection.data());
-        Collections.shuffle(data);
+        Collections.shuffle(data, RANDOM);
         this.collection.clear();
         this.collection = new SortingCollection<>(data);
 

@@ -107,7 +107,7 @@ public class VisualizationController {
         }
         IS_RUNNING = false;
 
-        var layout = this.stepper.randomizeCollection();
+        var layout = this.stepper.randomizeCollection(24);
         this.renderer.initialize(layout);
     }
 
