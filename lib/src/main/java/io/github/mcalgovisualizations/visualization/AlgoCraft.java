@@ -6,6 +6,7 @@ import io.github.mcalgovisualizations.visualization.engine.VisualizationControll
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
+import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
@@ -13,14 +14,12 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static io.github.mcalgovisualizations.visualization.Tags.*;
@@ -33,9 +32,12 @@ public class AlgoCraft {
 
     private IAlgorithmUI ui = new AlgorithmUI();
 
-    public final VisualizationManager visualizationManager = new VisualizationManager();
-
     private final InstanceContainer instanceContainer;
+
+    private final Map<UUID, VisualizationController> playerSteppers = new HashMap<>();
+
+    private final Map<String, AlgorithmEntry> algorithms = new HashMap<>();
+
 
     public AlgoCraft(InstanceContainer instanceContainer) {
         this.instanceContainer = instanceContainer;
@@ -44,7 +46,7 @@ public class AlgoCraft {
     public void addListeners(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, event -> {
             Player player = event.getPlayer();
-            VisualizationController vis = visualizationManager.getVisualization(player);
+            VisualizationController vis = getVisualization(player);
             ItemStack itemStack = event.getItemStack();
             event.setCancelled(true); // Prevent teleportation
             if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
@@ -67,8 +69,6 @@ public class AlgoCraft {
         });
     }
 
-    private final Map<String, AlgorithmEntry> algorithms = new HashMap<>();
-
     public <T extends Comparable<T>> void registerAlgorithm(
             String id,
             Supplier<? extends IPlayerSort> ctor,
@@ -80,14 +80,6 @@ public class AlgoCraft {
 
         algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout));
 
-    }
-
-    public void defineWorkArea(String algorithmType, Pos pos) {
-        visualizationManager.defineWorkArea(algorithmType, pos);
-    }
-
-    public void setSelectorUI(IAlgorithmUI ui) {
-        this.ui = ui;
     }
 
     public void selectAlgorithm(Player player) {
@@ -106,7 +98,7 @@ public class AlgoCraft {
                 var algo_id = clickedItem.getTag(ALGO_ID_TAG);
                 if (algo_id == null) continue;
                 if (algo_id.equals(algorithm)) {
-                    visualizationManager.assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm, algorithms.get(algorithm).layout);
+                    assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm, algorithms.get(algorithm).layout);
                     ui.applyRunningLayout(player);
                     player.closeInventory();
                     return;
@@ -116,4 +108,39 @@ public class AlgoCraft {
         player.openInventory(inventory);
     }
 
+    public void setSelectorUI(IAlgorithmUI ui) {
+        this.ui = ui;
+    }
+
+    private void assignVisualization(
+            Player player,
+            String type, // Todo - fix this so that it's not a string and either determined by the lib or the user.
+            InstanceContainer instance,
+            SortingCollection<?> collection,
+            IPlayerSort playerAlgorithm,
+            ILayout layout
+    )  {
+        removeVisualization(player);
+
+        final var origin = new Pos(0, -60, 0);
+
+        final var renderer = new Renderer(instance, origin, layout);
+        final var controller = new VisualizationController(playerAlgorithm, renderer, collection);
+        controller.setAudience(player);
+
+        controller.startVisualization();
+
+        playerSteppers.put(player.getUuid(), controller);
+    }
+
+    private void removeVisualization(Player player) {
+        VisualizationController vis = playerSteppers.remove(player.getUuid());
+        if (vis != null) {
+            vis.cleanup();
+        }
+    }
+
+    public VisualizationController getVisualization(Player player) {
+        return playerSteppers.get(player.getUuid());
+    }
 }
