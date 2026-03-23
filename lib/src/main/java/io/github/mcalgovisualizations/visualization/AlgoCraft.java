@@ -14,7 +14,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
@@ -49,12 +48,14 @@ public class AlgoCraft {
             VisualizationController vis = getVisualization(player);
             ItemStack itemStack = event.getItemStack();
             event.setCancelled(true); // Prevent teleportation
+
+            printAll();
             if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
                 selectAlgorithm(player);
                 return;
             }
 
-            if (itemStack.hasTag(ALGO_INTERACTION_TAG))
+            if (itemStack.hasTag(ALGO_INTERACTION_TAG)) {
                 switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
                     case RANDOMIZE -> vis.randomize();
                     case START -> vis.start();
@@ -64,9 +65,10 @@ public class AlgoCraft {
                     case BACKWARD -> vis.back();
                     case CLEAR -> {
                         ui.applyDefaultLayout(player);
-                        vis.cleanup();
+                        removeVisualization(player);
                     }
                 }
+            }
         });
     }
 
@@ -143,5 +145,10 @@ public class AlgoCraft {
 
     public VisualizationController getVisualization(Player player) {
         return playerSteppers.get(player.getUuid());
+    }
+
+    public void printAll() {
+        System.out.println("playerSteppers: " + playerSteppers);
+        System.out.println("algorithms: " + algorithms);
     }
 }

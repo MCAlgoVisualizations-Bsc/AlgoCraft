@@ -110,7 +110,8 @@ public final class Scene implements ISceneOps {
     public void cleanUp() {
         // Despawn/remove everything owned by this Scene
         for (var display : displaysBySlot.values()) {
-            safeRemove(display);
+            display.remove();
+            //   safeRemove(display);
         }
         if (hologram != null) {
             hologram.remove();

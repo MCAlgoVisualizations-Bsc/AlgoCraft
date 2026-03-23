@@ -16,4 +16,9 @@ public class PlayerInsertion implements IPlayerSort {
             }
         }
     }
+
+    @Override
+    public String getName() {
+        return "Insertion Sort";
+    }
 }
