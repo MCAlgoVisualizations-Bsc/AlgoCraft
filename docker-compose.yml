@@ -1,31 +1,38 @@
+# 1. Define a reusable "base template" using an extension field (x-...) and an anchor (&)
+x-minecraft-base: &minecraft-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment:
+    WORLD_PATH: /app/world
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        memory: 2G # Modern replacement for the deprecated mem_limit
+
 services:
   minecraft-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # 2. Inject the base template using the alias (*)
+    <<: *minecraft-base
     container_name: minecraft-prod
     ports:
       - "25565:25565"
-    environment:
-      WORLD_PATH: /app/world
     volumes:
       - prod-data:/app/world
-    restart: unless-stopped
-    mem_limit: 2g
+    # 3. Profiles prevent prod from accidentally starting if you just want to test dev
+    profiles:
+      - prod
 
   minecraft-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *minecraft-base
     container_name: minecraft-dev
     ports:
       - "25566:25565"
-    environment:
-      WORLD_PATH: /app/world
     volumes:
       - dev-data:/app/world
-    restart: unless-stopped
-    mem_limit: 2g
+    profiles:
+      - dev
 
 volumes:
   prod-data:
