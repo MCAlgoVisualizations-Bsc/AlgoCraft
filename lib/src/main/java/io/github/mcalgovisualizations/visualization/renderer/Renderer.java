@@ -19,7 +19,6 @@ public final class Renderer {
     private final Executor executor;
     private final Pos origin;
     private final ILayout layout;
-    private boolean started = false;
 
     public Renderer(
             @NotNull Instance instance,
@@ -37,12 +36,10 @@ public final class Renderer {
      * Typical use: controller.pause().
      */
     public void stop() {
-        if (!started) return;
         executor.pause();
     }
 
     public void resume() {
-        if (!started) return;
         executor.resume();
     }
 
@@ -62,10 +59,8 @@ public final class Renderer {
      * Typical use: application shutdown / leaving visualization.
      */
     public void onCleanup() {
-        if (!started) return;
         executor.onCleanup();   // kill tick loop + clear queue
         scene.cleanUp();   // despawn entities
-        started = false;
     }
 
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
