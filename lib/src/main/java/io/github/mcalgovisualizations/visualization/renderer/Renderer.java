@@ -10,6 +10,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 public final class Renderer {
@@ -68,8 +69,6 @@ public final class Renderer {
     }
 
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
-        if (started) return;
-        started = true;
         dispatcher.register(Compare.class, new CompareHandler());
         dispatcher.register(Swap.class, new SwapHandler());
         dispatcher.register(Complete.class, new CompleteHandler());

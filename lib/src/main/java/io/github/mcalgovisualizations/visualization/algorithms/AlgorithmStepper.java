@@ -62,7 +62,6 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         return history.get(historyPointer);
     }
 
-
     public List<Data<T>> randomizeCollection() {
         // create new collection with randomized data
         var data = new ArrayList<>(collection.data());

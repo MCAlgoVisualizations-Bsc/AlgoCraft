@@ -100,7 +100,6 @@ public class VisualizationController {
         }
 
         var layout = this.stepper.randomizeCollection();
-        System.out.println(layout);
         this.renderer.initialize(layout);
     }
 

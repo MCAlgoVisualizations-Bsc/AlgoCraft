@@ -48,6 +48,8 @@ public final class Scene implements ISceneOps {
 
     @Override
     public <T extends Comparable<T>> void setLayout(LayoutResult<T>[] layoutResults) {
+        Objects.requireNonNull(layoutResults);
+        cleanUp();
         this.started = true;
 
         // Rank values 1–10 across the mob ladder regardless of the actual type (Integer, String, etc.)
@@ -137,8 +139,6 @@ public final class Scene implements ISceneOps {
 
     @Override
     public void clearGlowing() {
-        assertStarted();
-
         // Turn off highlight visuals for all currently highlighted slots
         for (int slot : new HashSet<>(highlightedSlots)) {
             var display = displaysBySlot.get(slot);
@@ -166,11 +166,8 @@ public final class Scene implements ISceneOps {
         displaysBySlot.put(a, db);
         displaysBySlot.put(b, da);
 
-
         var posA = da.getPos();
         var posB = db.getPos();
-
-
 
         da.teleport(posB);
         db.teleport(posA);
