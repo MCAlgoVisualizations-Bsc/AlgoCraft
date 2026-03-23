@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.renderer.handlers;
+package io.github.mcalgovisualizations.events;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import net.kyori.adventure.audience.Audience;
