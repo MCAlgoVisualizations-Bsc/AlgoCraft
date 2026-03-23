@@ -45,13 +45,15 @@ public class VisualizationController {
 
     public void start() {
         if (!IS_INITIALIZED) throw new IllegalStateException("VisualizationController not initialized");
-        if(IS_RUNNING) return;
-        IS_RUNNING = true;
+        if (IS_RUNNING) return;
 
-        runningTask = MinecraftServer.getSchedulerManager()
-                .buildTask(this::step)
-                .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
-                .schedule();
+        renderer.resume();
+        IS_RUNNING = true;
+        scheduleSteppingTask();
+    }
+
+    public void resume() {
+        start();
     }
 
     public void stop() {
@@ -73,17 +75,21 @@ public class VisualizationController {
         renderer.render(event);
     }
 
+    private void scheduleSteppingTask() {
+        if (runningTask != null) {
+            runningTask.cancel();
+        }
+
+        runningTask = MinecraftServer.getSchedulerManager()
+                .buildTask(this::step)
+                .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
+                .schedule();
+    }
+
     public void setSpeed(int ticksPerStep) {
         this.ticksPerStep = Math.max(1, ticksPerStep);
-        // If running, restart with new speed
         if (IS_RUNNING) {
-            if (runningTask != null) {
-                runningTask.cancel();
-            }
-            runningTask = MinecraftServer.getSchedulerManager()
-                    .buildTask(this::step)
-                    .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
-                    .schedule();
+            scheduleSteppingTask();
         }
     }
 
@@ -99,6 +105,7 @@ public class VisualizationController {
             runningTask.cancel();
             runningTask = null;
         }
+        IS_RUNNING = false;
 
         var layout = this.stepper.randomizeCollection();
         this.renderer.initialize(layout);
