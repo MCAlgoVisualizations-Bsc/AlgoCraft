@@ -59,6 +59,7 @@ public class AlgoCraft {
                     case RANDOMIZE -> vis.randomize();
                     case START -> vis.start();
                     case STOP -> vis.stop();
+                    case RESUME -> vis.resume();
                     case FORWARD -> vis.step();
                     case BACKWARD -> vis.back();
                     case CLEAR -> {
