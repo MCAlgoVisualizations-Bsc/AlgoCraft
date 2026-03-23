@@ -21,6 +21,8 @@ public final class WorldConfig {
     private static final String WORLD_PATH_ENV = "WORLD_PATH";
     private static final Path DEFAULT_CONTAINER_WORLD_PATH = Path.of("/app/world");
 
+    private static final String BUNDLED_WORLD_NAME = "world2";
+
     private WorldConfig() {
     }
 
@@ -69,7 +71,7 @@ public final class WorldConfig {
     }
 
     private static Path resolveBundledWorldOnDisk() {
-        URL worldResource = Main.class.getClassLoader().getResource("world");
+        URL worldResource = Main.class.getClassLoader().getResource(BUNDLED_WORLD_NAME);
         if (worldResource == null) {
             return null;
         }
@@ -87,7 +89,7 @@ public final class WorldConfig {
     }
 
     private static boolean bootstrapFromBundledWorld(Path target) {
-        URL worldResource = Main.class.getClassLoader().getResource("world");
+        URL worldResource = Main.class.getClassLoader().getResource(BUNDLED_WORLD_NAME);
         if (worldResource == null) {
             System.err.println("Bundled resources/world not found, cannot bootstrap world volume.");
             return false;
@@ -124,7 +126,7 @@ public final class WorldConfig {
                 jarFs = FileSystems.getFileSystem(jarUri);
             }
 
-            copyDirectory(jarFs.getPath("/world"), target);
+            copyDirectory(jarFs.getPath("/" + BUNDLED_WORLD_NAME), target);
         } finally {
             if (created && jarFs != null) {
                 jarFs.close();

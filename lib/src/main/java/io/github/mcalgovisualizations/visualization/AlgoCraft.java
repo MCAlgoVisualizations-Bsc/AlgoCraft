@@ -125,7 +125,7 @@ public class AlgoCraft {
     )  {
         removeVisualization(player);
 
-        final var origin = new Pos(0, -60, 0);
+        final var origin = new Pos(194, 136, -30);
 
         final var renderer = new Renderer(instance, origin, layout);
         final var controller = new VisualizationController(playerAlgorithm, renderer, collection);

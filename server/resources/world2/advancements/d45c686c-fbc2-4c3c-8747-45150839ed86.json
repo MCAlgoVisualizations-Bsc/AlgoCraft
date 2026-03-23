@@ -1,0 +1,21 @@
+{
+  "minecraft:recipes/decorations/crafting_table": {
+    "criteria": {
+      "unlock_right_away": "2026-03-23 15:51:49 +0100"
+    },
+    "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:savanna_plateau": "2026-03-23 15:52:30 +0100",
+      "minecraft:desert": "2026-03-23 15:52:36 +0100",
+      "minecraft:forest": "2026-03-23 15:51:50 +0100",
+      "minecraft:windswept_hills": "2026-03-23 15:52:58 +0100",
+      "minecraft:savanna": "2026-03-23 15:52:21 +0100",
+      "minecraft:windswept_savanna": "2026-03-23 15:52:23 +0100",
+      "minecraft:plains": "2026-03-23 15:52:42 +0100"
+    },
+    "done": false
+  },
+  "DataVersion": 4671
+}
