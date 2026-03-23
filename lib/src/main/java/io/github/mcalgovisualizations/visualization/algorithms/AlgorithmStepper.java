@@ -13,7 +13,7 @@ import java.util.List;
 public class AlgorithmStepper<T extends Comparable<T>> {
 
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();
-    private final SortingCollection<T> collection; // TODO : Make an interface for this
+    private SortingCollection<T> collection; // TODO : Make an interface for this
     private final IPlayerSort algorithm;
 
     private int historyPointer = 0;
@@ -27,7 +27,8 @@ public class AlgorithmStepper<T extends Comparable<T>> {
      * Used to start the algorithm, sort the collection and return a copy of the backing collection.
      * @return a copy of the backing collection.
      */
-    public List<Data<T>> onStart() {
+    public List<Data<T>> getBackingCollection() {
+        var out = Collections.unmodifiableList(collection.data());
         algorithm.sort(collection);
         var parsedEvents = new ArrayList<>(collection.events());
         parsedEvents.add(new Complete(collection.size()));
@@ -35,7 +36,7 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         this.history.addAll(parsedEvents);
         this.historyPointer = 0;
 
-        return List.copyOf(collection.data());
+        return out;
     }
 
     public void onCleanup() {
@@ -59,5 +60,24 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         if ((historyPointer - 1) < 0) return new NoOp();
         this.historyPointer--;
         return history.get(historyPointer);
+    }
+
+
+    public List<Data<T>> randomizeCollection() {
+        // create new collection with randomized data
+        var data = new ArrayList<>(collection.data());
+        Collections.shuffle(data);
+        this.collection.clear();
+        this.collection = new SortingCollection<>(data);
+
+        // clear history and start over
+        this.history.clear();
+        this.historyPointer = 0;
+        this.algorithm.sort(collection);
+        var parsedEvents = new ArrayList<>(collection.events());
+        parsedEvents.add(new Complete(collection.size()));
+        this.history.addAll(parsedEvents);
+
+        return List.copyOf(data);
     }
 }

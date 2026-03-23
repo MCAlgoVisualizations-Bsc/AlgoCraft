@@ -78,7 +78,7 @@ public final class Renderer {
         dispatcher.register(NoOp.class, new NoOpHandler());
 
         final var layoutResult = this.layout.compute(initialModel, origin);
-        scene.onStart(layoutResult);
+        scene.setLayout(layoutResult);
     }
 
 }

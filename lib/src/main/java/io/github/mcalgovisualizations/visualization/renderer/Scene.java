@@ -47,7 +47,7 @@ public final class Scene implements ISceneOps {
     }
 
     @Override
-    public <T extends Comparable<T>> void onStart(LayoutResult<T>[] layoutResults) {
+    public <T extends Comparable<T>> void setLayout(LayoutResult<T>[] layoutResults) {
         this.started = true;
 
         // Rank values 1–10 across the mob ladder regardless of the actual type (Integer, String, etc.)

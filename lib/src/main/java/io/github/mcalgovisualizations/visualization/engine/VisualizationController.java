@@ -37,7 +37,7 @@ public class VisualizationController {
     }
 
     public void startVisualization() {
-        var event = stepper.onStart();
+        var event = stepper.getBackingCollection();
         renderer.initialize(event);
         this.IS_INITIALIZED = true;
     }
@@ -92,9 +92,16 @@ public class VisualizationController {
         this.stepper.onCleanup();
     }
 
+    @SuppressWarnings("unchecked")
     public void randomize() {
-        
+        if (runningTask != null) {
+            runningTask.cancel();
+            runningTask = null;
+        }
 
+        var layout = this.stepper.randomizeCollection();
+        System.out.println(layout);
+        this.renderer.initialize(layout);
     }
 
 }

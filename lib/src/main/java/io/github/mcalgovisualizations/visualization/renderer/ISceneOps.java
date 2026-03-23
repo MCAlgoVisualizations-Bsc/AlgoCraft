@@ -6,7 +6,7 @@ import net.minestom.server.coordinate.Pos;
 public interface ISceneOps {
 
     // lifecycle
-    <T extends Comparable<T>> void onStart(LayoutResult<T>[] model);
+    <T extends Comparable<T>> void setLayout(LayoutResult<T>[] model);
     void cleanUp();
 
     // state
