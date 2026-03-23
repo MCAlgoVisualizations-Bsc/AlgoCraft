@@ -85,7 +85,7 @@ public final class Main {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             event.setSpawningInstance(instance);
-            player.setRespawnPoint(new Pos(0, 42, 0));
+            player.setRespawnPoint(new Pos(0.5, -60, 0.5));
         });
 
         // Player spawn - give items and assign visualization (player is now fully in the world)

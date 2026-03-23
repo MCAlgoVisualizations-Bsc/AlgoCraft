@@ -22,7 +22,7 @@ public class VisualizationManager {
 
     public VisualizationManager(){
         // Define default area locations for different visualization types
-        areaLocations.put("sorting", new Pos(5, 42, 5));
+        areaLocations.put("sorting", new Pos(0, -60, 0));
         areaLocations.put("pathfinding", new Pos(-100, 42, 0));
         areaLocations.put("trees", new Pos(0, 42, 100));
         areaLocations.put("bfs", new Pos(50, 42, 50));
