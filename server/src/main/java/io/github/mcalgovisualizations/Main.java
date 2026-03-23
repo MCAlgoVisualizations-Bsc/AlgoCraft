@@ -10,6 +10,7 @@ import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMess
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
@@ -95,6 +96,7 @@ public final class Main {
 
             // Give fly access to player
             player.setAllowFlying(true);
+            player.setGameMode(GameMode.ADVENTURE);
 
             // Give only the algorithm selector and spawn item by default
             player.getInventory().setItemStack(0, VisualizationItems.algorithmSelectorItem());
