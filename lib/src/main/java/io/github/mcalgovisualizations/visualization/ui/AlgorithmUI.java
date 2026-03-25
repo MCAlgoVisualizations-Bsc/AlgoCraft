@@ -11,23 +11,46 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
 import java.util.Set;
+import java.util.function.Function;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 public class AlgorithmUI implements IAlgorithmUI {
-    @Override
-    public Inventory openSelector(Set<String> algorithms) {
-        if (algorithms.size() > 26) throw new RuntimeException("To many algorithms for ui, the ui can only handle 26 algorithms");
-        Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, Component.text("Select Algorithm", NamedTextColor.DARK_PURPLE));
+    private static final int[] CENTERED_SLOTS = {10, 12, 14, 16, 18, 20, 22, 24, 26};
 
+    @Override
+    public Inventory openSelector(Set<String> algorithms, Function<String, AlgorithmPresentation> presentationResolver) {
+        if (algorithms.size() > CENTERED_SLOTS.length) {
+            throw new RuntimeException("Too many algorithms for centered selector, max is " + CENTERED_SLOTS.length);
+        }
+
+        Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, Component.text("Select Algorithm", NamedTextColor.DARK_PURPLE));
 
         int i = 0;
         for (String algorithm : algorithms) {
-            ItemStack item = ItemStack.builder(Material.STICK)
-                    .customName(Component.text(algorithm, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
+            AlgorithmPresentation presentation = presentationResolver.apply(algorithm);
+            if (presentation == null) {
+                presentation = AlgorithmPresentation.fallback(algorithm);
+            }
+
+            ItemStack item = ItemStack.builder(presentation.icon())
+                    .customName(Component.text(presentation.displayName(), NamedTextColor.GOLD)
+                            .decoration(TextDecoration.ITALIC, false))
+                    .lore(
+                            Component.text(presentation.description1(), NamedTextColor.GRAY)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            Component.text(presentation.description2(), NamedTextColor.GRAY)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            Component.empty(),
+                            Component.text(presentation.complexity(), NamedTextColor.YELLOW)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            Component.empty(),
+                            Component.text("Click to select!", NamedTextColor.GREEN)
+                                    .decoration(TextDecoration.ITALIC, false)
+                    )
                     .set(ALGO_ID_TAG, algorithm)
                     .build();
-            inventory.setItemStack(i, item);
+            inventory.setItemStack(CENTERED_SLOTS[i], item);
             i++;
         }
 
@@ -98,6 +121,15 @@ public class AlgorithmUI implements IAlgorithmUI {
                         Component.text("algorithm selection menu", NamedTextColor.GRAY)
                                 .decoration(TextDecoration.ITALIC, false)
                 ).set(ALGO_SELECTOR_TAG, true)
+                .build()
+        );
+
+        inv.setItemStack(8, ItemStack.builder(Material.COMPASS)
+                .customName(Component.text("Return to Hub", NamedTextColor.LIGHT_PURPLE)
+                        .decoration(TextDecoration.ITALIC, false))
+                .lore(Component.text("Right-click to return to the hub", NamedTextColor.GRAY)
+                        .decoration(TextDecoration.ITALIC, false))
+                .set(ALGO_INTERACTION_TAG, InteractionType.SPAWN)
                 .build()
         );
     }

@@ -8,6 +8,8 @@ import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentationProvider;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -19,6 +21,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -36,6 +39,12 @@ public class AlgoCraft {
     private final Map<UUID, VisualizationController> playerSteppers = new HashMap<>();
 
     private final Map<String, AlgorithmEntry> algorithms = new HashMap<>();
+
+    private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
+
+    private AlgorithmPresentationProvider presentationProvider = id -> null;
+
+    private Consumer<Player> spawnAction = player -> {};
 
 
     public AlgoCraft(InstanceContainer instanceContainer) {
@@ -57,16 +66,29 @@ public class AlgoCraft {
 
             if (itemStack.hasTag(ALGO_INTERACTION_TAG)) {
                 switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-                    case RANDOMIZE -> vis.randomize();
-                    case START -> vis.start();
-                    case STOP -> vis.stop();
-                    case RESUME -> vis.resume();
-                    case FORWARD -> vis.step();
-                    case BACKWARD -> vis.back();
+                    case RANDOMIZE -> {
+                        if (vis != null) vis.randomize();
+                    }
+                    case START -> {
+                        if (vis != null) vis.start();
+                    }
+                    case STOP -> {
+                        if (vis != null) vis.stop();
+                    }
+                    case RESUME -> {
+                        if (vis != null) vis.resume();
+                    }
+                    case FORWARD -> {
+                        if (vis != null) vis.step();
+                    }
+                    case BACKWARD -> {
+                        if (vis != null) vis.back();
+                    }
                     case CLEAR -> {
                         ui.applyDefaultLayout(player);
                         removeVisualization(player);
                     }
+                    case SPAWN -> spawnAction.accept(player);
                 }
             }
         });
@@ -86,7 +108,7 @@ public class AlgoCraft {
     }
 
     public void selectAlgorithm(Player player) {
-        var inventory = ui.openSelector(algorithms.keySet());
+        var inventory = ui.openSelector(algorithms.keySet(), this::resolvePresentation);
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
             if (event.getPlayer() != player) return;
             if (event.getInventory() != inventory) return;
@@ -113,6 +135,32 @@ public class AlgoCraft {
 
     public void setSelectorUI(IAlgorithmUI ui) {
         this.ui = ui;
+    }
+
+    public void registerAlgorithmPresentation(String algorithmId, AlgorithmPresentation presentation) {
+        algorithmPresentations.put(algorithmId, presentation);
+    }
+
+    public void setAlgorithmPresentationProvider(AlgorithmPresentationProvider presentationProvider) {
+        this.presentationProvider = presentationProvider == null ? id -> null : presentationProvider;
+    }
+
+    public void setSpawnAction(Consumer<Player> spawnAction) {
+        this.spawnAction = spawnAction == null ? player -> {} : spawnAction;
+    }
+
+    public void applyDefaultLayout(Player player) {
+        ui.applyDefaultLayout(player);
+    }
+
+    private AlgorithmPresentation resolvePresentation(String algorithmId) {
+        AlgorithmPresentation presentation = algorithmPresentations.get(algorithmId);
+        if (presentation != null) return presentation;
+
+        presentation = presentationProvider.presentationFor(algorithmId);
+        if (presentation != null) return presentation;
+
+        return AlgorithmPresentation.fallback(algorithmId);
     }
 
     private void assignVisualization(
