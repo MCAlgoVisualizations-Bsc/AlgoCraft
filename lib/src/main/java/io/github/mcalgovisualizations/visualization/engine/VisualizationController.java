@@ -18,7 +18,7 @@ public class VisualizationController {
     private final AlgorithmStepper stepper;
     private final Renderer renderer;
 
-    private int ticksPerStep = 20;
+    private int ticksPerStep = 5;
     private boolean IS_RUNNING = false;
     private Task runningTask = null;
     private boolean IS_INITIALIZED = false;

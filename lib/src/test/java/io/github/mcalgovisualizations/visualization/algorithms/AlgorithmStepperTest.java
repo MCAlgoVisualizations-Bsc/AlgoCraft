@@ -94,6 +94,27 @@ class AlgorithmStepperTest {
         assertNotSame(expected, newCollection);
     }
 
+    @Test
+    void custom_events_emitted_by_algorithm_are_replayed() {
+        var algorithm = new IPlayerSort() {
+            @Override
+            public <T extends Comparable<T>> void sort(SortingCollection<T> values) {
+                values.emit(new Message("hello", Message.MessageType.INFO));
+            }
+
+            @Override
+            public String getName() {
+                return "Emitter";
+            }
+        };
+
+        var stepper = new AlgorithmStepper<>(algorithm, createCollection(1, 2));
+        stepper.getBackingCollection();
+
+        assertInstanceOf(Message.class, stepper.step());
+        assertInstanceOf(Complete.class, stepper.step());
+    }
+
     // Helpers for testing
     private static class FakePlayerSort implements IPlayerSort {
         @Override

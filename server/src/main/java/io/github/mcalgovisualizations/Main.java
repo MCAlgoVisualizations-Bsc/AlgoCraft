@@ -1,9 +1,11 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
+import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
+import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
@@ -32,6 +34,8 @@ public final class Main {
             new AlgoCraft.AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
     private static final AlgoCraft.AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
             new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgoCraft.AlgorithmPlacement ASTAR_2D_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
 
     private static AlgoCraft algo = null;
 
@@ -74,9 +78,21 @@ public final class Main {
                 new Data<>("e")
         ));
 
+        var aStarGrid = new ArrayList<>(Arrays.asList(
+                new Data<>(2), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0),
+                new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(0),
+                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0),
+                new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1),
+                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1),
+                new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1),
+                new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0),
+                new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(3)
+        ));
+
         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
+        algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(8), aStarGrid, new GridLayout(8), ASTAR_2D_PLACEMENT);
         //How the UI Looks
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
@@ -98,6 +114,13 @@ public final class Main {
                 "Insertion-sort using string values",
                 "to demonstrate generic ordering.",
                 "Time: O(n^2) | Space: O(1)"
+        ));
+        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
+                "A* Pathfinding",
+                net.minestom.server.item.Material.COMPASS,
+                "4-way A* on a fixed 2D obstacle map",
+                "Colors show open, closed, and final path.",
+                "Time: O(E log V) | Space: O(V)"
         ));
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());

@@ -72,6 +72,7 @@ public final class Renderer {
         dispatcher.register(Message.class, new MessageHandler());
         dispatcher.register(Validate.class, new ValidateHandler());
         dispatcher.register(NoOp.class, new NoOpHandler());
+        dispatcher.register(CellStateTransition.class, new CellStateTransitionHandler());
 
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
         scene.setLayout(layoutResult);

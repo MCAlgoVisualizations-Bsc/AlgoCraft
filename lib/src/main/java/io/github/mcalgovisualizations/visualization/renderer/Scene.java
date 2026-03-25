@@ -1,5 +1,7 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 
@@ -10,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -38,6 +41,7 @@ public final class Scene implements ISceneOps {
 
     // Visual state
     private final Set<Integer> highlightedSlots = new HashSet<>();
+    private final Map<Integer, CellState> slotStates = new HashMap<>();
 
     private boolean started = false;
 
@@ -52,27 +56,36 @@ public final class Scene implements ISceneOps {
         cleanUp();
         this.started = true;
 
-        // Rank values 1–10 across the mob ladder regardless of the actual type (Integer, String, etc.)
-        List<T> sorted = Arrays.stream(layoutResults)
-                .map(r -> r.value().value())
-                .distinct()
-                .sorted()
-                .toList();
-        int uniqueCount = sorted.size();
+        boolean useBlockGridDisplay = isAStarGrid(layoutResults);
+
+        List<T> sorted = List.of();
+        int uniqueCount = 0;
+        if (!useBlockGridDisplay) {
+            sorted = Arrays.stream(layoutResults)
+                    .map(r -> r.value().value())
+                    .distinct()
+                    .sorted()
+                    .toList();
+            uniqueCount = sorted.size();
+        }
 
         for(int i = 0; i < layoutResults.length; i++) {
             var pos = layoutResults[i].pos();
             var value = layoutResults[i].value();
 
-            int rank0 = sorted.indexOf(value.value());
-            int mobValue = Math.clamp(
-                    (int) Math.round((rank0 / (double) Math.max(uniqueCount - 1, 1)) * 9) + 1,
-                    1, 10
-            );
-
-            // TODO : Move the creation of IDisplayValue somewhere else
-            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
-            //var dv = new BlockDisplay(instance, pos, Block.GRANITE, value.toString());
+            IDisplayValue dv;
+            if (useBlockGridDisplay) {
+                dv = new BlockDisplay(instance, pos, Block.SMOOTH_STONE, value.toString());
+                slotStates.put(i, CellState.DEFAULT);
+            } else {
+                int rank0 = sorted.indexOf(value.value());
+                int mobValue = Math.clamp(
+                        (int) Math.round((rank0 / (double) Math.max(uniqueCount - 1, 1)) * 9) + 1,
+                        1,
+                        10
+                );
+                dv = new MobDisplay(instance, pos, mobValue, value.toString());
+            }
 
             displaysBySlot.put(i, dv);
 
@@ -118,6 +131,7 @@ public final class Scene implements ISceneOps {
         }
         clearGlowing();
         displaysBySlot.clear();
+        slotStates.clear();
         started = false;
     }
 
@@ -208,6 +222,15 @@ public final class Scene implements ISceneOps {
     }
 
     @Override
+    public void toggleCellState(int slot, CellState first, CellState second) {
+        assertStarted();
+        var current = slotStates.getOrDefault(slot, CellState.DEFAULT);
+        var next = current == first ? second : first;
+        slotStates.put(slot, next);
+        applyCellState(slot, next);
+    }
+
+    @Override
     public void stopAnimations() {
         clearGlowing();
         clearHologram();
@@ -239,5 +262,32 @@ public final class Scene implements ISceneOps {
         if (!started) {
             throw new IllegalStateException("Scene not started. Call onStart() before using SceneOps.");
         }
+    }
+
+    private void applyCellState(int slot, CellState state) {
+        var display = requireDisplay(slot);
+        if (!(display instanceof IBlockStateDisplay blockDisplay)) {
+            return;
+        }
+        Block block = switch (state) {
+            case DEFAULT -> Block.SMOOTH_STONE;
+            case WALL -> Block.BLACK_CONCRETE;
+            case START -> Block.LIME_CONCRETE;
+            case GOAL -> Block.RED_CONCRETE;
+            case OPEN -> Block.LIGHT_BLUE_CONCRETE;
+            case CLOSED -> Block.GREEN_CONCRETE;
+            case PATH -> Block.ORANGE_CONCRETE;
+        };
+        blockDisplay.setBlock(block);
+    }
+
+    private <T extends Comparable<T>> boolean isAStarGrid(LayoutResult<T>[] layoutResults) {
+        if (layoutResults.length == 0) return false;
+        for (var layoutResult : layoutResults) {
+            Object raw = layoutResult.value().value();
+            if (!(raw instanceof Integer number)) return false;
+            if (number < 0 || number > 3) return false;
+        }
+        return true;
     }
 }

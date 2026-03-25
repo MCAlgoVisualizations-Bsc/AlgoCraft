@@ -24,6 +24,11 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
         return List.copyOf(events);
     }
 
+    public void emit(IAlgorithmEvent event) {
+        if (event == null) return;
+        events.add(event);
+    }
+
     @Override
     public boolean add(T t) {
         throw new UnsupportedOperationException();

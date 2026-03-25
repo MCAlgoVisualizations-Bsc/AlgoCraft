@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 
@@ -27,6 +28,8 @@ public interface ISceneOps {
     void sendMessage(Component message);
 
     void hoverDisplay(int slot, boolean hover);
+
+    void toggleCellState(int slot, CellState first, CellState second);
 
     /**
      * Show a floating hologram text above the visualization.
