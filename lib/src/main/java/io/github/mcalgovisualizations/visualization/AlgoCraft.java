@@ -18,6 +18,7 @@ import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -27,7 +28,6 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 
 public class AlgoCraft {
-
     public record AlgorithmPlacement(Pos renderOrigin, Pos teleportPoint) {
         public AlgorithmPlacement {
             Objects.requireNonNull(renderOrigin, "renderOrigin");
@@ -36,6 +36,10 @@ public class AlgoCraft {
     }
 
     private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
+        @Override
+        public SortingCollection<?> collection() {
+            return this.collection.copy();
+        }
     }
 
     private IAlgorithmUI ui = new AlgorithmUI();
@@ -99,19 +103,13 @@ public class AlgoCraft {
     }
 
     public <T extends Comparable<T>> void registerAlgorithm(
-            String id,
-            Supplier<? extends IPlayerSort> ctor,
-            List<Data<T>> lst,
-            ILayout layout,
-            AlgorithmPlacement placement
+            @NotNull String id,
+            @NotNull Supplier<? extends IPlayerSort> ctor,
+            @NotNull List<Data<T>> lst,
+            @NotNull ILayout layout,
+            @NotNull AlgorithmPlacement placement
     ) {
-        Objects.requireNonNull(id, "id");
-        Objects.requireNonNull(ctor, "ctor");
-        Objects.requireNonNull(layout, "layout");
-        Objects.requireNonNull(placement, "placement");
-
         algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout, placement));
-
     }
 
     public void selectAlgorithm(Player player) {
@@ -131,7 +129,7 @@ public class AlgoCraft {
             var entry = algorithms.get(algorithmId);
             if (entry == null) return;
 
-            assignVisualization(player, instanceContainer, entry.collection, entry.algorithm, entry.layout, entry.placement.renderOrigin());
+            assignVisualization(player, instanceContainer, entry.collection(), entry.algorithm(), entry.layout(), entry.placement.renderOrigin());
             player.teleport(entry.placement.teleportPoint());
 
             ui.applyRunningLayout(player);
@@ -183,10 +181,16 @@ public class AlgoCraft {
     }
 
     private void removeVisualization(Player player) {
-        VisualizationController vis = playerSteppers.remove(player.getUuid());
-        if (vis != null) {
-            vis.cleanup();
+        var v = playerSteppers.get(player.getUuid());
+        if (v != null) {
+            v.cleanup();
+            playerSteppers.clear();
         }
+
+//        VisualizationController vis = playerSteppers.remove(player.getUuid());
+//        if (vis != null) {
+//            vis.cleanup();
+//        }
     }
 
     public VisualizationController getVisualization(Player player) {
