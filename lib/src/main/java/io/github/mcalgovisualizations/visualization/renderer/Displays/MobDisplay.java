@@ -12,6 +12,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.instance.Instance;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents one sorting element as a living mob whose type scales with value (1–10).
@@ -44,19 +45,17 @@ public class MobDisplay implements IDisplayValue {
 
     private static final double TEXT_Y_OFFSET = 3.5;
 
-    private final Instance instance;
     private final EntityCreature mobEntity;
     private final Entity textEntity;
     private Pos pos;
 
-    public MobDisplay(Instance instance, Pos pos, int value, String text) {
-        if (instance == null) throw new NullPointerException("instance cannot be null");
+    public MobDisplay(Pos pos, String text) {
         if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
 
-        this.instance = instance;
         this.pos = pos;
 
-        this.mobEntity = new EntityCreature(mobTypeForValue(value));
+        var mobTypeValue = Math.abs(text.hashCode()) % MOB_LADDER.length;
+        this.mobEntity = new EntityCreature(mobTypeForValue(mobTypeValue));
         this.mobEntity.setNoGravity(true);
         this.textEntity = new Entity(EntityType.TEXT_DISPLAY);
         setupText(text);
@@ -82,7 +81,7 @@ public class MobDisplay implements IDisplayValue {
     }
 
     @Override
-    public void setInstance() {
+    public void setInstance(@NotNull Instance instance) {
         mobEntity.setInstance(instance, pos);
         textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
     }

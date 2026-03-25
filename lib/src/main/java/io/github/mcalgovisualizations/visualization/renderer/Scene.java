@@ -70,13 +70,10 @@ public final class Scene implements ISceneOps {
                     1, 10
             );
 
-            // TODO : Move the creation of IDisplayValue somewhere else
-            var dv = new MobDisplay(instance, pos, mobValue, value.toString());
-            //var dv = new BlockDisplay(instance, pos, Block.GRANITE, value.toString());
+            var dv = layoutResults[i].getDisplayValue();
 
             displaysBySlot.put(i, dv);
-
-            dv.setInstance();
+            dv.setInstance(instance);
         }
 
         // Create hologram dynamicallyy floating above the center of the layout
