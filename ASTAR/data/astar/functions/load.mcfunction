@@ -1,0 +1,1 @@
+execute unless entity @e[name="checkFirstTime"] run function astar:init
