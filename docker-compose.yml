@@ -9,18 +9,17 @@ x-minecraft-base: &minecraft-base
   deploy:
     resources:
       limits:
-        memory: 2G # Modern replacement for the deprecated mem_limit
+        memory: 2G
 
 services:
   minecraft-prod:
-    # 2. Inject the base template using the alias (*)
+    # Inject the base template using the alias (*)
     <<: *minecraft-base
     container_name: minecraft-prod
     ports:
       - "25565:25565"
     volumes:
       - prod-data:/app/world
-    # 3. Profiles prevent prod from accidentally starting if you just want to test dev
     profiles:
       - prod
 
