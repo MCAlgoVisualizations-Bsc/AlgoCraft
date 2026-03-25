@@ -71,7 +71,7 @@ public record FloatingLinearLayout(
             final double x = origin.x() + (i * spacing);
             final var pos = new Pos(x, y, z);
 
-            out[i] = new LayoutResult<>(model.get(i), pos);
+            out[i] = new LayoutResult<>(model.get(i), pos, new StylingProfile());
         }
 
         return out;

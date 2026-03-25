@@ -63,7 +63,8 @@ public class BlockDisplay implements IDisplayValue {
         meta.setTransformationInterpolationStartDelta(0);
     }
 
-    public void setInstance() {
+    @Override
+    public void setInstance(Instance instance) {
         blockEntity.setInstance(instance);
         textEntity.setInstance(instance);
     }

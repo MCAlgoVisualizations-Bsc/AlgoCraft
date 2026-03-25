@@ -27,7 +27,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
         if (size == 0) return new LayoutResult[0];
 
         if (size == 1) {
-            out[0] = new LayoutResult<>(model.getFirst(), origin);
+            out[0] = new LayoutResult<>(model.getFirst(), origin, new StylingProfile());
             return out;
         }
  
@@ -36,7 +36,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
             double x = origin.x() + (Math.cos(angle) * radius);
             double z = origin.z() + (Math.sin(angle) * radius);
             final var pos = new Pos(x, y, z);
-            out[i] = new LayoutResult<>(model.get(i), pos);
+            out[i] = new LayoutResult<>(model.get(i), pos, new StylingProfile());
         }
 
         return out;
