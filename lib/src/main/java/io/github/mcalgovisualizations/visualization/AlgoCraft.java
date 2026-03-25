@@ -29,12 +29,7 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 
 public class AlgoCraft {
-    public record AlgorithmPlacement(Pos renderOrigin, Pos teleportPoint) {
-        public AlgorithmPlacement {
-            Objects.requireNonNull(renderOrigin, "renderOrigin");
-            Objects.requireNonNull(teleportPoint, "teleportPoint");
-        }
-    }
+    public record AlgorithmPlacement(@NotNull Pos renderOrigin, @NotNull Pos teleportPoint) { }
 
     private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
         @Override
