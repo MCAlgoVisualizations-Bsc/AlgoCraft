@@ -15,6 +15,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
@@ -100,6 +101,7 @@ public class AlgoCraft {
                 }
             }
         });
+        handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
     public <T extends Comparable<T>> void registerAlgorithm(
@@ -181,16 +183,10 @@ public class AlgoCraft {
     }
 
     private void removeVisualization(Player player) {
-        var v = playerSteppers.get(player.getUuid());
-        if (v != null) {
-            v.cleanup();
-            playerSteppers.clear();
+        VisualizationController vis = playerSteppers.remove(player.getUuid());
+        if (vis != null) {
+            vis.cleanup();
         }
-
-//        VisualizationController vis = playerSteppers.remove(player.getUuid());
-//        if (vis != null) {
-//            vis.cleanup();
-//        }
     }
 
     public VisualizationController getVisualization(Player player) {
