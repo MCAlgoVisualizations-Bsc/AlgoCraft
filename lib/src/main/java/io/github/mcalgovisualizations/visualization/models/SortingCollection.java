@@ -68,4 +68,8 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
         this.data.clear();
         this.events.clear();
     }
+
+    public SortingCollection<T> copy() {
+        return new SortingCollection<>(List.copyOf(data));
+    }
 }

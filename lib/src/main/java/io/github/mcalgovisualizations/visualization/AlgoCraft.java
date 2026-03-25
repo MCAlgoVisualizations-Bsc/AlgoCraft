@@ -8,25 +8,34 @@ import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 
 public class AlgoCraft {
+    public record AlgorithmPlacement(@NotNull Pos renderOrigin, @NotNull Pos teleportPoint) { }
 
-    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout) {
+    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
+        @Override
+        public SortingCollection<?> collection() {
+            return this.collection.copy();
+        }
     }
 
     private IAlgorithmUI ui = new AlgorithmUI();
@@ -36,6 +45,10 @@ public class AlgoCraft {
     private final Map<UUID, VisualizationController> playerSteppers = new HashMap<>();
 
     private final Map<String, AlgorithmEntry> algorithms = new HashMap<>();
+
+    private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
+
+    private Consumer<Player> spawnAction = player -> {};
 
 
     public AlgoCraft(InstanceContainer instanceContainer) {
@@ -57,36 +70,47 @@ public class AlgoCraft {
 
             if (itemStack.hasTag(ALGO_INTERACTION_TAG)) {
                 switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-                    case RANDOMIZE -> vis.randomize();
-                    case START -> vis.start();
-                    case STOP -> vis.stop();
-                    case RESUME -> vis.resume();
-                    case FORWARD -> vis.step();
-                    case BACKWARD -> vis.back();
+                    case RANDOMIZE -> {
+                        if (vis != null) vis.randomize();
+                    }
+                    case START -> {
+                        if (vis != null) vis.start();
+                    }
+                    case STOP -> {
+                        if (vis != null) vis.stop();
+                    }
+                    case RESUME -> {
+                        if (vis != null) vis.resume();
+                    }
+                    case FORWARD -> {
+                        if (vis != null) vis.step();
+                    }
+                    case BACKWARD -> {
+                        if (vis != null) vis.back();
+                    }
                     case CLEAR -> {
                         ui.applyDefaultLayout(player);
                         removeVisualization(player);
                     }
+                    case SPAWN -> spawnAction.accept(player);
                 }
             }
         });
+        handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
     public <T extends Comparable<T>> void registerAlgorithm(
-            String id,
-            Supplier<? extends IPlayerSort> ctor,
-            List<Data<T>> lst,
-            ILayout layout
+            @NotNull String id,
+            @NotNull Supplier<? extends IPlayerSort> ctor,
+            @NotNull List<Data<T>> lst,
+            @NotNull ILayout layout,
+            @NotNull AlgorithmPlacement placement
     ) {
-        Objects.requireNonNull(id, "id");
-        Objects.requireNonNull(ctor, "ctor");
-
-        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout));
-
+        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout, placement));
     }
 
     public void selectAlgorithm(Player player) {
-        var inventory = ui.openSelector(algorithms.keySet());
+        var inventory = ui.openSelector(algorithms.keySet(), this::resolvePresentation);
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
             if (event.getPlayer() != player) return;
             if (event.getInventory() != inventory) return;
@@ -96,17 +120,17 @@ public class AlgoCraft {
             ItemStack clickedItem = event.getClickedItem();
             if (clickedItem.isAir()) return;
 
-            // Find which algorithm was clicked
-            for (String algorithm : algorithms.keySet()) {
-                var algo_id = clickedItem.getTag(ALGO_ID_TAG);
-                if (algo_id == null) continue;
-                if (algo_id.equals(algorithm)) {
-                    assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm, algorithms.get(algorithm).layout);
-                    ui.applyRunningLayout(player);
-                    player.closeInventory();
-                    return;
-                }
-            }
+            var algorithmId = clickedItem.getTag(ALGO_ID_TAG);
+            if (algorithmId == null) return;
+
+            var entry = algorithms.get(algorithmId);
+            if (entry == null) return;
+
+            assignVisualization(player, instanceContainer, entry.collection(), entry.algorithm(), entry.layout(), entry.placement.renderOrigin());
+            player.teleport(entry.placement.teleportPoint());
+
+            ui.applyRunningLayout(player);
+            player.closeInventory();
         });
         player.openInventory(inventory);
     }
@@ -115,19 +139,36 @@ public class AlgoCraft {
         this.ui = ui;
     }
 
+    public void registerAlgorithmPresentation(String algorithmId, AlgorithmPresentation presentation) {
+        algorithmPresentations.put(algorithmId, presentation);
+    }
+
+    public void setSpawnAction(Consumer<Player> spawnAction) {
+        this.spawnAction = spawnAction == null ? player -> {} : spawnAction;
+    }
+
+    public void applyDefaultLayout(Player player) {
+        ui.applyDefaultLayout(player);
+    }
+
+    private AlgorithmPresentation resolvePresentation(String algorithmId) {
+        AlgorithmPresentation presentation = algorithmPresentations.get(algorithmId);
+        if (presentation != null) return presentation;
+
+        return AlgorithmPresentation.fallback(algorithmId);
+    }
+
     private void assignVisualization(
             Player player,
-            String type, // Todo - fix this so that it's not a string and either determined by the lib or the user.
             InstanceContainer instance,
             SortingCollection<?> collection,
             IPlayerSort playerAlgorithm,
-            ILayout layout
+            ILayout layout,
+            Pos renderOrigin
     )  {
         removeVisualization(player);
 
-        final var origin = new Pos(194, 136, -30);
-
-        final var renderer = new Renderer(instance, origin, layout);
+        final var renderer = new Renderer(instance, renderOrigin, layout);
         final var controller = new VisualizationController(playerAlgorithm, renderer, collection);
         controller.setAudience(player);
 
