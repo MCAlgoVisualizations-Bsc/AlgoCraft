@@ -29,7 +29,14 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 public class AlgoCraft {
 
-    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout) {
+    public record AlgorithmPlacement(Pos renderOrigin, Pos teleportPoint) {
+    }
+
+    private static final Pos DEFAULT_RENDER_ORIGIN = new Pos(194, 136, -30);
+
+    private static final AlgorithmPlacement DEFAULT_PLACEMENT = new AlgorithmPlacement(DEFAULT_RENDER_ORIGIN, null);
+
+    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
     }
 
     private IAlgorithmUI ui = new AlgorithmUI();
@@ -100,10 +107,23 @@ public class AlgoCraft {
             List<Data<T>> lst,
             ILayout layout
     ) {
+        registerAlgorithm(id, ctor, lst, layout, DEFAULT_PLACEMENT);
+    }
+
+    public <T extends Comparable<T>> void registerAlgorithm(
+            String id,
+            Supplier<? extends IPlayerSort> ctor,
+            List<Data<T>> lst,
+            ILayout layout,
+            AlgorithmPlacement placement
+    ) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(ctor, "ctor");
+        Objects.requireNonNull(layout, "layout");
+        Objects.requireNonNull(placement, "placement");
+        Objects.requireNonNull(placement.renderOrigin(), "placement.renderOrigin");
 
-        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout));
+        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout, placement));
 
     }
 
@@ -118,17 +138,20 @@ public class AlgoCraft {
             ItemStack clickedItem = event.getClickedItem();
             if (clickedItem.isAir()) return;
 
-            // Find which algorithm was clicked
-            for (String algorithm : algorithms.keySet()) {
-                var algo_id = clickedItem.getTag(ALGO_ID_TAG);
-                if (algo_id == null) continue;
-                if (algo_id.equals(algorithm)) {
-                    assignVisualization(player, algo_id, instanceContainer, algorithms.get(algorithm).collection, algorithms.get(algorithm).algorithm, algorithms.get(algorithm).layout);
-                    ui.applyRunningLayout(player);
-                    player.closeInventory();
-                    return;
-                }
+            var algorithmId = clickedItem.getTag(ALGO_ID_TAG);
+            if (algorithmId == null) return;
+
+            var entry = algorithms.get(algorithmId);
+            if (entry == null) return;
+
+            assignVisualization(player, instanceContainer, entry.collection, entry.algorithm, entry.layout, entry.placement.renderOrigin());
+            if (entry.placement.teleportPoint() != null) {
+                player.teleport(entry.placement.teleportPoint());
             }
+
+            ui.applyRunningLayout(player);
+            player.closeInventory();
+            return;
         });
         player.openInventory(inventory);
     }
@@ -165,17 +188,15 @@ public class AlgoCraft {
 
     private void assignVisualization(
             Player player,
-            String type, // Todo - fix this so that it's not a string and either determined by the lib or the user.
             InstanceContainer instance,
             SortingCollection<?> collection,
             IPlayerSort playerAlgorithm,
-            ILayout layout
+            ILayout layout,
+            Pos renderOrigin
     )  {
         removeVisualization(player);
 
-        final var origin = new Pos(194, 136, -30);
-
-        final var renderer = new Renderer(instance, origin, layout);
+        final var renderer = new Renderer(instance, renderOrigin, layout);
         final var controller = new VisualizationController(playerAlgorithm, renderer, collection);
         controller.setAudience(player);
 

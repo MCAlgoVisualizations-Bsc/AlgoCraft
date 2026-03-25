@@ -26,6 +26,13 @@ import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstan
 public final class Main {
     private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
 
+    private static final AlgoCraft.AlgorithmPlacement INSERTION_INTS_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgoCraft.AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgoCraft.AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+
     private static AlgoCraft algo = null;
 
     static void main(String[] args) {
@@ -67,9 +74,9 @@ public final class Main {
                 new Data<>("e")
         ));
 
-        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout());
-        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout());
-        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout());
+        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
+        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
+        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
         //How the UI Looks
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
