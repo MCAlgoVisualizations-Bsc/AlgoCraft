@@ -180,7 +180,7 @@ public class AlgoCraft {
     private void removeVisualization(Player player) {
         VisualizationController vis = playerSteppers.remove(player.getUuid());
         if (vis != null) {
-            vis.cleanup();
+            vis.clear();
         }
     }
 

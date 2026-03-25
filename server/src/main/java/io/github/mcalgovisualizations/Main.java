@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.PlayerBFS;
 import io.github.mcalgovisualizations.algorithms.PlayerDFS;
+import io.github.mcalgovisualizations.algorithms.PlayerGreedyBestFirst;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
@@ -42,6 +43,8 @@ public final class Main {
             new AlgoCraft.AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
     private static final AlgoCraft.AlgorithmPlacement DFS_2D_PLACEMENT =
             new AlgoCraft.AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
+    private static final AlgoCraft.AlgorithmPlacement GREEDY_2D_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
 
     private static AlgoCraft algo = null;
 
@@ -101,6 +104,7 @@ public final class Main {
         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(8), aStarGrid, new GridLayout(8), ASTAR_2D_PLACEMENT);
         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(8), aStarGrid, new GridLayout(8), BFS_2D_PLACEMENT);
         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(8), aStarGrid, new GridLayout(8), DFS_2D_PLACEMENT);
+        algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(8), aStarGrid, new GridLayout(8), GREEDY_2D_PLACEMENT);
         //How the UI Looks
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
@@ -143,6 +147,13 @@ public final class Main {
                 "4-way DFS explores depth-first",
                 "Stack-based backtracking expansion.",
                 "Time: O(V + E) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
+                "Greedy Best-First",
+                net.minestom.server.item.Material.REDSTONE_TORCH,
+                "Fast heuristic-only pathfinding",
+                "Prioritizes closeness to goal, may miss optimal paths.",
+                "Time: O(E log V) | Space: O(V)"
         ));
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());

@@ -93,7 +93,7 @@ public class VisualizationController {
         }
     }
 
-    public void cleanup() {
+    public void clear() {
         stop();
         this.renderer.onCleanup();
         this.stepper.onCleanup();
@@ -107,6 +107,7 @@ public class VisualizationController {
         }
         IS_RUNNING = false;
 
+        renderer.onCleanup();
         var layout = this.stepper.randomizeCollection(24);
         this.renderer.initialize(layout);
     }
