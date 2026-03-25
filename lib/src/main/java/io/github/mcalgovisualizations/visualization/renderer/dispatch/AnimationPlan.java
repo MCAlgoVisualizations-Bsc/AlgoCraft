@@ -50,9 +50,14 @@ public final class AnimationPlan {
     public static final class Builder {
         private final List<Step> steps = new ArrayList<>();
 
-        /**
-         * Runs {@code op} once, then waits {@code ticks} executor ticks before the next step.
-         */
+        public Builder step(int ticks) {
+            return step(ticks, _ -> {});
+        }
+
+        public Builder step(Consumer<ISceneOps> op) {
+            return step(0, op);
+        }
+
         public Builder step(int ticks, Consumer<ISceneOps> op) {
             steps.add(new Step(ticks, op));
             return this;

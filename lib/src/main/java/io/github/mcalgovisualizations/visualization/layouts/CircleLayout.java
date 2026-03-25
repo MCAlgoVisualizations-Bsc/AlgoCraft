@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.layouts;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.Instance;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin) {
+    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
         var size = model.size();
         var out = new LayoutResult[size];
 

@@ -15,6 +15,7 @@ import java.util.List;
 
 public final class Renderer {
     private final Scene scene;
+    private final Instance instance;
     private final Dispatcher dispatcher = new Dispatcher();
     private final Executor executor;
     private final Pos origin;
@@ -25,6 +26,7 @@ public final class Renderer {
             @NotNull Pos origin,
             @NotNull ILayout layout
     ) {
+        this.instance = instance;
         this.scene = new Scene(instance, origin);
         this.layout = layout;
         this.origin = origin;
@@ -71,7 +73,7 @@ public final class Renderer {
         dispatcher.register(Validate.class, new ValidateHandler());
         dispatcher.register(NoOp.class, new NoOpHandler());
 
-        final var layoutResult = this.layout.compute(initialModel, origin);
+        final var layoutResult = this.layout.compute(initialModel, origin, instance);
         scene.setLayout(layoutResult);
     }
 

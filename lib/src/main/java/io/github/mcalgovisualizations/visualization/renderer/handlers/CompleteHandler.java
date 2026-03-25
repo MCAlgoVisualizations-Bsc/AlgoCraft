@@ -8,8 +8,8 @@ public class CompleteHandler implements IAnimationHandler<Complete> {
     @Override
     public AnimationPlan handle(Complete event) {
         var plan = AnimationPlan.builder()
-                .step(0, ISceneOps::stopAnimations)
-                .step(0, sceneOps -> sceneOps.playEffect(2, "SUCCESS"));
+                .step(ISceneOps::stopAnimations)
+                .step(sceneOps -> sceneOps.playEffect(2, "SUCCESS"));
 
         // hover each element with a small delay
         for (var i = 0; i < event.size(); i++) {
