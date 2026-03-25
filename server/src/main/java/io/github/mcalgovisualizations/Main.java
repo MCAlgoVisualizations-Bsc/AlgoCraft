@@ -2,6 +2,8 @@ package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
+import io.github.mcalgovisualizations.algorithms.PlayerBFS;
+import io.github.mcalgovisualizations.algorithms.PlayerDFS;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
@@ -36,6 +38,10 @@ public final class Main {
             new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
     private static final AlgoCraft.AlgorithmPlacement ASTAR_2D_PLACEMENT =
             new AlgoCraft.AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
+    private static final AlgoCraft.AlgorithmPlacement BFS_2D_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
+    private static final AlgoCraft.AlgorithmPlacement DFS_2D_PLACEMENT =
+            new AlgoCraft.AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
 
     private static AlgoCraft algo = null;
 
@@ -93,6 +99,8 @@ public final class Main {
         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(8), aStarGrid, new GridLayout(8), ASTAR_2D_PLACEMENT);
+        algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(8), aStarGrid, new GridLayout(8), BFS_2D_PLACEMENT);
+        algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(8), aStarGrid, new GridLayout(8), DFS_2D_PLACEMENT);
         //How the UI Looks
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
@@ -121,6 +129,20 @@ public final class Main {
                 "4-way A* on a fixed 2D obstacle map",
                 "Colors show open, closed, and final path.",
                 "Time: O(E log V) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
+                "BFS Pathfinding",
+                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                "4-way BFS explores breadth-first",
+                "Queue-based level-by-level expansion.",
+                "Time: O(V + E) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
+                "DFS Pathfinding",
+                net.minestom.server.item.Material.LOOM,
+                "4-way DFS explores depth-first",
+                "Stack-based backtracking expansion.",
+                "Time: O(V + E) | Space: O(V)"
         ));
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
