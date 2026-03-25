@@ -9,7 +9,6 @@ import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
-import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentationProvider;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -30,11 +29,11 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 public class AlgoCraft {
 
     public record AlgorithmPlacement(Pos renderOrigin, Pos teleportPoint) {
+        public AlgorithmPlacement {
+            Objects.requireNonNull(renderOrigin, "renderOrigin");
+            Objects.requireNonNull(teleportPoint, "teleportPoint");
+        }
     }
-
-    private static final Pos DEFAULT_RENDER_ORIGIN = new Pos(194, 136, -30);
-
-    private static final AlgorithmPlacement DEFAULT_PLACEMENT = new AlgorithmPlacement(DEFAULT_RENDER_ORIGIN, null);
 
     private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
     }
@@ -48,8 +47,6 @@ public class AlgoCraft {
     private final Map<String, AlgorithmEntry> algorithms = new HashMap<>();
 
     private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
-
-    private AlgorithmPresentationProvider presentationProvider = id -> null;
 
     private Consumer<Player> spawnAction = player -> {};
 
@@ -105,15 +102,6 @@ public class AlgoCraft {
             String id,
             Supplier<? extends IPlayerSort> ctor,
             List<Data<T>> lst,
-            ILayout layout
-    ) {
-        registerAlgorithm(id, ctor, lst, layout, DEFAULT_PLACEMENT);
-    }
-
-    public <T extends Comparable<T>> void registerAlgorithm(
-            String id,
-            Supplier<? extends IPlayerSort> ctor,
-            List<Data<T>> lst,
             ILayout layout,
             AlgorithmPlacement placement
     ) {
@@ -121,7 +109,6 @@ public class AlgoCraft {
         Objects.requireNonNull(ctor, "ctor");
         Objects.requireNonNull(layout, "layout");
         Objects.requireNonNull(placement, "placement");
-        Objects.requireNonNull(placement.renderOrigin(), "placement.renderOrigin");
 
         algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout, placement));
 
@@ -145,13 +132,10 @@ public class AlgoCraft {
             if (entry == null) return;
 
             assignVisualization(player, instanceContainer, entry.collection, entry.algorithm, entry.layout, entry.placement.renderOrigin());
-            if (entry.placement.teleportPoint() != null) {
-                player.teleport(entry.placement.teleportPoint());
-            }
+            player.teleport(entry.placement.teleportPoint());
 
             ui.applyRunningLayout(player);
             player.closeInventory();
-            return;
         });
         player.openInventory(inventory);
     }
@@ -164,10 +148,6 @@ public class AlgoCraft {
         algorithmPresentations.put(algorithmId, presentation);
     }
 
-    public void setAlgorithmPresentationProvider(AlgorithmPresentationProvider presentationProvider) {
-        this.presentationProvider = presentationProvider == null ? id -> null : presentationProvider;
-    }
-
     public void setSpawnAction(Consumer<Player> spawnAction) {
         this.spawnAction = spawnAction == null ? player -> {} : spawnAction;
     }
@@ -178,9 +158,6 @@ public class AlgoCraft {
 
     private AlgorithmPresentation resolvePresentation(String algorithmId) {
         AlgorithmPresentation presentation = algorithmPresentations.get(algorithmId);
-        if (presentation != null) return presentation;
-
-        presentation = presentationProvider.presentationFor(algorithmId);
         if (presentation != null) return presentation;
 
         return AlgorithmPresentation.fallback(algorithmId);
