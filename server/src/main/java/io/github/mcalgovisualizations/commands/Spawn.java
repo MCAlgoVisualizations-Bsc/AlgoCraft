@@ -10,7 +10,7 @@ public class Spawn extends Command {
         addSyntax((sender, context) -> {
             if (!(sender instanceof Player)) return;
             sender.sendMessage("Returning to spawn!");
-            ((Player) sender).teleport(new Pos(0.0, 42.0, 0.0));
+            ((Player) sender).teleport(new Pos(194, 137, -38));
         });
     }
 }

@@ -8,4 +8,5 @@ public enum InteractionType {
     FORWARD,
     BACKWARD,
     CLEAR,
+    SPAWN,
 }
