@@ -23,10 +23,11 @@ public record Algorithm<T extends Comparable<T>>(
     AlgorithmPlacement placement,
     Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry
 ) {
-    public static <T extends Comparable<T>> Algorithm<T> register(Consumer<Builder<T>> configurer) {
+    public static <T extends Comparable<T>> Algorithm<T> build(Consumer<Builder<T>> configurer)
+    throws IllegalStateException {
         Builder<T> builder = new Builder<>();
         configurer.accept(builder);
-        return builder.build();
+        return builder.create();
     }
 
     public static final class Builder<T extends Comparable<T>> {
@@ -38,7 +39,7 @@ public record Algorithm<T extends Comparable<T>>(
         private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder<T> identify(String id, Supplier<? extends IPlayerSort> ctor) {
+        public Builder<T> withIdentity(String id, Supplier<? extends IPlayerSort> ctor) {
             this.id = id;
             this.ctor = ctor;
             return this;
@@ -60,32 +61,31 @@ public record Algorithm<T extends Comparable<T>>(
         }
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder<T> onEvent(@NotNull Class<? extends IAlgorithmEvent> event, @NotNull IAnimationHandler<?> handler) {
+        public <E extends IAlgorithmEvent> Builder<T> onEvent(
+                @NotNull Class<? extends IAlgorithmEvent> event,
+                @NotNull IAnimationHandler<E> handler
+        ) {
             Objects.requireNonNull(event, "event");
             Objects.requireNonNull(handler, "handlerRegistry");
             this.handlers.put(event, handler);
             return this;
         }
 
-        private Algorithm<T> build() {
-            if (id == null || ctor == null || data == null || layout == null || placement == null) {
-                throw new IllegalStateException("Missing mandatory algorithm configuration!");
-            }
+        private Algorithm<T> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing event at least 1 event!");
             }
 
+            handlers.put(NoOp.class, new NoOpHandler());
             if (!handlers.containsKey(Complete.class))
                 handlers.put(Complete.class, new CompleteHandler());
-            if (!handlers.containsKey(NoOp.class))
-                handlers.put(NoOp.class, new NoOpHandler());
 
-            final var bid = Objects.requireNonNull(id, "id");
-            final var bctor = Objects.requireNonNull(ctor, "ctor");
-            final var bdata = Objects.requireNonNull(data, "data");
-            final var blayout = Objects.requireNonNull(layout, "layout");
-            final var bplacement = Objects.requireNonNull(placement, "placement");
-            final var bhandlers = Objects.requireNonNull(handlers, "handlers");
+            var bhandlers = Map.copyOf(handlers);
+            var bid = Objects.requireNonNull(id, "id");
+            var bctor = Objects.requireNonNull(ctor, "ctor");
+            var bdata = Objects.requireNonNull(data, "data");
+            var blayout = Objects.requireNonNull(layout, "layout");
+            var bplacement = Objects.requireNonNull(placement, "placement");
 
             return new Algorithm<>(bid, bctor, bdata, blayout, bplacement, bhandlers);
         }

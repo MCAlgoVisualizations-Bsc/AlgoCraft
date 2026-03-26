@@ -78,6 +78,8 @@ public class VisualizationController {
         final IAlgorithmEvent event = stepper.step();
         renderer.render(event);
 
+
+
         if (event instanceof Complete) {
             return;
         }

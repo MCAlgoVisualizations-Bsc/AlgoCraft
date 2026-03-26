@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.models.Data;
@@ -71,7 +70,6 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         historyPointer = 0;
         algorithm.sort(collection);
         history.addAll(collection.events());
-        history.add(new Complete(collection.size()));
     }
 
     public String getAlgoName() {
