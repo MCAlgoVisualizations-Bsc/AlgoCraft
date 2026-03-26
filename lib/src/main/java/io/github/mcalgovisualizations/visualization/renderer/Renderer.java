@@ -56,6 +56,10 @@ public final class Renderer {
         executor.startIfIdle();
     }
 
+    public boolean hasPendingAnimations() {
+        return !executor.isIdle();
+    }
+
     /**
      * Full teardown. Not resumable.
      * Typical use: application shutdown / leaving visualization.

@@ -101,9 +101,16 @@ public class VisualizationController {
         }
 
         runningTask = MinecraftServer.getSchedulerManager()
-                .buildTask(this::step)
+                .buildTask(this::autoStep)
                 .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
                 .schedule();
+    }
+
+    private void autoStep() {
+        if (renderer.hasPendingAnimations()) {
+            return;
+        }
+        step();
     }
 
     public void setSpeed(int ticksPerStep) {
