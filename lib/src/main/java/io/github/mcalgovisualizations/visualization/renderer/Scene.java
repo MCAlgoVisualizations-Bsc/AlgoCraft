@@ -90,8 +90,7 @@ public final class Scene implements ISceneOps {
             }
 
             displaysBySlot.put(i, dv);
-
-            dv.setInstance();
+            dv.setInstance(instance);
         }
 
         // Create hologram dynamicallyy floating above the center of the layout

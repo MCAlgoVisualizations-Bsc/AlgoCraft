@@ -2,11 +2,13 @@ package io.github.mcalgovisualizations.visualization;
 
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
@@ -24,14 +26,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 
 public class AlgoCraft {
-    public record AlgorithmPlacement(@NotNull Pos renderOrigin, @NotNull Pos teleportPoint) { }
 
-    private record AlgorithmEntry(IPlayerSort algorithm, SortingCollection<?> collection, ILayout layout, AlgorithmPlacement placement) {
+    private record AlgorithmEntry(
+            IPlayerSort algorithm,
+            SortingCollection<?> collection,
+            ILayout layout,
+            AlgorithmPlacement placement,
+            Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> eventHandlers) {
         @Override
         public SortingCollection<?> collection() {
             return this.collection.copy();
@@ -62,7 +69,6 @@ public class AlgoCraft {
             ItemStack itemStack = event.getItemStack();
             event.setCancelled(true); // Prevent teleportation
 
-            printAll();
             if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
                 selectAlgorithm(player);
                 return;
@@ -100,14 +106,21 @@ public class AlgoCraft {
     }
 
     public <T extends Comparable<T>> void registerAlgorithm(
-            @NotNull String id,
-            @NotNull Supplier<? extends IPlayerSort> ctor,
-            @NotNull List<Data<T>> lst,
-            @NotNull ILayout layout,
-            @NotNull AlgorithmPlacement placement
-    ) {
-        algorithms.put(id, new AlgorithmEntry(ctor.get(), new SortingCollection<>(lst), layout, placement));
+        Algorithm<T> algo
+            ) {
+        algorithms.put(
+                algo.id(),
+                new AlgorithmEntry(
+                        algo.ctor().get(),
+                        new SortingCollection<>(algo.lst()),
+                        algo.layout(),
+                        algo.placement(),
+                        algo.handlerRegistry()
+                )
+        );
     }
+
+
 
     public void selectAlgorithm(Player player) {
         var inventory = ui.openSelector(algorithms.keySet(), this::resolvePresentation);
@@ -126,7 +139,7 @@ public class AlgoCraft {
             var entry = algorithms.get(algorithmId);
             if (entry == null) return;
 
-            assignVisualization(player, instanceContainer, entry.collection(), entry.algorithm(), entry.layout(), entry.placement.renderOrigin());
+            assignVisualization(player, instanceContainer, entry);
             player.teleport(entry.placement.teleportPoint());
 
             ui.applyRunningLayout(player);
@@ -161,17 +174,13 @@ public class AlgoCraft {
     private void assignVisualization(
             Player player,
             InstanceContainer instance,
-            SortingCollection<?> collection,
-            IPlayerSort playerAlgorithm,
-            ILayout layout,
-            Pos renderOrigin
+            AlgorithmEntry algo
     )  {
         removeVisualization(player);
 
-        final var renderer = new Renderer(instance, renderOrigin, layout);
-        final var controller = new VisualizationController(playerAlgorithm, renderer, collection);
+        final var renderer = new Renderer(instance, algo.placement().renderOrigin(), algo.layout(), algo.eventHandlers());
+        final var controller = new VisualizationController(algo.algorithm(), renderer, algo.collection());
         controller.setAudience(player);
-
         controller.startVisualization();
 
         playerSteppers.put(player.getUuid(), controller);
@@ -186,10 +195,5 @@ public class AlgoCraft {
 
     public VisualizationController getVisualization(Player player) {
         return playerSteppers.get(player.getUuid());
-    }
-
-    public void printAll() {
-        System.out.println("playerSteppers: " + playerSteppers);
-        System.out.println("algorithms: " + algorithms);
     }
 }

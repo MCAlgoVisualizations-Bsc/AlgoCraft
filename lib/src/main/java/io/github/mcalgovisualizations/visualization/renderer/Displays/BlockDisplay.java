@@ -42,8 +42,11 @@ public class BlockDisplay implements IBlockStateDisplay {
         meta.setTransformationInterpolationStartDelta(0);
     }
 
-    public void setInstance() {
-        blockEntity.setInstance(instance, pos);
+
+    @Override
+    public void setInstance(Instance instance) {
+        blockEntity.setInstance(instance);
+        textEntity.setInstance(instance);
     }
 
     @Override

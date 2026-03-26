@@ -56,7 +56,6 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
     @Override
     public int compare(int i, int j) {
         events.add(new Compare(i, j, data.get(i), data.get(j)));
-        var s = "sad";
         return data.get(i).value().compareTo(data.get(j).value());
     }
 

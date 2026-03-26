@@ -10,15 +10,10 @@ import java.util.Objects;
 
 public final class Dispatcher {
 
-    private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
+    private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers;
 
-    public <E extends IAlgorithmEvent> void register(
-            @NotNull Class<E> eventType,
-            @NotNull IAnimationHandler<E> handler
-    ) {
-        Objects.requireNonNull(eventType, "eventType");
-        Objects.requireNonNull(handler, "handler");
-        handlers.put(eventType, handler);
+    public Dispatcher(Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers) {
+        this.handlers = Map.copyOf(handlers);
     }
 
     public AnimationPlan dispatch(@NotNull IAlgorithmEvent event) {

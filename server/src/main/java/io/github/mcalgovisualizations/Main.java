@@ -7,9 +7,17 @@ import io.github.mcalgovisualizations.algorithms.PlayerDFS;
 import io.github.mcalgovisualizations.algorithms.PlayerGreedyBestFirst;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
+import io.github.mcalgovisualizations.visualization.Algorithm;
+import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
+import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.CompareHandler;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.NoOpHandler;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.SwapHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.MinecraftServer;
@@ -22,8 +30,10 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
@@ -87,18 +97,48 @@ public final class Main {
                 new Data<>("e")
         ));
 
-        final int gridX = 20;
-        final int gridY = 20;
-        var aStarGrid = buildPathGrid(gridX, gridY);
 
-        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
-        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
-        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
-        algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
-        algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
-        algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
-        algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
+//         final int gridX = 20;
+//         final int gridY = 20;
+//         var aStarGrid = buildPathGrid(gridX, gridY);
+
+//         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
+//         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
+//         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
+//         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
+//         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
+//         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
+//         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
+// 
+        algo.registerAlgorithm(
+                Algorithm.<String>register(ctx -> ctx
+                        .identify("insertion sort (ints)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+        algo.registerAlgorithm(
+                Algorithm.<Integer>register(ctx -> ctx
+                        .identify("small insertion sort (ints)", PlayerInsertion::new)
+                        .withData(integerCollection2)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+        algo.registerAlgorithm(
+                Algorithm.<String>register(ctx -> ctx
+                        .identify("insertion sort (string)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+
         //How the UI Looks
+        var myData = List.of(new Data<>(8), new Data<>(3), new Data<>(1));
+
+
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
                 net.minestom.server.item.Material.IRON_SWORD,
