@@ -126,6 +126,7 @@ public final class Main {
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
+
         algo.registerAlgorithm(
                 Algorithm.<String>build(ctx -> ctx
                         .withIdentity("insertion sort (string)", PlayerInsertion::new)
@@ -134,7 +135,6 @@ public final class Main {
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
-
         algo.registerAlgorithmPresentation("insertion sort (string)", new AlgorithmPresentation(
                 "Insertion Sort (Strings)",
                 net.minestom.server.item.Material.BOOK,
