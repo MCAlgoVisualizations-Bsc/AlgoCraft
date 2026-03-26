@@ -76,7 +76,7 @@ public final class Main {
                 new Data<>(1)
         ));
 
-        var sortedIntegerCollection = new ArrayList<>(Arrays.asList(
+        var sortedStringCollection = new ArrayList<>(Arrays.asList(
                 new Data<>("a"),
                 new Data<>("b"),
                 new Data<>("c")
@@ -110,13 +110,21 @@ public final class Main {
 
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<Integer>build(ctx -> ctx
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
-                        .withData(stringCollection1)
+                        .withData(integerCollection1)
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
+        algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
+                "Insertion Sort",
+                net.minestom.server.item.Material.IRON_SWORD,
+                "A simple sorting algorithm that builds",
+                "the final sorted array one item at a time.",
+                "Time: O(n^2) | Space: O(1)"
+        ));
+
 
         algo.registerAlgorithm(
                 Algorithm.<Integer>build(ctx -> ctx
@@ -126,6 +134,14 @@ public final class Main {
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
+        algo.registerAlgorithmPresentation("small insertion sort (ints)", new AlgorithmPresentation(
+                "Small Insertion Sort",
+                net.minestom.server.item.Material.GOLDEN_SWORD,
+                "A compact insertion-sort demo",
+                "with fewer values for quick runs.",
+                "Time: O(n^2) | Space: O(1)"
+        ));
+
 
         algo.registerAlgorithm(
                 Algorithm.<String>build(ctx -> ctx
@@ -143,50 +159,44 @@ public final class Main {
                 "Time: O(n^2) | Space: O(1)"
         ));
 
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("sorted insertion", PlayerInsertion::new)
+                        .withData(sortedStringCollection)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                )
+        );
 
-        algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
-                "Insertion Sort",
-                net.minestom.server.item.Material.IRON_SWORD,
-                "A simple sorting algorithm that builds",
-                "the final sorted array one item at a time.",
-                "Time: O(n^2) | Space: O(1)"
-        ));
-        algo.registerAlgorithmPresentation("small insertion sort (ints)", new AlgorithmPresentation(
-                "Small Insertion Sort",
-                net.minestom.server.item.Material.GOLDEN_SWORD,
-                "A compact insertion-sort demo",
-                "with fewer values for quick runs.",
-                "Time: O(n^2) | Space: O(1)"
-        ));
 
-        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
-                "A* Pathfinding",
-                net.minestom.server.item.Material.COMPASS,
-                "4-way A* on a fixed 2D obstacle map",
-                "Colors show open, closed, and final path.",
-                "Time: O(E log V) | Space: O(V)"
-        ));
-        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
-                "BFS Pathfinding",
-                net.minestom.server.item.Material.RECOVERY_COMPASS,
-                "4-way BFS explores breadth-first",
-                "Queue-based level-by-level expansion.",
-                "Time: O(V + E) | Space: O(V)"
-        ));
-        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
-                "DFS Pathfinding",
-                net.minestom.server.item.Material.LOOM,
-                "4-way DFS explores depth-first",
-                "Stack-based backtracking expansion.",
-                "Time: O(V + E) | Space: O(V)"
-        ));
-        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
-                "Greedy Best-First",
-                net.minestom.server.item.Material.REDSTONE_TORCH,
-                "Fast heuristic-only pathfinding",
-                "Prioritizes closeness to goal, may miss optimal paths.",
-                "Time: O(E log V) | Space: O(V)"
-        ));
+//        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
+//                "A* Pathfinding",
+//                net.minestom.server.item.Material.COMPASS,
+//                "4-way A* on a fixed 2D obstacle map",
+//                "Colors show open, closed, and final path.",
+//                "Time: O(E log V) | Space: O(V)"
+//        ));
+//        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
+//                "BFS Pathfinding",
+//                net.minestom.server.item.Material.RECOVERY_COMPASS,
+//                "4-way BFS explores breadth-first",
+//                "Queue-based level-by-level expansion.",
+//                "Time: O(V + E) | Space: O(V)"
+//        ));
+//        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
+//                "DFS Pathfinding",
+//                net.minestom.server.item.Material.LOOM,
+//                "4-way DFS explores depth-first",
+//                "Stack-based backtracking expansion.",
+//                "Time: O(V + E) | Space: O(V)"
+//        ));
+//        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
+//                "Greedy Best-First",
+//                net.minestom.server.item.Material.REDSTONE_TORCH,
+//                "Fast heuristic-only pathfinding",
+//                "Prioritizes closeness to goal, may miss optimal paths.",
+//                "Time: O(E log V) | Space: O(V)"
+//        ));
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
 

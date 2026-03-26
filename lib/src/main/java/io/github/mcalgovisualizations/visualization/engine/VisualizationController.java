@@ -78,11 +78,6 @@ public class VisualizationController {
         final IAlgorithmEvent event = stepper.step();
         renderer.render(event);
 
-
-
-        if (event instanceof Complete) {
-            return;
-        }
         if (!(event instanceof NoOp)) {
             playUiSound("minecraft:block.note_block.hat", 0.6f, 1.6f);
         }
