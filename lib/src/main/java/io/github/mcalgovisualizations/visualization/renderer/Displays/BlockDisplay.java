@@ -46,7 +46,6 @@ public class BlockDisplay implements IBlockStateDisplay {
     @Override
     public void setInstance(Instance instance) {
         blockEntity.setInstance(instance);
-        textEntity.setInstance(instance);
     }
 
     @Override

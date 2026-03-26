@@ -1,22 +1,15 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
-import io.github.mcalgovisualizations.algorithms.PlayerAStar;
-import io.github.mcalgovisualizations.algorithms.PlayerBFS;
-import io.github.mcalgovisualizations.algorithms.PlayerDFS;
-import io.github.mcalgovisualizations.algorithms.PlayerGreedyBestFirst;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
-import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
-import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.CompareHandler;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.NoOpHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SwapHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
@@ -29,8 +22,6 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
-
-import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,20 +32,20 @@ import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstan
 public final class Main {
     private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
 
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_INTS_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgoCraft.AlgorithmPlacement ASTAR_2D_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
-    private static final AlgoCraft.AlgorithmPlacement BFS_2D_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
-    private static final AlgoCraft.AlgorithmPlacement DFS_2D_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
-    private static final AlgoCraft.AlgorithmPlacement GREEDY_2D_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
+    private static final AlgorithmPlacement INSERTION_INTS_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
+            new AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement ASTAR_2D_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
+    private static final AlgorithmPlacement BFS_2D_PLACEMENT =
+            new AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
+    private static final AlgorithmPlacement DFS_2D_PLACEMENT =
+            new AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
+    private static final AlgorithmPlacement GREEDY_2D_PLACEMENT =
+            new AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
 
     private static AlgoCraft algo = null;
 

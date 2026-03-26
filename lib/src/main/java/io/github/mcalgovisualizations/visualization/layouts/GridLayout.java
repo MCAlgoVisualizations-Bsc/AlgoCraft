@@ -43,7 +43,7 @@ public record GridLayout(
 
             double x = origin.x() + (col * spacing);
             double z = zBase + (row * spacing);
-            out[idx] = new LayoutResult<>(model.get(idx), new Pos(x, y, z));
+            out[idx] = new LayoutResult<>(model.get(idx), new Pos(x, y, z), new StylingProfile());
         }
 
         return out;

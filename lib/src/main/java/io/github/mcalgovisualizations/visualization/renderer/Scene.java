@@ -86,7 +86,7 @@ public final class Scene implements ISceneOps {
                         1,
                         10
                 );
-                dv = new MobDisplay(instance, pos, mobValue, value.toString());
+                dv = new MobDisplay(pos, value.toString());
             }
 
             displaysBySlot.put(i, dv);
