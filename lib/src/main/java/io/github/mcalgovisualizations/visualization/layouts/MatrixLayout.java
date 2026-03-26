@@ -82,7 +82,7 @@ public record MatrixLayout (
             Cell cell = cells.get(id);
             final double x = startX + cell.col * spacing;
             final double z = startZ + cell.row * spacing;
-            out[id] = new LayoutResult<>(new Data<>(id), new Pos(x, y, z));
+            out[id] = new LayoutResult<>(new Data<>(id), new Pos(x, y, z), new StylingProfile());
         }
 
         return out;
