@@ -1,1 +1,0 @@
-tellraw @a {"text":"IMPOSSIBLE","bold":true,"color":"red"}

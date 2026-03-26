@@ -1,6 +1,0 @@
-{
-    "pack":{
-        "pack_format": 6,
-        "description": "A data pack for visualizing the path finding algorithm A*"
-    }
-}

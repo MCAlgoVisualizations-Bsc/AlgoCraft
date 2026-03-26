@@ -1,3 +1,0 @@
-tellraw @a "This is the first datapack I've ever made, just a fun and challenging project I decided to do because of how much I adore the A* algorithm"
-tellraw @a "My name is Ha Chi Hao, at the time I made this, I was a sophomore IT student at Ho Chi Minh University of Science in Vietnam"
-tellraw @a "Minecraft's commands were the main reason that I chose programming for my career, and I'm still not regretted making that decision"
