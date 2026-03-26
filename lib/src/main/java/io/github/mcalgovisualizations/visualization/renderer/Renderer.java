@@ -12,11 +12,12 @@ import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 public final class Renderer {
     private final Scene scene;
     private final Instance instance;
-    private final Dispatcher dispatcher = new Dispatcher();
+    private final Dispatcher dispatcher;
     private final Executor executor;
     private final Pos origin;
     private final ILayout layout;
@@ -24,13 +25,15 @@ public final class Renderer {
     public Renderer(
             @NotNull Instance instance,
             @NotNull Pos origin,
-            @NotNull ILayout layout
+            @NotNull ILayout layout,
+            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers
     ) {
         this.instance = instance;
         this.scene = new Scene(instance, origin);
         this.layout = layout;
         this.origin = origin;
         this.executor = new Executor(scene);
+        this.dispatcher = new Dispatcher(handlers);
     }
 
     /**
@@ -66,13 +69,6 @@ public final class Renderer {
     }
 
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
-        dispatcher.register(Compare.class, new CompareHandler());
-        dispatcher.register(Swap.class, new SwapHandler());
-        dispatcher.register(Complete.class, new CompleteHandler());
-        dispatcher.register(Message.class, new MessageHandler());
-        dispatcher.register(Validate.class, new ValidateHandler());
-        dispatcher.register(NoOp.class, new NoOpHandler());
-
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
         scene.setLayout(layoutResult);
     }

@@ -3,8 +3,16 @@ package io.github.mcalgovisualizations;
 import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
+import io.github.mcalgovisualizations.visualization.Algorithm;
+import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
+import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.CompareHandler;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.NoOpHandler;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.SwapHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.MinecraftServer;
@@ -17,8 +25,10 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
@@ -26,12 +36,12 @@ import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstan
 public final class Main {
     private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
 
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_INTS_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgoCraft.AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
-            new AlgoCraft.AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement INSERTION_INTS_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
+            new AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
 
     private static AlgoCraft algo = null;
 
@@ -74,10 +84,35 @@ public final class Main {
                 new Data<>("e")
         ));
 
-        algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
-        algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
-        algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
+        algo.registerAlgorithm(
+                Algorithm.<String>register(ctx -> ctx
+                        .identify("insertion sort (ints)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+        algo.registerAlgorithm(
+                Algorithm.<Integer>register(ctx -> ctx
+                        .identify("small insertion sort (ints)", PlayerInsertion::new)
+                        .withData(integerCollection2)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+        algo.registerAlgorithm(
+                Algorithm.<String>register(ctx -> ctx
+                        .identify("insertion sort (string)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+
         //How the UI Looks
+        var myData = List.of(new Data<>(8), new Data<>(3), new Data<>(1));
+
+
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
                 net.minestom.server.item.Material.IRON_SWORD,
