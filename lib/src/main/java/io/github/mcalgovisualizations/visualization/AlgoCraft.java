@@ -107,7 +107,7 @@ public class AlgoCraft {
 
     public <T extends Comparable<T>> void registerAlgorithm(
         Algorithm<T> algo
-            ) {
+    ) {
         algorithms.put(
                 algo.id(),
                 new AlgorithmEntry(

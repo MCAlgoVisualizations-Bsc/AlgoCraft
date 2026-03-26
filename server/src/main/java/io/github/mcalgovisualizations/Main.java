@@ -102,32 +102,38 @@ public final class Main {
 //         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
 // 
         algo.registerAlgorithm(
-                Algorithm.<String>register(ctx -> ctx
-                        .identify("insertion sort (ints)", PlayerInsertion::new)
-                        .withData(stringCollection1)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-        ));
-        algo.registerAlgorithm(
-                Algorithm.<Integer>register(ctx -> ctx
-                        .identify("small insertion sort (ints)", PlayerInsertion::new)
-                        .withData(integerCollection2)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-        ));
-        algo.registerAlgorithm(
-                Algorithm.<String>register(ctx -> ctx
-                        .identify("insertion sort (string)", PlayerInsertion::new)
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("insertion sort (ints)", PlayerInsertion::new)
                         .withData(stringCollection1)
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
 
-        //How the UI Looks
-        var myData = List.of(new Data<>(8), new Data<>(3), new Data<>(1));
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
+                        .withData(integerCollection2)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("insertion sort (string)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+        ));
+        algo.registerAlgorithmPresentation("insertion sort (string)", new AlgorithmPresentation(
+                "Insertion Sort (Strings)",
+                net.minestom.server.item.Material.BOOK,
+                "Insertion-sort using string values",
+                "to demonstrate generic ordering.",
+                "Time: O(n^2) | Space: O(1)"
+        ));
 
 
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
@@ -144,13 +150,7 @@ public final class Main {
                 "with fewer values for quick runs.",
                 "Time: O(n^2) | Space: O(1)"
         ));
-        algo.registerAlgorithmPresentation("insertion sort (string)", new AlgorithmPresentation(
-                "Insertion Sort (Strings)",
-                net.minestom.server.item.Material.BOOK,
-                "Insertion-sort using string values",
-                "to demonstrate generic ordering.",
-                "Time: O(n^2) | Space: O(1)"
-        ));
+
         algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
                 "A* Pathfinding",
                 net.minestom.server.item.Material.COMPASS,
