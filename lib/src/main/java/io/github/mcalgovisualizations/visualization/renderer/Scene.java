@@ -75,8 +75,10 @@ public final class Scene implements ISceneOps {
 
             IDisplayValue dv;
             if (useBlockGridDisplay) {
-                dv = new BlockDisplay(instance, pos, Block.SMOOTH_STONE, value.toString());
-                slotStates.put(i, CellState.DEFAULT);
+                CellState initialState = initialCellState(value.value());
+                Block initialBlock = blockForState(initialState);
+                dv = new BlockDisplay(instance, pos, initialBlock, value.toString());
+                slotStates.put(i, initialState);
             } else {
                 int rank0 = sorted.indexOf(value.value());
                 int mobValue = Math.clamp(
@@ -269,7 +271,23 @@ public final class Scene implements ISceneOps {
         if (!(display instanceof IBlockStateDisplay blockDisplay)) {
             return;
         }
-        Block block = switch (state) {
+        blockDisplay.setBlock(blockForState(state));
+    }
+
+    private static CellState initialCellState(Object value) {
+        if (!(value instanceof Integer number)) {
+            return CellState.DEFAULT;
+        }
+        return switch (number) {
+            case 1 -> CellState.WALL;
+            case 2 -> CellState.START;
+            case 3 -> CellState.GOAL;
+            default -> CellState.DEFAULT;
+        };
+    }
+
+    private static Block blockForState(CellState state) {
+        return switch (state) {
             case DEFAULT -> Block.SMOOTH_STONE;
             case WALL -> Block.BLACK_CONCRETE;
             case START -> Block.LIME_CONCRETE;
@@ -278,7 +296,6 @@ public final class Scene implements ISceneOps {
             case CLOSED -> Block.GREEN_CONCRETE;
             case PATH -> Block.ORANGE_CONCRETE;
         };
-        blockDisplay.setBlock(block);
     }
 
     private <T extends Comparable<T>> boolean isAStarGrid(LayoutResult<T>[] layoutResults) {

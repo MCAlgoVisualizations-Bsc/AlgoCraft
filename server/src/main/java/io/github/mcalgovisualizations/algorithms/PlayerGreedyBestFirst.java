@@ -46,20 +46,8 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
         int goal = -1;
 
         for (int i = 0; i < size; i++) {
-            switch (cells[i]) {
-                case WALL -> values.emit(new CellStateTransition(i, CellState.DEFAULT, CellState.WALL));
-                case START -> {
-                    start = i;
-                    values.emit(new CellStateTransition(i, CellState.DEFAULT, CellState.START));
-                }
-                case GOAL -> {
-                    goal = i;
-                    values.emit(new CellStateTransition(i, CellState.DEFAULT, CellState.GOAL));
-                }
-                default -> {
-                    // Keep default color for open terrain.
-                }
-            }
+            if (cells[i] == START) start = i;
+            if (cells[i] == GOAL) goal = i;
         }
 
         if (start < 0 || goal < 0) {
