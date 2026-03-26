@@ -3,10 +3,12 @@ package io.github.mcalgovisualizations.visualization;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.CompleteHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.NoOpHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -72,9 +74,20 @@ public record Algorithm<T extends Comparable<T>>(
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing event at least 1 event!");
             }
+
             if (!handlers.containsKey(Complete.class))
                 handlers.put(Complete.class, new CompleteHandler());
-            return new Algorithm<>(id, ctor, data, layout, placement, handlers);
+            if (!handlers.containsKey(NoOp.class))
+                handlers.put(NoOp.class, new NoOpHandler());
+
+            final var bid = Objects.requireNonNull(id, "id");
+            final var bctor = Objects.requireNonNull(ctor, "ctor");
+            final var bdata = Objects.requireNonNull(data, "data");
+            final var blayout = Objects.requireNonNull(layout, "layout");
+            final var bplacement = Objects.requireNonNull(placement, "placement");
+            final var bhandlers = Objects.requireNonNull(handlers, "handlers");
+
+            return new Algorithm<>(bid, bctor, bdata, blayout, bplacement, bhandlers);
         }
     }
 

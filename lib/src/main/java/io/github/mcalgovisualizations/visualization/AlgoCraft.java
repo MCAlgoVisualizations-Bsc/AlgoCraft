@@ -5,7 +5,6 @@ import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
@@ -13,7 +12,6 @@ import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -21,12 +19,9 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
@@ -180,7 +175,7 @@ public class AlgoCraft {
 
         final var renderer = new Renderer(instance, algo.placement().renderOrigin(), algo.layout(), algo.eventHandlers());
         final var controller = new VisualizationController(algo.algorithm(), renderer, algo.collection());
-        controller.setAudience(player);
+        controller.addAudience(player);
         controller.startVisualization();
 
         playerSteppers.put(player.getUuid(), controller);

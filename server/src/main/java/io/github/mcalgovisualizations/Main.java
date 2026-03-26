@@ -76,6 +76,12 @@ public final class Main {
                 new Data<>(1)
         ));
 
+        var sortedIntegerCollection = new ArrayList<>(Arrays.asList(
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("c")
+        ));
+
         var stringCollection1 = new ArrayList<>(Arrays.asList(
                 new Data<>("a"),
                 new Data<>("b"),
@@ -100,7 +106,9 @@ public final class Main {
 //         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
 //         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
 //         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
-// 
+//
+
+
         algo.registerAlgorithm(
                 Algorithm.<String>register(ctx -> ctx
                         .identify("insertion sort (ints)", PlayerInsertion::new)
@@ -109,6 +117,16 @@ public final class Main {
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
+
+        algo.registerAlgorithm(
+                Algorithm.<String>register(builder -> builder
+                        .identify("insertion sort (ints) sorted", PlayerInsertion::new)
+                        .withData(sortedIntegerCollection)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                ));
+
         algo.registerAlgorithm(
                 Algorithm.<Integer>register(ctx -> ctx
                         .identify("small insertion sort (ints)", PlayerInsertion::new)

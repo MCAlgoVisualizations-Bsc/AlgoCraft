@@ -38,9 +38,9 @@ public class VisualizationController {
         this.renderer = renderer;
     }
 
-    public void setAudience(Audience audience) {
-        this.audience = audience == null ? Audience.empty() : audience;
-        renderer.setAudience(audience);
+    public void addAudience(Audience player) {
+        this.audience = Audience.audience(player); // TODO: Create an audience class such controller and renderer can share
+        renderer.setAudience(player);
     }
 
     @SuppressWarnings("unchecked")
@@ -79,7 +79,6 @@ public class VisualizationController {
         renderer.render(event);
 
         if (event instanceof Complete) {
-            playUiSound("minecraft:entity.player.levelup", 1.0f, 1.2f);
             return;
         }
         if (!(event instanceof NoOp)) {

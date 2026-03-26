@@ -55,7 +55,7 @@ public final class AnimationPlan {
         }
 
         public Builder step(Consumer<ISceneOps> op) {
-            return step(0, op);
+            return step(1, op);
         }
 
         public Builder step(int ticks, Consumer<ISceneOps> op) {

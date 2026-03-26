@@ -29,7 +29,9 @@ public final class Scene implements ISceneOps {
     private Audience audience = Audience.empty();
 
     public void setAudience(Audience audience) {
-        this.audience = Objects.requireNonNullElse(audience, Audience.empty());
+        if (this.audience != null) { System.err.println("Audience already set."); }
+        this.audience = Audience.audience(audience);
+
     }
 
     // Stable identity mapping (slot -> display wrapper/entity)
@@ -189,12 +191,9 @@ public final class Scene implements ISceneOps {
     }
 
     @Override
-    public void playEffect(int slot, String effectId) {
+    public void playSound(String key, float volume, float pitch) {
         assertStarted();
-
-        viewers.forEach(viewer -> viewer.playSound(Sound.sound(
-                Key.key("minecraft:block.note_block.pling"), Sound.Source.MASTER, 1.0f, 1.0f
-        )));
+        audience.playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
     }
 
 

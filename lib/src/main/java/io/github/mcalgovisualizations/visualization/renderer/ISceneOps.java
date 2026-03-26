@@ -22,8 +22,10 @@ public interface ISceneOps {
 
     void swapSlots(int a, int b);
 
-    // optional extension point
-    void playEffect(int slot, String effectId);
+//    // optional extension point
+//    void playEffect(int slot, String effectId);
+
+    void playSound(String key, float volume, float pitch);
 
     void sendMessage(Component message);
 

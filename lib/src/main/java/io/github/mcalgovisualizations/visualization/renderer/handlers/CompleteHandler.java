@@ -9,7 +9,7 @@ public class CompleteHandler implements IAnimationHandler<Complete> {
     public AnimationPlan handle(Complete event) {
         var plan = AnimationPlan.builder()
                 .step(ISceneOps::stopAnimations)
-                .step(sceneOps -> sceneOps.playEffect(2, "SUCCESS"));
+                .step(sceneOps -> sceneOps.playSound("minecraft:entity.player.levelup", 1.0f, 1.2f));
 
         // hover each element with a small delay
         for (var i = 0; i < event.size(); i++) {
