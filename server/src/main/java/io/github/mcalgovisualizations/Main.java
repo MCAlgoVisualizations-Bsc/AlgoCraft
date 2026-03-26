@@ -87,24 +87,17 @@ public final class Main {
                 new Data<>("e")
         ));
 
-        var aStarGrid = new ArrayList<>(Arrays.asList(
-                new Data<>(2), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0),
-                new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(0),
-                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0),
-                new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1),
-                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(1),
-                new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(0), new Data<>(1),
-                new Data<>(0), new Data<>(1), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0),
-                new Data<>(0), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(1), new Data<>(3)
-        ));
+        final int gridX = 20;
+        final int gridY = 20;
+        var aStarGrid = buildPathGrid(gridX, gridY);
 
         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
-        algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(8), aStarGrid, new GridLayout(8), ASTAR_2D_PLACEMENT);
-        algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(8), aStarGrid, new GridLayout(8), BFS_2D_PLACEMENT);
-        algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(8), aStarGrid, new GridLayout(8), DFS_2D_PLACEMENT);
-        algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(8), aStarGrid, new GridLayout(8), GREEDY_2D_PLACEMENT);
+        algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
+        algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
+        algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
+        algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
         //How the UI Looks
         algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
                 "Insertion Sort",
@@ -208,5 +201,34 @@ public final class Main {
         cm.register(new Teleport());
         cm.register(new Gamemode());
         cm.register(new Spawn());
+    }
+
+    private static ArrayList<Data<Integer>> buildPathGrid(int xSize, int ySize) {
+        if (xSize <= 0 || ySize <= 0) {
+            throw new IllegalArgumentException("Grid dimensions must be > 0");
+        }
+
+        ArrayList<Data<Integer>> grid = new ArrayList<>(xSize * ySize);
+        final int wallPercent = 30;
+
+        for (int y = 0; y < ySize; y++) {
+            for (int x = 0; x < xSize; x++) {
+                int value;
+                if (x == 0 && y == 0) {
+                    value = 2; // src at (0,0)
+                } else if (x == xSize - 1 && y == ySize - 1) {
+                    value = 3; // dst at (n,n)
+                } else if (y == 0 || x == xSize - 1) {
+                    // Keep one guaranteed open corridor: top row -> right column.
+                    value = 0;
+                } else {
+                    // Deterministic pseudo-random wall placement so each size has a stable maze.
+                    int noise = Math.floorMod((x * 37) + (y * 57) + (x * y * 11), 100);
+                    value = noise < wallPercent ? 1 : 0;
+                }
+                grid.add(new Data<>(value));
+            }
+        }
+        return grid;
     }
 }
