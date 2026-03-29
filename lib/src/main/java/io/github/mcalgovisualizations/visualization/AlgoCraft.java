@@ -10,6 +10,7 @@ import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
@@ -173,9 +174,9 @@ public class AlgoCraft {
     )  {
         removeVisualization(player);
 
-        final var renderer = new Renderer(instance, algo.placement().renderOrigin(), algo.layout(), algo.eventHandlers());
-        final var controller = new VisualizationController(algo.algorithm(), renderer, algo.collection());
-        controller.addAudience(player);
+        final var audience = new PlayerFeedback(player);
+        final var renderer = new Renderer(instance, algo.placement().renderOrigin(), algo.layout(), algo.eventHandlers(), audience);
+        final var controller = new VisualizationController(algo.algorithm(), renderer, algo.collection(), audience);
         controller.startVisualization();
 
         playerSteppers.put(player.getUuid(), controller);

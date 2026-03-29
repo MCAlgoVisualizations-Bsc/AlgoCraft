@@ -1,11 +1,11 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.*;
-import net.kyori.adventure.audience.Audience;
+import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +25,11 @@ public final class Renderer {
             @NotNull Instance instance,
             @NotNull Pos origin,
             @NotNull ILayout layout,
-            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers
+            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
+            @NotNull AudienceChannel audience
     ) {
         this.instance = instance;
-        this.scene = new Scene(instance, origin);
+        this.scene = new Scene(instance, origin, audience);
         this.layout = layout;
         this.origin = origin;
         this.executor = new Executor(scene);
@@ -46,11 +47,6 @@ public final class Renderer {
     public void resume() {
         executor.resume();
     }
-
-    public void setAudience(Audience audience) {
-        scene.setAudience(audience);
-    }
-
 
     public void render(IAlgorithmEvent event) {
         final var plan = dispatcher.dispatch(event);

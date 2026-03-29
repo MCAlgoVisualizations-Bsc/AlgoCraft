@@ -15,7 +15,7 @@ public final class AnimationPlan {
      */
     public record Step(int ticks, Consumer<ISceneOps> op) {
             public Step(int ticks, Consumer<ISceneOps> op) {
-                if (ticks < 0) throw new IllegalArgumentException("ticks must be >= 0");
+                if (ticks < 1) throw new IllegalArgumentException("ticks must be >= 1");
                 this.ticks = ticks;
                 this.op = Objects.requireNonNull(op, "op");
             }

@@ -1,15 +1,13 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
+import io.github.mcalgovisualizations.visualization.PlayerControls;
+import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.AlgorithmStepper;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
@@ -19,10 +17,13 @@ import java.time.Duration;
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.
  */
-public class VisualizationController {
+public class VisualizationController implements PlayerControls {
     private final AlgorithmStepper stepper;
     private final Renderer renderer;
-    private Audience audience = Audience.empty();
+
+
+    private final PlayerFeedback audience;
+
 
     private int ticksPerStep = 5;
     private boolean IS_RUNNING = false;
@@ -32,15 +33,12 @@ public class VisualizationController {
     public VisualizationController(
             @NotNull IPlayerSort algorithm,
             @NotNull Renderer renderer,
-            @NotNull SortingCollection<?> collection
+            @NotNull SortingCollection<?> collection,
+            @NotNull PlayerFeedback audience
     ) {
         this.stepper = new AlgorithmStepper<>(algorithm, collection);
         this.renderer = renderer;
-    }
-
-    public void addAudience(Audience player) {
-        this.audience = Audience.audience(player); // TODO: Create an audience class such controller and renderer can share
-        renderer.setAudience(player);
+        this.audience = audience;
     }
 
     @SuppressWarnings("unchecked")
@@ -57,11 +55,12 @@ public class VisualizationController {
         renderer.resume();
         IS_RUNNING = true;
         scheduleSteppingTask();
-        playUiSound("minecraft:block.note_block.chime", 1.0f, 1.25f);
+        audience.start();
     }
 
     public void resume() {
         start();
+        audience.resume();
     }
 
     public void stop() {
@@ -71,7 +70,7 @@ public class VisualizationController {
             runningTask = null;
         }
         renderer.stop();
-        playUiSound("minecraft:block.note_block.bass", 0.9f, 0.9f);
+        audience.stop();
     }
 
     public void step() {
@@ -79,7 +78,7 @@ public class VisualizationController {
         renderer.render(event);
 
         if (!(event instanceof NoOp)) {
-            playUiSound("minecraft:block.note_block.hat", 0.6f, 1.6f);
+            audience.step();
         }
     }
 
@@ -87,7 +86,7 @@ public class VisualizationController {
         final IAlgorithmEvent event = stepper.back();
         renderer.render(event);
         if (!(event instanceof NoOp)) {
-            playUiSound("minecraft:block.note_block.snare", 0.7f, 1.2f);
+            audience.back();
         }
     }
 
@@ -120,6 +119,7 @@ public class VisualizationController {
         stop();
         this.renderer.onCleanup();
         this.stepper.onCleanup();
+        audience.clear();
     }
 
     @SuppressWarnings("unchecked")
@@ -133,11 +133,7 @@ public class VisualizationController {
         renderer.onCleanup();
         var layout = this.stepper.randomizeCollection(24);
         this.renderer.initialize(layout);
-        playUiSound("minecraft:entity.item.pickup", 0.8f, 1.3f);
-    }
-
-    private void playUiSound(String key, float volume, float pitch) {
-        audience.playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
+        audience.randomize();
     }
 
     @Override

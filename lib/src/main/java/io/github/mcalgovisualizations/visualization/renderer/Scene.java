@@ -1,13 +1,10 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
@@ -25,14 +22,9 @@ public final class Scene implements ISceneOps {
 
     private final Instance instance;
     private final Pos origin;
-    public final List<Player> viewers = new ArrayList<>();
-    private Audience audience = Audience.empty();
+    private final List<Player> viewers = new ArrayList<>();
+    private final AudienceChannel audience;
 
-    public void setAudience(Audience audience) {
-        if (this.audience != null) { System.err.println("Audience already set."); }
-        this.audience = Audience.audience(audience);
-
-    }
 
     // Stable identity mapping (slot -> display wrapper/entity)
     private final Map<Integer, IDisplayValue> displaysBySlot =
@@ -47,9 +39,10 @@ public final class Scene implements ISceneOps {
 
     private boolean started = false;
 
-    public Scene(@NotNull Instance instance, @NotNull Pos origin) {
+    public Scene(@NotNull Instance instance, @NotNull Pos origin, @NotNull AudienceChannel audience) {
         this.instance = instance;
         this.origin = origin;
+        this.audience = audience;
     }
 
     @Override
@@ -96,7 +89,7 @@ public final class Scene implements ISceneOps {
         }
 
         // Create hologram dynamicallyy floating above the center of the layout
-        if (layoutResults != null && layoutResults.length > 0) {
+        if (layoutResults.length > 0) {
             double sumX = 0.0;
             double sumY = 0.0;
             double sumZ = 0.0;
@@ -118,7 +111,6 @@ public final class Scene implements ISceneOps {
         }
 
         // Add viewers after all displays have been created
-        displaysBySlot.values().forEach(display -> viewers.forEach(display::addViewer));
         viewers.forEach(hologram::addViewer);
     }
 
@@ -193,7 +185,7 @@ public final class Scene implements ISceneOps {
     @Override
     public void playSound(String key, float volume, float pitch) {
         assertStarted();
-        audience.playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
+        audience.playSound(key, volume, pitch);
     }
 
 
@@ -234,7 +226,7 @@ public final class Scene implements ISceneOps {
     public void stopAnimations() {
         clearGlowing();
         clearHologram();
-        SystemMessages.sendTo(audience, SystemMessages.ALGORITHM_COMPLETE);
+        // SystemMessages.sendTo(audience, SystemMessages.ALGORITHM_COMPLETE);
     }
 
     // -------------------------

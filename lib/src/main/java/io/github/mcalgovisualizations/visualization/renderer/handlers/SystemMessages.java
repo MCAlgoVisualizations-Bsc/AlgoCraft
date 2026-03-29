@@ -15,27 +15,6 @@ public final class SystemMessages {
 
     // ── Constants ─────────────────────────────────────────────────────────────
 
-    public static final Component ALGORITHM_COMPLETE =
-            Component.text("Algorithm complete! Use randomize to restart.", Message.MessageType.SUCCESS.color());
-
-    public static final Component VISUALIZATION_STARTED =
-            Component.text("Visualization started!", Message.MessageType.SUCCESS.color());
-
-    public static final Component VISUALIZATION_STOPPED =
-            Component.text("Visualization stopped!", Message.MessageType.ERROR.color());
-
-    public static final Component STEP_FORWARD =
-            Component.text("Stepped forward", NamedTextColor.YELLOW);
-
-    public static final Component STEP_BACKWARD =
-            Component.text("Stepped back", NamedTextColor.GOLD);
-
-    public static final Component RANDOMIZED =
-            Component.text("Values randomized!", Message.MessageType.HINT.color());
-
-    public static final Component NO_VISUALIZATION =
-            Component.text("No visualization assigned! Use the Algorithm Selector first.", Message.MessageType.ERROR.color());
-
     public static final Component RETURNED_TO_HUB =
             Component.text("Returned to hub!", NamedTextColor.LIGHT_PURPLE);
 
