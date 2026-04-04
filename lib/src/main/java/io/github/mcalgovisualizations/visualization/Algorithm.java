@@ -1,94 +1,146 @@
 package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.CompleteHandler;
+import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.NoOpHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record Algorithm<T extends Comparable<T>>(
-    String id,
-    Supplier<? extends IPlayerSort> ctor,
-    List<Data<T>> lst,
-    ILayout layout,
-    AlgorithmPlacement placement,
-    Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry
+        @NotNull String id,
+        @NotNull Supplier<? extends IPlayerSort> ctor,
+        @NotNull List<Data<T>> model,
+        @NotNull ILayout layout,
+        @NotNull AlgorithmPlacement placement,
+        @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
+        @NotNull Function<? super ISort<T>, ? extends AnimationPlan> onComplete
 ) {
-    public static <T extends Comparable<T>> Algorithm<T> build(Consumer<Builder<T>> configurer)
-    throws IllegalStateException {
-        Builder<T> builder = new Builder<>();
+    public static <T extends Comparable<T>> @NotNull Algorithm<T> build(
+            @NotNull Consumer<Builder<T>> configurer
+    ) {
+        var builder = new Builder<T>();
         configurer.accept(builder);
         return builder.create();
     }
 
     public static final class Builder<T extends Comparable<T>> {
+        private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
+        private Function<? super ISort<T>, ? extends AnimationPlan> onComplete;
+
         private String id;
         private Supplier<? extends IPlayerSort> ctor;
-        private List<Data<T>> data;
+        private List<Data<T>> model;
         private ILayout layout;
         private AlgorithmPlacement placement;
-        private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder<T> withIdentity(String id, Supplier<? extends IPlayerSort> ctor) {
-            this.id = id;
-            this.ctor = ctor;
+        public @NotNull Builder<T> withIdentity(
+                @NotNull String id,
+                @NotNull Supplier<? extends IPlayerSort> ctor
+        ) {
+            this.id = Objects.requireNonNull(id, "id");
+            this.ctor = Objects.requireNonNull(ctor, "ctor");
             return this;
         }
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder<T> withData(List<Data<T>> data) {
-            this.data = List.copyOf(data);
+        public @NotNull Builder<T> withData(@NotNull List<Data<T>> model) {
+            this.model = List.copyOf(Objects.requireNonNull(model, "model"));
             return this;
         }
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder<T> positioning(ILayout layout, AlgorithmPlacement placement) {
-            Objects.requireNonNull(layout, "layout");
-            Objects.requireNonNull(placement, "placement");
-            this.layout = layout;
-            this.placement = placement;
+        public @NotNull Builder<T> positioning(
+                @NotNull ILayout layout,
+                @NotNull AlgorithmPlacement placement
+        ) {
+            this.layout = Objects.requireNonNull(layout, "layout");
+            this.placement = Objects.requireNonNull(placement, "placement");
             return this;
         }
 
         @SuppressWarnings("UnusedReturnValue")
-        public <E extends IAlgorithmEvent> Builder<T> onEvent(
-                @NotNull Class<? extends IAlgorithmEvent> event,
+        public <E extends IAlgorithmEvent> @NotNull Builder<T> onEvent(
+                @NotNull Class<E> event,
                 @NotNull IAnimationHandler<E> handler
         ) {
-            Objects.requireNonNull(event, "event");
-            Objects.requireNonNull(handler, "handlerRegistry");
-            this.handlers.put(event, handler);
+            this.handlers.put(
+                    Objects.requireNonNull(event, "event"),
+                    Objects.requireNonNull(handler, "handler")
+            );
             return this;
         }
 
-        private Algorithm<T> create() {
+        @SuppressWarnings("UnusedReturnValue")
+        public @NotNull Builder<T> onCompletion(
+                @NotNull Function<? super ISort<T>, ? extends AnimationPlan> handler
+        ) {
+            this.onComplete = Objects.requireNonNull(handler, "handler");
+            return this;
+        }
+
+        private @NotNull Algorithm<T> create() {
             if (handlers.isEmpty()) {
-                throw new IllegalStateException("Missing event at least 1 event!");
+                throw new IllegalStateException("Missing at least 1 event handler");
             }
 
-            handlers.put(NoOp.class, new NoOpHandler());
-            if (!handlers.containsKey(Complete.class))
-                handlers.put(Complete.class, new CompleteHandler());
-
-            var bhandlers = Map.copyOf(handlers);
             var bid = Objects.requireNonNull(id, "id");
             var bctor = Objects.requireNonNull(ctor, "ctor");
-            var bdata = Objects.requireNonNull(data, "data");
+            var bmodel = Objects.requireNonNull(model, "model");
             var blayout = Objects.requireNonNull(layout, "layout");
             var bplacement = Objects.requireNonNull(placement, "placement");
+            var bonComplete =
+                    onComplete == null ? defaultOnComplete() : onComplete;
 
-            return new Algorithm<>(bid, bctor, bdata, blayout, bplacement, bhandlers);
+            return new Algorithm<>(
+                    bid,
+                    bctor,
+                    bmodel,
+                    blayout,
+                    bplacement,
+                    Map.copyOf(handlers),
+                    bonComplete
+            );
+        }
+
+        private static <T extends Comparable<T>>
+        Function<? super ISort<T>, ? extends AnimationPlan> defaultOnComplete() {
+            return collection -> {
+                var size = collection.copy().size();
+
+                var plan = AnimationPlan.builder()
+                        .step(ISceneOps::stopAnimations)
+                        .step(sceneOps -> {
+                            var component = Component.text(
+                                    "Algorithm is complete, click on randomize or step through the steps!",
+                                    NamedTextColor.GREEN
+                            );
+                            sceneOps.sendMessage(component);
+                        });
+
+                for (int i = 0; i < size; i++) {
+                    final int idx = i;
+                    plan.step(sceneOps -> sceneOps.hoverDisplay(idx, true));
+                }
+
+                for (int i = 0; i < size; i++) {
+                    final int idx = i;
+                    plan.step(sceneOps -> sceneOps.hoverDisplay(idx, false));
+                }
+
+                return plan.build();
+            };
         }
     }
-
 }

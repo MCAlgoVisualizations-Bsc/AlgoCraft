@@ -1,11 +1,11 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.models.SortingCollection;
+import io.github.mcalgovisualizations.visualization.models.ISort;
 
 public class ThanosSort implements IPlayerSort {
     @Override
-    public <T extends Comparable<T>> void sort(SortingCollection<T> values) {
+    public <T extends Comparable<T>> void sort(ISort<T> values) {
         int n = values.size();
         for (int i = 1; i < n; i++) {
             int j = i;

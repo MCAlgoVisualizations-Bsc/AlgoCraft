@@ -1,25 +1,26 @@
 package io.github.mcalgovisualizations.visualization.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.Complete;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.algorithms.events.NoOp;
 import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 public class AlgorithmStepper<T extends Comparable<T>> {
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();
-    private SortingCollection<T> collection; // TODO : Make an interface for this
+    private ISort<T> collection; // TODO : Make an interface for this
     private final IPlayerSort algorithm;
 
     private int historyPointer = 0;
 
-    public AlgorithmStepper(@NotNull IPlayerSort algorithm, @NotNull SortingCollection<T> collection) {
+    public AlgorithmStepper(@NotNull IPlayerSort algorithm, @NotNull ISort<T> collection) {
         this.algorithm = algorithm;
         this.collection = collection;
     }
@@ -39,24 +40,23 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         this.collection.clear();
     }
 
-    public IAlgorithmEvent step() {
-        // check for empty history?
-        if(history.isEmpty()) return new NoOp();
-        // check if we are already at the end of the history
-        if(historyPointer >= history.size()) return new NoOp();
+    public @Nullable IAlgorithmEvent step() {
+        assertNotEmpty();
+        if(isComplete()) return null;
         return history.get(historyPointer++);
     }
 
-    public IAlgorithmEvent back() {
-        // check for empty history?
-        if(history.isEmpty()) return new NoOp();
-        // check if we are already at the beginning of the history
-        if (historyPointer <= 0) return new NoOp();
+    public @Nullable IAlgorithmEvent back() {
+        assertNotEmpty();
+        if (isAtBeginning()) return null;
         return history.get(--historyPointer);
     }
 
     public List<Data<T>> randomizeCollection(int seed) {
         var data = new ArrayList<>(collection.data());
+
+        // This is a hack, but it works for now
+        // TODO : should be fixed in the collection
         Collections.shuffle(data, new Random(seed));
 
         this.collection.clear();
@@ -66,15 +66,27 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         return List.copyOf(data);
     }
 
+    public Boolean isComplete() {
+        return historyPointer >= history.size();
+    }
+
+    public Boolean isAtBeginning() {
+        return historyPointer <= 0;
+    }
+
     private void rebuildHistory() {
         history.clear();
         historyPointer = 0;
         algorithm.sort(collection);
         history.addAll(collection.events());
-        history.add(new Complete(collection.size()));
     }
 
     public String getAlgoName() {
         return algorithm.getName();
     }
+
+    private void assertNotEmpty() {
+        if(history.isEmpty()) throw new IllegalStateException("Cannot step from empty history");
+    }
+
 }

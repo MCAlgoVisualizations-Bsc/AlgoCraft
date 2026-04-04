@@ -9,6 +9,7 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.CompareHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SwapHandler;
 import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
@@ -150,6 +151,7 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
+                        .onCompletion(d -> AnimationPlan.empty())
         ));
         algo.registerAlgorithmPresentation("insertion sort (string)", new AlgorithmPresentation(
                 "Insertion Sort (Strings)",
@@ -159,12 +161,14 @@ public final class Main {
                 "Time: O(n^2) | Space: O(1)"
         ));
 
+
         algo.registerAlgorithm(
                 Algorithm.<String>build(ctx -> ctx
                         .withIdentity("sorted insertion", PlayerInsertion::new)
                         .withData(sortedStringCollection)
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
                 )
         );
 

@@ -22,6 +22,7 @@ public final class Dispatcher {
         if (handler == null) {
             throw new IllegalStateException("No handler registered for event type " + event.getClass().getName());
         }
+
         return invokeUnchecked(handler, event);
     }
 

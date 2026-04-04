@@ -4,7 +4,7 @@ import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
-import io.github.mcalgovisualizations.visualization.models.SortingCollection;
+import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,7 +24,7 @@ public class PlayerAStar implements IPlayerSort {
     }
 
     @Override
-    public <T extends Comparable<T>> void sort(SortingCollection<T> values) {
+    public <T extends Comparable<T>> void sort(ISort<T> values) {
         int size = values.size();
         if (size == 0) {
             values.emit(new Message("A*: empty grid", Message.MessageType.ERROR));

@@ -12,7 +12,6 @@ import java.util.List;
 
 public class SortingCollection<T extends Comparable<T>> extends AbstractCollection<T> implements ISort<T> {
 
-
     private final List<Data<T>> data;
     private final List<IAlgorithmEvent> events = new ArrayList<>();
 

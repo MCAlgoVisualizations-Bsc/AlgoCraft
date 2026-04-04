@@ -1,5 +1,7 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
@@ -20,20 +22,25 @@ public final class Renderer {
     private final Executor executor;
     private final Pos origin;
     private final ILayout layout;
+    private final AnimationPlan complete;
 
     public Renderer(
             @NotNull Instance instance,
             @NotNull Pos origin,
             @NotNull ILayout layout,
+            @NotNull AudienceChannel audience,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
-            @NotNull AudienceChannel audience
+            @NotNull AnimationPlan complete
     ) {
-        this.instance = instance;
         this.scene = new Scene(instance, origin, audience);
-        this.layout = layout;
-        this.origin = origin;
         this.executor = new Executor(scene);
         this.dispatcher = new Dispatcher(handlers);
+        this.complete = complete;
+
+        // make these into context?
+        this.instance = instance;
+        this.layout = layout;
+        this.origin = origin;
     }
 
     /**
@@ -49,8 +56,23 @@ public final class Renderer {
     }
 
     public void render(IAlgorithmEvent event) {
-        final var plan = dispatcher.dispatch(event);
-        executor.add(plan);
+        if (event == null) {
+            System.err.println("Received null event");
+            return;
+        }
+
+        try {
+            final var plan = dispatcher.dispatch(event);
+            executor.add(plan);
+        } catch (IllegalStateException e) {
+            System.err.println("Error while dispatching event: " + e.getMessage());
+        } finally {
+            executor.startIfIdle();
+        }
+    }
+
+    public void complete() {
+        executor.add(complete);
         executor.startIfIdle();
     }
 
