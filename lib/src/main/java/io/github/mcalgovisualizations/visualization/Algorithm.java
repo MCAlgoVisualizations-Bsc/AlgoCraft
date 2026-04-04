@@ -95,22 +95,14 @@ public record Algorithm<T extends Comparable<T>>(
                 throw new IllegalStateException("Missing at least 1 event handler");
             }
 
-            var bid = Objects.requireNonNull(id, "id");
-            var bctor = Objects.requireNonNull(ctor, "ctor");
-            var bmodel = Objects.requireNonNull(model, "model");
-            var blayout = Objects.requireNonNull(layout, "layout");
-            var bplacement = Objects.requireNonNull(placement, "placement");
-            var bonComplete =
-                    onComplete == null ? defaultOnComplete() : onComplete;
-
             return new Algorithm<>(
-                    bid,
-                    bctor,
-                    bmodel,
-                    blayout,
-                    bplacement,
+                    Objects.requireNonNull(id, "id"),
+                    Objects.requireNonNull(ctor, "ctor"),
+                    Objects.requireNonNull(model, "model"),
+                    Objects.requireNonNull(layout, "layout"),
+                    Objects.requireNonNull(placement, "placement"),
                     Map.copyOf(handlers),
-                    bonComplete
+                    onComplete == null ? defaultOnComplete() : onComplete
             );
         }
 
