@@ -1,12 +1,12 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
 import io.github.mcalgovisualizations.visualization.PlayerControls;
-import io.github.mcalgovisualizations.visualization.models.ISort;
-import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.AlgorithmStepper;
+import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
+import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
@@ -31,11 +31,8 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     private final PlayerFeedback audience;
 
     private int ticksPerStep = 5;
-    private boolean IS_RUNNING = false;
     private Task runningTask = null;
-    private boolean IS_INITIALIZED = false;
-
-    private State state;
+    private State state = State.NEW;
 
     public VisualizationController(
             @NotNull IPlayerSort algorithm,
@@ -49,67 +46,92 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     }
 
     public void startVisualization() {
+        assertNotCleared();
+
         var model = stepper.getBackingCollection();
         renderer.initialize(model);
-        this.state = State.INITIALIZED;
+        state = State.INITIALIZED;
     }
 
     @Override
     public void start() {
-        if (IS_RUNNING) return;
+        if (state == State.RUNNING) return;
+
+        if (state != State.INITIALIZED && state != State.PAUSED) {
+            throw new IllegalStateException("VisualizationController must be initialized or paused before starting");
+        }
 
         renderer.resume();
-        IS_RUNNING = true;
         scheduleSteppingTask();
+        state = State.RUNNING;
         audience.start();
-
     }
 
     @Override
     public void resume() {
-        this.state = State.RUNNING;
+        if (state != State.PAUSED) {
+            throw new IllegalStateException("VisualizationController is not paused");
+        }
 
-        start();
+        renderer.resume();
+        scheduleSteppingTask();
+        state = State.RUNNING;
         audience.resume();
-
     }
 
     @Override
     public void stop() {
-        IS_RUNNING = false;
+        if (state == State.CLEARED) return;
+        if (state == State.PAUSED) return;
 
-        if(runningTask != null) {
-            runningTask.cancel();
-            runningTask = null;
-        }
+        cancelRunningTask();
         renderer.stop();
         audience.stop();
 
-        this.state = State.PAUSED;
+        if (state != State.COMPLETED) {
+            state = State.PAUSED;
+        }
     }
 
     @Override
     public void step() {
-        final IAlgorithmEvent event = stepper.step();
-        renderer.render(event);
-        audience.step();
+        assertSteppable();
 
-        this.state = State.RUNNING;
+        if (stepper.isComplete()) {
+            completeVisualization();
+            return;
+        }
+
+        final IAlgorithmEvent event = stepper.step();
+        if (event != null) {
+            renderer.render(event);
+            audience.step();
+        }
+
+        if (stepper.isComplete()) {
+            completeVisualization();
+        }
     }
 
     @Override
     public void back() {
-        final IAlgorithmEvent event = stepper.back();
-        renderer.render(event);
-        audience.back();
+        if (state == State.NEW || state == State.CLEARED) {
+            throw new IllegalStateException("VisualizationController is not initialized");
+        }
 
-        this.state = State.RUNNING;
+        final IAlgorithmEvent event = stepper.back();
+        if (event != null) {
+            renderer.render(event);
+            audience.back();
+        }
+
+        if (state == State.COMPLETED) {
+            state = State.PAUSED;
+        }
     }
 
     private void scheduleSteppingTask() {
-        if (runningTask != null) {
-            runningTask.cancel();
-        }
+        cancelRunningTask();
 
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::autoStep)
@@ -118,48 +140,49 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     }
 
     private void autoStep() {
+        if (state != State.RUNNING) {
+            cancelRunningTask();
+            return;
+        }
+
         if (renderer.hasPendingAnimations()) {
             return;
         }
 
         if (stepper.isComplete()) {
-            renderer.complete();
+            completeVisualization();
             return;
         }
+
         step();
     }
 
     public void setSpeed(int ticksPerStep) {
         this.ticksPerStep = Math.max(1, ticksPerStep);
-        if (IS_RUNNING) {
+
+        if (state == State.RUNNING) {
             scheduleSteppingTask();
         }
     }
 
     @Override
     public void clear() {
-        stop();
-        this.renderer.onCleanup();
-        this.stepper.onCleanup();
+        cancelRunningTask();
+        renderer.onCleanup();
+        stepper.onCleanup();
         audience.clear();
-
-        this.state = State.CLEARED;
+        state = State.CLEARED;
     }
 
     @Override
     public void randomize() {
-        if (runningTask != null) {
-            runningTask.cancel();
-            runningTask = null;
-        }
-        IS_RUNNING = false;
+        cancelRunningTask();
 
         renderer.onCleanup();
-        var layout = this.stepper.randomizeCollection(24);
-        this.renderer.initialize(layout);
+        var layout = stepper.randomizeCollection(24);
+        renderer.initialize(layout);
         audience.randomize();
-
-        this.state = State.INITIALIZED;
+        state = State.INITIALIZED;
     }
 
     @Override
@@ -167,15 +190,29 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         return stepper.getAlgoName();
     }
 
-    private void assertInitialized() {
-        if (!state.equals(State.INITIALIZED)) {
-            throw new IllegalStateException("VisualizationController not initialized");
+    // private helpers to ensure state transitions are correct
+    private void completeVisualization() {
+        cancelRunningTask();
+        renderer.complete();
+        state = State.COMPLETED;
+    }
+
+    private void cancelRunningTask() {
+        if (runningTask != null) {
+            runningTask.cancel();
+            runningTask = null;
         }
     }
 
-    private void assertRunning() {
-        if (!state.equals(State.RUNNING)) {
-            throw new IllegalStateException("VisualizationController not running");
+    private void assertSteppable() {
+        if (state == State.NEW || state == State.CLEARED) {
+            throw new IllegalStateException("VisualizationController is not initialized");
+        }
+    }
+
+    private void assertNotCleared() {
+        if (state == State.CLEARED) {
+            throw new IllegalStateException("VisualizationController has been cleared");
         }
     }
 }

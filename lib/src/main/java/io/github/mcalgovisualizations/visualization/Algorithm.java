@@ -95,7 +95,7 @@ public record Algorithm<T extends Comparable<T>>(
                 throw new IllegalStateException("Missing at least 1 event handler");
             }
 
-            return new Algorithm<>(
+            return new Algorithm<T>(
                     Objects.requireNonNull(id, "id"),
                     Objects.requireNonNull(ctor, "ctor"),
                     Objects.requireNonNull(model, "model"),
