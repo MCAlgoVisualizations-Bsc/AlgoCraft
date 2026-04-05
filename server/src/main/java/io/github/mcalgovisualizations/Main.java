@@ -10,6 +10,7 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateT
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
+import io.github.mcalgovisualizations.visualization.layouts.BinaryTreeLayout;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
@@ -47,6 +48,10 @@ public final class Main {
             new AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
     private static final AlgorithmPlacement GREEDY_2D_PLACEMENT =
             new AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
+    private static final AlgorithmPlacement BST_BUILD_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 120), new Pos(194.5, 139, 136));
+    private static final AlgorithmPlacement BST_SEARCH_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 120), new Pos(194.5, 139, 136));
 
     private static AlgoCraft algo = null;
 
@@ -93,6 +98,20 @@ public final class Main {
                 new Data<>("a"),
                 new Data<>("b"),
                 new Data<>("e")
+        ));
+
+        var bstCollection = new ArrayList<>(Arrays.asList(
+                new Data<>(50),
+                new Data<>(30),
+                new Data<>(70),
+                new Data<>(20),
+                new Data<>(40),
+                new Data<>(60),
+                new Data<>(80),
+                new Data<>(35),
+                new Data<>(45),
+                new Data<>(65),
+                new Data<>(75)
         ));
 
 
@@ -160,6 +179,40 @@ public final class Main {
                         .onEvent(Swap.class, new SwapHandler())
                 )
         );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("bst build", PlayerBSTBuild::new)
+                        .withData(bstCollection)
+                        .positioning(new BinaryTreeLayout(), BST_BUILD_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                )
+        );
+        algo.registerAlgorithmPresentation("bst build", new AlgorithmPresentation(
+                "Binary Search Tree (Build)",
+                net.minestom.server.item.Material.OAK_SAPLING,
+                "Inserts values in order and compares",
+                "against existing nodes to place each value.",
+                "Tip: use Randomize before Start to rebuild a different tree"
+        ));
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("bst search", PlayerBSTSearch::new)
+                        .withData(bstCollection)
+                        .positioning(new BinaryTreeLayout(), BST_SEARCH_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                )
+        );
+        algo.registerAlgorithmPresentation("bst search", new AlgorithmPresentation(
+                "Binary Search Tree (Search)",
+                net.minestom.server.item.Material.SPYGLASS,
+                "Builds a BST from the current values",
+                "then searches for one value using branch decisions.",
+                "Tip: use Randomize before Start to explore new search paths"
+        ));
 
         final int gridX = 20;
         final int gridY = 20;

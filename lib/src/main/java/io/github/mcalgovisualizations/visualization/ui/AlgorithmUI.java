@@ -10,24 +10,35 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
 public class AlgorithmUI implements IAlgorithmUI {
-    private static final int[] CENTERED_SLOTS = {10, 12, 14, 16, 18, 20, 22, 24, 26};
+    private static final int MAX_SELECTOR_ITEMS = 54;
 
     @Override
     public Inventory openSelector(Set<String> algorithms, Function<String, AlgorithmPresentation> presentationResolver) {
-        if (algorithms.size() > CENTERED_SLOTS.length) {
-            throw new RuntimeException("Too many algorithms for centered selector, max is " + CENTERED_SLOTS.length);
+        if (algorithms.size() > MAX_SELECTOR_ITEMS) {
+            throw new IllegalArgumentException(
+                    "Too many algorithms for selector, max is " + MAX_SELECTOR_ITEMS + ", got " + algorithms.size()
+            );
         }
 
-        Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, Component.text("Select Algorithm", NamedTextColor.DARK_PURPLE));
+        int rowCount = Math.max(1, (int) Math.ceil(algorithms.size() / 9.0));
+        InventoryType inventoryType = inventoryTypeForRows(rowCount);
+        List<Integer> slots = centeredSlots(rowCount, algorithms.size());
+
+        Inventory inventory = new Inventory(inventoryType, Component.text("Select Algorithm", NamedTextColor.DARK_PURPLE));
+
+        List<String> sortedAlgorithms = algorithms.stream().sorted(Comparator.naturalOrder()).toList();
 
         int i = 0;
-        for (String algorithm : algorithms) {
+        for (String algorithm : sortedAlgorithms) {
             AlgorithmPresentation presentation = presentationResolver.apply(algorithm);
             if (presentation == null) {
                 presentation = AlgorithmPresentation.fallback(algorithm);
@@ -50,11 +61,40 @@ public class AlgorithmUI implements IAlgorithmUI {
                     )
                     .set(ALGO_ID_TAG, algorithm)
                     .build();
-            inventory.setItemStack(CENTERED_SLOTS[i], item);
+            inventory.setItemStack(slots.get(i), item);
             i++;
         }
 
         return inventory;
+    }
+
+    private static InventoryType inventoryTypeForRows(int rows) {
+        return switch (Math.clamp(rows, 1, 6)) {
+            case 1 -> InventoryType.CHEST_1_ROW;
+            case 2 -> InventoryType.CHEST_2_ROW;
+            case 3 -> InventoryType.CHEST_3_ROW;
+            case 4 -> InventoryType.CHEST_4_ROW;
+            case 5 -> InventoryType.CHEST_5_ROW;
+            default -> InventoryType.CHEST_6_ROW;
+        };
+    }
+
+    private static List<Integer> centeredSlots(int rows, int count) {
+        var slots = new ArrayList<Integer>(count);
+        int remaining = count;
+
+        for (int row = 0; row < rows && remaining > 0; row++) {
+            int inRow = Math.min(9, remaining);
+            int leftPad = (9 - inRow) / 2;
+            int rowStart = row * 9;
+
+            for (int col = 0; col < inRow; col++) {
+                slots.add(rowStart + leftPad + col);
+            }
+            remaining -= inRow;
+        }
+
+        return slots;
     }
 
     @Override
