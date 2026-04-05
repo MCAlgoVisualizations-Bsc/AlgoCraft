@@ -15,7 +15,7 @@ public final class AnimationPlan {
      */
     public record Step(int ticks, Consumer<ISceneOps> op) {
             public Step(int ticks, Consumer<ISceneOps> op) {
-                if (ticks < 1) throw new IllegalArgumentException("ticks must be >= 1");
+                if (ticks < 0) throw new IllegalArgumentException("ticks must be >= 0");
                 this.ticks = ticks;
                 this.op = Objects.requireNonNull(op, "op");
             }
@@ -40,7 +40,7 @@ public final class AnimationPlan {
     }
 
     public static AnimationPlan instant(Consumer<ISceneOps> op) {
-        return builder().step(1, op).build();
+        return builder().step(op).build();
     }
 
     public static AnimationPlan empty() {
@@ -55,7 +55,7 @@ public final class AnimationPlan {
         }
 
         public Builder step(Consumer<ISceneOps> op) {
-            return step(1, op);
+            return step(0, op);
         }
 
         public Builder step(int ticks, Consumer<ISceneOps> op) {

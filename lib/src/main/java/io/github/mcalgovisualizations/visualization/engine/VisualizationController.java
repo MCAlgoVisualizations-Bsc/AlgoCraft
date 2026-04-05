@@ -31,7 +31,11 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     private final Renderer renderer;
     private final PlayerFeedback audience;
 
-    private int delayPerStep = 5;
+    private static final int MIN_TICKS_PER_STEP = 1;
+    private static final int MAX_TICKS_PER_STEP = 5;
+
+
+    private int delayPerStep = MAX_TICKS_PER_STEP;
     private Task runningTask = null;
     private State state = State.NEW;
 
@@ -50,6 +54,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         assertNotCleared();
 
         var model = stepper.getBackingCollection();
+        applyPlaybackSpeed();
         renderer.initialize(model);
         state = State.INITIALIZED;
     }
@@ -136,9 +141,10 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
 
     private void scheduleSteppingTask() {
         cancelRunningTask();
+        int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::autoStep)
-                .repeat(Duration.ofMillis(this.delayPerStep * 50L))
+                .repeat(Duration.ofMillis(schedulerTicks * 50L))
                 .schedule();
     }
 
@@ -162,19 +168,26 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
 
     @Override
     public void changeSpeed() {
-        setSpeed(this.delayPerStep + 1); // faster
-        if(this.delayPerStep == 1) {
-            this.delayPerStep = 5;
+        // Lower ticks/step means faster stepping + faster animation playback.
+        int nextSpeed = this.delayPerStep - 1;
+        if (nextSpeed < MIN_TICKS_PER_STEP) {
+            nextSpeed = MAX_TICKS_PER_STEP;
         }
+        setSpeed(nextSpeed);
         audience.sendMessage(Component.text("Ticks/step: " + this.delayPerStep));
     }
 
     private void setSpeed(int ticksPerStep) {
-        this.delayPerStep = Math.max(1, ticksPerStep);
-        renderer.setSpeed(this.delayPerStep);
+        this.delayPerStep = Math.clamp(ticksPerStep, MIN_TICKS_PER_STEP, MAX_TICKS_PER_STEP);
+        applyPlaybackSpeed();
         if (state == State.RUNNING) {
             scheduleSteppingTask();
         }
+    }
+
+    private void applyPlaybackSpeed() {
+        int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
+        renderer.setSpeed(schedulerTicks);
     }
 
     @Override

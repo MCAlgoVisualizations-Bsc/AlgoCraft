@@ -12,6 +12,8 @@ import java.util.Queue;
 
 public final class Executor {
 
+    private static final int MAX_OPS_PER_TICK = 256;
+
     private final ISceneOps scene;
     private Task runningTask = null;
 
@@ -73,48 +75,47 @@ public final class Executor {
     private void tick() {
         if (paused) return;
 
-        // If we're waiting inside a step, consume one tick and return
-        if (ticksRemaining > 0) {
-            ticksRemaining--;
-            return;
-        }
-
-        // Ensure we have a plan
-        if (currentPlan == null) {
-            currentPlan = queue.poll();
-            stepIndex = 0;
-            stepJustEntered = true;
-
-            if (currentPlan == null) {
-                stopScheduler();
+        int opsThisTick = 0;
+        while (opsThisTick < MAX_OPS_PER_TICK) {
+            // If we're waiting inside a step, consume one tick and return.
+            if (ticksRemaining > 0) {
+                ticksRemaining--;
                 return;
             }
-        }
 
-        // Finished plan?
-        if (stepIndex >= currentPlan.steps().size()) {
-            finishCurrentPlan();
-            return;
-        }
+            // Ensure we have a plan.
+            if (currentPlan == null) {
+                currentPlan = queue.poll();
+                stepIndex = 0;
+                stepJustEntered = true;
 
-        // Enter new step: apply op ONCE, then set wait
-        if (stepJustEntered) {
-            var step = currentPlan.steps().get(stepIndex);
+                if (currentPlan == null) {
+                    stopScheduler();
+                    return;
+                }
+            }
 
-            // This is the whole point:
-            step.op().accept(scene);
+            // Finished plan?
+            if (stepIndex >= currentPlan.steps().size()) {
+                finishCurrentPlan();
+                continue;
+            }
 
-            // Wait AFTER applying (0 means continue next tick)
-            ticksRemaining = step.ticks();
+            if (stepJustEntered) {
+                var step = currentPlan.steps().get(stepIndex);
+                step.op().accept(scene);
+                ticksRemaining = step.ticks();
 
-            stepJustEntered = false;
+                stepJustEntered = false;
+                stepIndex++;
+                stepJustEntered = true;
+                opsThisTick++;
 
-            // Advance to next step once this step's wait has elapsed
-            stepIndex++;
-            stepJustEntered = true;
-
-            // If ticksRemaining == 0, we could loop and apply multiple 0-tick steps
-            // in one scheduler tick — optional. Keep simple for now.
+                // Stay in the loop to consume zero-wait steps immediately.
+                if (ticksRemaining > 0) {
+                    return;
+                }
+            }
         }
 
     }

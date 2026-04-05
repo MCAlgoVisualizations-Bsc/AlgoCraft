@@ -21,6 +21,7 @@ public final class Renderer {
     private final Pos origin;
     private final ILayout layout;
     private final AnimationPlan complete;
+    private boolean collapseAnimationDelays = false;
 
     public Renderer(
             @NotNull Instance instance,
@@ -42,6 +43,7 @@ public final class Renderer {
     }
 
     public void setSpeed(int ticksPerStep) {
+        this.collapseAnimationDelays = ticksPerStep <= 1;
         executor.setSpeed(ticksPerStep);
     }
 
@@ -64,7 +66,7 @@ public final class Renderer {
         }
 
         try {
-            final var plan = dispatcher.dispatch(event);
+            final var plan = normalizePlan(dispatcher.dispatch(event));
             executor.add(plan);
         } catch (IllegalStateException e) {
             System.err.println("Error while dispatching event: " + e.getMessage());
@@ -74,7 +76,7 @@ public final class Renderer {
     }
 
     public void complete() {
-        executor.add(complete);
+        executor.add(normalizePlan(complete));
         executor.startIfIdle();
     }
 
@@ -94,6 +96,18 @@ public final class Renderer {
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
         scene.setLayout(layoutResult);
+    }
+
+    private AnimationPlan normalizePlan(AnimationPlan plan) {
+        if (!collapseAnimationDelays || plan.isEmpty()) {
+            return plan;
+        }
+
+        var builder = AnimationPlan.builder();
+        for (var step : plan.steps()) {
+            builder.step(0, step.op());
+        }
+        return builder.build();
     }
 
 }
