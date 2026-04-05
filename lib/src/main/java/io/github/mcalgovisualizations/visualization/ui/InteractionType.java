@@ -9,4 +9,5 @@ public enum InteractionType {
     BACKWARD,
     CLEAR,
     SPAWN,
+    SET_SPEED,
 }

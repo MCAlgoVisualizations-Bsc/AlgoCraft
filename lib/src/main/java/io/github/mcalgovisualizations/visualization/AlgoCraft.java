@@ -8,7 +8,7 @@ import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
@@ -87,9 +87,9 @@ public final class AlgoCraft {
                     case RANDOMIZE -> controls.randomize();
                     case START -> controls.start();
                     case STOP -> controls.pause();
-                    case RESUME -> controls.resume();
                     case FORWARD -> controls.step();
                     case BACKWARD -> controls.back();
+                    case SET_SPEED -> controls.changeSpeed();
                     default -> {
                         ui.applyDefaultLayout(player);
                         removeVisualization(player);

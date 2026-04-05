@@ -6,7 +6,6 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithm
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +39,10 @@ public final class Renderer {
         this.instance = instance;
         this.layout = layout;
         this.origin = origin;
+    }
+
+    public void setSpeed(int ticksPerStep) {
+        executor.setSpeed(ticksPerStep);
     }
 
     /**

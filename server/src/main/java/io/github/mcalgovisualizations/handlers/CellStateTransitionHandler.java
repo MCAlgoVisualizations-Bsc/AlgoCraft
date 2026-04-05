@@ -1,6 +1,7 @@
-package io.github.mcalgovisualizations.visualization.renderer.handlers;
+package io.github.mcalgovisualizations.handlers;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
+import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 
 public final class CellStateTransitionHandler implements IAnimationHandler<CellStateTransition> {

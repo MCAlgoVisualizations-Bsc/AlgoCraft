@@ -1,18 +1,19 @@
 package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.algorithms.PlayerInsertion;
+import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.commands.*;
+import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
+import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
+import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
+import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.CompareHandler;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.SwapHandler;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.SystemMessages;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -25,7 +26,6 @@ import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
@@ -120,7 +120,7 @@ public final class Main {
                 Algorithm.<Integer>build(ctx -> ctx
                         .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
                         .withData(integerCollection2)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .positioning(new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
         ));
@@ -137,7 +137,7 @@ public final class Main {
                 Algorithm.<String>build(ctx -> ctx
                         .withIdentity("insertion sort (string)", PlayerInsertion::new)
                         .withData(stringCollection1)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .positioning(new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
                         .onCompletion(d -> AnimationPlan.empty())
@@ -163,25 +163,25 @@ public final class Main {
 
         final int gridX = 20;
         final int gridY = 20;
-//         var aStarGrid = buildPathGrid(gridX, gridY);
+        var aStarGrid = buildPathGrid(gridX, gridY);
 
 //         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
 //         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
 //         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
-//         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
+//      algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
 //         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
 //         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
 //         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
 //
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
-                        .withIdentity("A* Pathfinding (4 way)", new PlayerAStar(gridX))
-                        .withData(sortedStringCollection)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
                 )
-
+        );
         algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
                 "A* Pathfinding",
                 net.minestom.server.item.Material.COMPASS,
@@ -189,6 +189,16 @@ public final class Main {
                 "Colors show open, closed, and final path.",
                 "Time: O(E log V) | Space: O(V)"
         ));
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                )
+        );
         algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
                 "BFS Pathfinding",
                 net.minestom.server.item.Material.RECOVERY_COMPASS,
@@ -196,6 +206,16 @@ public final class Main {
                 "Queue-based level-by-level expansion.",
                 "Time: O(V + E) | Space: O(V)"
         ));
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                )
+        );
         algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
                 "DFS Pathfinding",
                 net.minestom.server.item.Material.LOOM,
@@ -203,6 +223,16 @@ public final class Main {
                 "Stack-based backtracking expansion.",
                 "Time: O(V + E) | Space: O(V)"
         ));
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                )
+        );
         algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
                 "Greedy Best-First",
                 net.minestom.server.item.Material.REDSTONE_TORCH,

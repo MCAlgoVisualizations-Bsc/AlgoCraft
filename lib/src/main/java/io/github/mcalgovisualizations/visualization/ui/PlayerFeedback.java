@@ -44,6 +44,10 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         this.audience = Audience.audience(newAudience);
     }
 
+    public Audience audience() {
+        return this.audience;
+    }
+
     /**
      * Plays a sound to the aggregated audience.
      *
@@ -111,7 +115,14 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      */
     @Override
     public void clear() {
-        playSound("minecraft:block.note_block.Amethyst", 0.7f, 1.2f);
+        playSound("minecraft:block.note_block.amethyst", 0.7f, 0.8f);
     }
 
+    /**
+     * Plays a sound indicating a speed change.
+     */
+    @Override
+    public void changeSpeed() {
+        playSound("minecraft:block.note_block.amethyst", 0.7f, 1.2f);
+    }
 }

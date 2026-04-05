@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.renderer.handlers;
+package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;

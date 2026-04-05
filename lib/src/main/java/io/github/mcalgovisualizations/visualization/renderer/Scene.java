@@ -109,9 +109,6 @@ public final class Scene implements ISceneOps {
             // Fallback: place hologram relative to origin
             hologram = new HologramDisplay(instance, origin.add(8, 5, 0));
         }
-
-        // Add viewers after all displays have been created
-        viewers.forEach(hologram::addViewer);
     }
 
     @Override

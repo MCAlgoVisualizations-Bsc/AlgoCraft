@@ -38,4 +38,9 @@ public interface PlayerControls {
      * Clears the visualization.
      */
     void clear();
+
+    /**
+     * Sets the speed of the visualization.
+     */
+    void changeSpeed();
 }

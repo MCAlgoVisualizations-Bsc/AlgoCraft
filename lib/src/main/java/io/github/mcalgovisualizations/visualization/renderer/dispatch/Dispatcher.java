@@ -1,10 +1,9 @@
 package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.renderer.handlers.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

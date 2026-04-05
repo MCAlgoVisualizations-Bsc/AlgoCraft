@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithm
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     private final Renderer renderer;
     private final PlayerFeedback audience;
 
-    private int ticksPerStep = 5;
+    private int delayPerStep = 5;
     private Task runningTask = null;
     private State state = State.NEW;
 
@@ -135,10 +136,9 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
 
     private void scheduleSteppingTask() {
         cancelRunningTask();
-
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::autoStep)
-                .repeat(Duration.ofMillis(this.ticksPerStep * 50L))
+                .repeat(Duration.ofMillis(this.delayPerStep * 50L))
                 .schedule();
     }
 
@@ -160,9 +160,18 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         step();
     }
 
-    public void setSpeed(int ticksPerStep) {
-        this.ticksPerStep = Math.max(1, ticksPerStep);
+    @Override
+    public void changeSpeed() {
+        setSpeed(this.delayPerStep + 1); // faster
+        if(this.delayPerStep == 1) {
+            this.delayPerStep = 5;
+        }
+        audience.sendMessage(Component.text("Ticks/step: " + this.delayPerStep));
+    }
 
+    private void setSpeed(int ticksPerStep) {
+        this.delayPerStep = Math.max(1, ticksPerStep);
+        renderer.setSpeed(this.delayPerStep);
         if (state == State.RUNNING) {
             scheduleSteppingTask();
         }
