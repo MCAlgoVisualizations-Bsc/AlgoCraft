@@ -5,7 +5,6 @@ import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
-import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
 import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
@@ -19,7 +18,6 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -29,28 +27,10 @@ import net.minestom.server.instance.InstanceContainer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static io.github.mcalgovisualizations.config.MapConstants.*;
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
 public final class Main {
-    private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
-
-    private static final AlgorithmPlacement INSERTION_INTS_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
-            new AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement ASTAR_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
-    private static final AlgorithmPlacement BFS_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
-    private static final AlgorithmPlacement DFS_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
-    private static final AlgorithmPlacement GREEDY_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
-    private static final AlgorithmPlacement BST_SEARCH_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 120), new Pos(194.5, 139, 136));
-
     private static AlgoCraft algo = null;
 
     static void main(String[] args) {
@@ -188,15 +168,15 @@ public final class Main {
                         .withData(bstCollection)
                         .positioning(new DynamicBstLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Binary Search Tree (Search)",
+                                net.minestom.server.item.Material.SPYGLASS,
+                                "Builds a BST from the current values",
+                                "then searches for one value using branch decisions.",
+                                "Tip: use Randomize before Start to explore new search paths"
+                        ))
                 )
         );
-        algo.registerAlgorithmPresentation("bst search", new AlgorithmPresentation(
-                "Binary Search Tree (Search)",
-                net.minestom.server.item.Material.SPYGLASS,
-                "Builds a BST from the current values",
-                "then searches for one value using branch decisions.",
-                "Tip: use Randomize before Start to explore new search paths"
-        ));
 
         final int gridX = 20;
         final int gridY = 20;

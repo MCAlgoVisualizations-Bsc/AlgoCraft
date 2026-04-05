@@ -14,7 +14,7 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
 
         return AnimationPlan.builder()
                 .step(1, sceneOps -> {
-                    sceneOps.showHologram(Component.text(
+                    sceneOps.sendActionBar(Component.text(
                             "BST compare [" + event.xValue() + "] vs [" + event.yValue() + "]",
                             NamedTextColor.AQUA));
                     sceneOps.setHighlighted(event.x(), true);
@@ -32,7 +32,6 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
                 .step(1, sceneOps -> {
                     sceneOps.setHighlighted(event.x(), false);
                     sceneOps.setHighlighted(event.y(), false);
-                    sceneOps.clearHologram();
                 })
                 .build();
     }

@@ -20,4 +20,6 @@ public final class MapConstants {
             new AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
     public static final AlgorithmPlacement GREEDY_2D_PLACEMENT =
             new AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
+    public static final AlgorithmPlacement BST_SEARCH_PLACEMENT =
+            new AlgorithmPlacement(new Pos(187, 138, 120), new Pos(194.5, 139, 136));
 }

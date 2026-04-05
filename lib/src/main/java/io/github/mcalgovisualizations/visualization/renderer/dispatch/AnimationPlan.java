@@ -40,7 +40,7 @@ public final class AnimationPlan {
     }
 
     public static AnimationPlan instant(Consumer<ISceneOps> op) {
-        return builder().step(op).build();
+        return builder().step(0, op).build();
     }
 
     public static AnimationPlan empty() {

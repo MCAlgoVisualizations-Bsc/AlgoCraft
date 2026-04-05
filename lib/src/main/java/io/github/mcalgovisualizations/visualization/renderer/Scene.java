@@ -3,7 +3,6 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
@@ -30,9 +29,6 @@ public final class Scene implements ISceneOps {
     private final Map<Integer, IDisplayValue> displaysBySlot =
             new HashMap<>();
 
-    // Floating hologram above the visualization
-    private HologramDisplay hologram;
-
     // Visual state
     private final Set<Integer> highlightedSlots = new HashSet<>();
     private final Map<Integer, CellState> slotStates = new HashMap<>();
@@ -46,23 +42,17 @@ public final class Scene implements ISceneOps {
     }
 
     @Override
-    public <T extends Comparable<T>> void setLayout(LayoutResult<T>[] layoutResults) {
+    public Pos getOrigin() {
+        return origin;
+    }
+
+    @Override
+    public void setLayout(LayoutResult[] layoutResults) {
         Objects.requireNonNull(layoutResults);
         cleanUp();
         this.started = true;
 
         boolean useBlockGridDisplay = isAStarGrid(layoutResults);
-
-        List<T> sorted = List.of();
-        int uniqueCount = 0;
-        if (!useBlockGridDisplay) {
-            sorted = Arrays.stream(layoutResults)
-                    .map(r -> r.value().value())
-                    .distinct()
-                    .sorted()
-                    .toList();
-            uniqueCount = sorted.size();
-        }
 
         for(int i = 0; i < layoutResults.length; i++) {
             var pos = layoutResults[i].pos();
@@ -72,43 +62,16 @@ public final class Scene implements ISceneOps {
             if (useBlockGridDisplay) {
                 CellState initialState = initialCellState(value.value());
                 Block initialBlock = blockForState(initialState);
-                dv = new BlockDisplay(instance, pos, initialBlock, value.toString());
+                dv = new BlockDisplay(instance, pos, initialBlock, value.toString(), false);
                 slotStates.put(i, initialState);
             } else {
-                int rank0 = sorted.indexOf(value.value());
-                int mobValue = Math.clamp(
-                        (int) Math.round((rank0 / (double) Math.max(uniqueCount - 1, 1)) * 9) + 1,
-                        1,
-                        10
-                );
-                dv = new MobDisplay(pos, value.toString());
+                dv = layoutResults[i].getDisplayValue();
             }
 
             displaysBySlot.put(i, dv);
             dv.setInstance(instance);
         }
 
-        // Create hologram dynamicallyy floating above the center of the layout
-        if (layoutResults.length > 0) {
-            double sumX = 0.0;
-            double sumY = 0.0;
-            double sumZ = 0.0;
-            for (var lr : layoutResults) {
-                var p = lr.pos();
-                sumX += p.x();
-                sumY += p.y();
-                sumZ += p.z();
-            }
-            double centerX = sumX / layoutResults.length;
-            double centerY = sumY / layoutResults.length;
-            double centerZ = sumZ / layoutResults.length;
-
-            // Place hologram a few blocks above the average element Y (adjust offset as needed)
-            hologram = new HologramDisplay(instance, new Pos(centerX, centerY + 5.5, centerZ));
-        } else {
-            // Fallback: place hologram relative to origin
-            hologram = new HologramDisplay(instance, origin.add(8, 5, 0));
-        }
     }
 
     @Override
@@ -116,10 +79,6 @@ public final class Scene implements ISceneOps {
         // Despawn/remove everything owned by this Scene
         for (var display : displaysBySlot.values()) {
             safeRemove(display);
-        }
-        if (hologram != null) {
-            hologram.remove();
-            hologram = null;
         }
         clearGlowing();
         displaysBySlot.clear();
@@ -192,13 +151,11 @@ public final class Scene implements ISceneOps {
     }
 
     @Override
-    public void showHologram(Component text) {
-        assertStarted();
-        if (hologram != null) {
-            hologram.setText(text);
-        }
+    public void sendActionBar(Component message) {
+        audience.sendActionBar(message);
     }
 
+    @Override
     public void hoverDisplay(int slot, boolean hover) {
         assertStarted();
 
@@ -219,12 +176,6 @@ public final class Scene implements ISceneOps {
         applyCellState(slot, next);
     }
 
-    @Override
-    public void stopAnimations() {
-        clearGlowing();
-        clearHologram();
-        // SystemMessages.sendTo(audience, SystemMessages.ALGORITHM_COMPLETE);
-    }
 
     // -------------------------
     // Internals
