@@ -8,9 +8,11 @@ import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -24,7 +26,8 @@ public record Algorithm<T extends Comparable<T>>(
         @NotNull ILayout layout,
         @NotNull AlgorithmPlacement placement,
         @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
-        @NotNull Function<? super ISort<T>, ? extends AnimationPlan> onComplete
+        @NotNull Function<? super ISort<T>, ? extends AnimationPlan> onComplete,
+        @Nullable AlgorithmPresentation presentation
 ) {
     public static <T extends Comparable<T>> @NotNull Algorithm<T> build(
             @NotNull Consumer<Builder<T>> configurer
@@ -43,6 +46,7 @@ public record Algorithm<T extends Comparable<T>>(
         private List<Data<T>> model;
         private ILayout layout;
         private AlgorithmPlacement placement;
+        private @Nullable AlgorithmPresentation presentation;
 
         @SuppressWarnings("UnusedReturnValue")
         public @NotNull Builder<T> withIdentity(
@@ -90,6 +94,14 @@ public record Algorithm<T extends Comparable<T>>(
             return this;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
+        public @NotNull Builder<T> withPresentation(
+               @Nullable AlgorithmPresentation presentation
+        ) {
+            this.presentation = presentation;
+            return this;
+        }
+
         private @NotNull Algorithm<T> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing at least 1 event handler");
@@ -102,7 +114,8 @@ public record Algorithm<T extends Comparable<T>>(
                     Objects.requireNonNull(layout, "layout"),
                     Objects.requireNonNull(placement, "placement"),
                     Map.copyOf(handlers),
-                    onComplete == null ? defaultOnComplete() : onComplete
+                    onComplete == null ? defaultOnComplete() : onComplete,
+                    presentation
             );
         }
 

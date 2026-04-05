@@ -106,13 +106,13 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-        ));
-        algo.registerAlgorithmPresentation("insertion sort (ints)", new AlgorithmPresentation(
-                "Insertion Sort",
-                net.minestom.server.item.Material.IRON_SWORD,
-                "A simple sorting algorithm that builds",
-                "the final sorted array one item at a time.",
-                "Time: O(n^2) | Space: O(1)"
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion Sort",
+                                net.minestom.server.item.Material.IRON_SWORD,
+                                "A simple sorting algorithm that builds",
+                                "the final sorted array one item at a time.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
         ));
 
 
@@ -123,13 +123,13 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-        ));
-        algo.registerAlgorithmPresentation("small insertion sort (ints)", new AlgorithmPresentation(
-                "Small Insertion Sort",
-                net.minestom.server.item.Material.GOLDEN_SWORD,
-                "A compact insertion-sort demo",
-                "with fewer values for quick runs.",
-                "Time: O(n^2) | Space: O(1)"
+                        .withPresentation(new AlgorithmPresentation(
+                                "Small Insertion Sort",
+                                net.minestom.server.item.Material.GOLDEN_SWORD,
+                                "A compact insertion-sort demo",
+                                "with fewer values for quick runs.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
         ));
 
 
@@ -140,14 +140,14 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .onCompletion(d -> AnimationPlan.empty())
-        ));
-        algo.registerAlgorithmPresentation("insertion sort (string)", new AlgorithmPresentation(
-                "Insertion Sort (Strings)",
-                net.minestom.server.item.Material.BOOK,
-                "Insertion-sort using string values",
-                "to demonstrate generic ordering.",
-                "Time: O(n^2) | Space: O(1)"
+                        .onCompletion(_ -> AnimationPlan.empty())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion Sort (Strings)",
+                                net.minestom.server.item.Material.BOOK,
+                                "Insertion-sort using string values",
+                                "to demonstrate generic ordering.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
         ));
 
 
@@ -180,15 +180,15 @@ public final class Main {
                         .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "A* Pathfinding",
+                                net.minestom.server.item.Material.COMPASS,
+                                "4-way A* on a fixed 2D obstacle map",
+                                "Colors show open, closed, and final path.",
+                                "Time: O(E log V) | Space: O(V)"
+                        ))
                 )
         );
-        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
-                "A* Pathfinding",
-                net.minestom.server.item.Material.COMPASS,
-                "4-way A* on a fixed 2D obstacle map",
-                "Colors show open, closed, and final path.",
-                "Time: O(E log V) | Space: O(V)"
-        ));
 
         algo.registerAlgorithm(
                 Algorithm.<Integer>build(ctx -> ctx
@@ -197,15 +197,15 @@ public final class Main {
                         .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "BFS Pathfinding",
+                                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                                "4-way BFS explores breadth-first",
+                                "Queue-based level-by-level expansion.",
+                                "Time: O(V + E) | Space: O(V)"
+                        ))
                 )
         );
-        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
-                "BFS Pathfinding",
-                net.minestom.server.item.Material.RECOVERY_COMPASS,
-                "4-way BFS explores breadth-first",
-                "Queue-based level-by-level expansion.",
-                "Time: O(V + E) | Space: O(V)"
-        ));
 
         algo.registerAlgorithm(
                 Algorithm.<Integer>build(ctx -> ctx
@@ -214,15 +214,15 @@ public final class Main {
                         .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "DFS Pathfinding",
+                                net.minestom.server.item.Material.LOOM,
+                                "4-way DFS explores depth-first",
+                                "Stack-based backtracking expansion.",
+                                "Time: O(V + E) | Space: O(V)"
+                        ))
                 )
         );
-        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
-                "DFS Pathfinding",
-                net.minestom.server.item.Material.LOOM,
-                "4-way DFS explores depth-first",
-                "Stack-based backtracking expansion.",
-                "Time: O(V + E) | Space: O(V)"
-        ));
 
         algo.registerAlgorithm(
                 Algorithm.<Integer>build(ctx -> ctx
@@ -231,15 +231,16 @@ public final class Main {
                         .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Greedy Best-First",
+                                net.minestom.server.item.Material.REDSTONE_TORCH,
+                                "Fast heuristic-only pathfinding",
+                                "Prioritizes closeness to goal, may miss optimal paths.",
+                                "Time: O(E log V) | Space: O(V)"
+                        ))
                 )
         );
-        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
-                "Greedy Best-First",
-                net.minestom.server.item.Material.REDSTONE_TORCH,
-                "Fast heuristic-only pathfinding",
-                "Prioritizes closeness to goal, may miss optimal paths.",
-                "Time: O(E log V) | Space: O(V)"
-        ));
+
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
 
