@@ -108,10 +108,14 @@ public final class Main {
                 new Data<>(40),
                 new Data<>(60),
                 new Data<>(80),
+                new Data<>(10),
+                new Data<>(25),
                 new Data<>(35),
                 new Data<>(45),
+                new Data<>(55),
                 new Data<>(65),
-                new Data<>(75)
+                new Data<>(75),
+                new Data<>(90)
         ));
 
 
@@ -180,15 +184,6 @@ public final class Main {
                 )
         );
 
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("bst build", PlayerBSTBuild::new)
-                        .withData(bstCollection)
-                        .positioning(new BinaryTreeLayout(), BST_BUILD_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                )
-        );
         algo.registerAlgorithmPresentation("bst build", new AlgorithmPresentation(
                 "Binary Search Tree (Build)",
                 net.minestom.server.item.Material.OAK_SAPLING,
@@ -202,8 +197,7 @@ public final class Main {
                         .withIdentity("bst search", PlayerBSTSearch::new)
                         .withData(bstCollection)
                         .positioning(new BinaryTreeLayout(), BST_SEARCH_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Message.class, new MessageHandler())
+                        .onEvent(Compare.class, new BstCompareHandler(BstCompareHandler.Mode.SEARCH))
                 )
         );
         algo.registerAlgorithmPresentation("bst search", new AlgorithmPresentation(
@@ -217,15 +211,6 @@ public final class Main {
         final int gridX = 20;
         final int gridY = 20;
         var aStarGrid = buildPathGrid(gridX, gridY);
-
-//         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
-//         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
-//         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
-//      algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
-//         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
-//         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
-//         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
-//
         algo.registerAlgorithm(
                 Algorithm.<Integer>build(ctx -> ctx
                         .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
