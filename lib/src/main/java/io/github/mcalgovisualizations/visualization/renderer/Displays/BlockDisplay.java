@@ -1,32 +1,51 @@
 package io.github.mcalgovisualizations.visualization.renderer.Displays;
 
 import io.github.mcalgovisualizations.visualization.renderer.IBlockStateDisplay;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.BlockDisplayMeta;
+import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 
 public class BlockDisplay implements IBlockStateDisplay {
-    public final Instance instance;
     public final Entity blockEntity;
+    private final Entity textEntity;
+    private static final double TEXT_Y_OFFSET = 1.2;
 
     private Pos pos;
 
-    public BlockDisplay(Instance instance, Pos pos, Block block, String text) {
+    public BlockDisplay(Pos pos, Block block, String text) {
+        this(pos, block, text, true);
+    }
+
+    public BlockDisplay(Pos pos, Block block, String text, boolean showLabel) {
         if (block == null) throw new NullPointerException("block cannot be null");
-        if (instance == null) throw new NullPointerException("instance cannot be null");
         if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
 
-        this.instance = instance;
-
         this.blockEntity = new Entity(EntityType.BLOCK_DISPLAY);
-
+        this.textEntity = showLabel ? new Entity(EntityType.TEXT_DISPLAY) : null;
         this.pos = pos;
-
         setupBlock(block);
+        if (this.textEntity != null) {
+            setupText(text);
+        }
+    }
+
+    public BlockDisplay(Instance instance, Pos pos, Block block, String text) {
+        this(instance, pos, block, text, true);
+    }
+
+    public BlockDisplay(Instance instance, Pos pos, Block block, String text, boolean showLabel) {
+        if (instance == null) throw new NullPointerException("instance cannot be null");
+        this(pos, block, text, showLabel);
+        setInstance(instance);
     }
 
     public Pos getPos() {
@@ -42,32 +61,61 @@ public class BlockDisplay implements IBlockStateDisplay {
         meta.setTransformationInterpolationStartDelta(0);
     }
 
+    private void setupText(String text) {
+        var meta = (TextDisplayMeta) textEntity.getEntityMeta();
+        meta.setText(Component.text(text, NamedTextColor.GOLD));
+        meta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.CENTER);
+        meta.setScale(new Vec(1.25));
+        meta.setHasNoGravity(true);
+        meta.setPosRotInterpolationDuration(0);
+        meta.setTransformationInterpolationStartDelta(0);
+    }
+
 
     @Override
     public void setInstance(Instance instance) {
         blockEntity.setInstance(instance, pos);
+        if (textEntity != null) {
+            textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
+        }
     }
 
     @Override
     public void addViewer(Player player) {
         this.blockEntity.addViewer(player);
+        if (textEntity != null) {
+            textEntity.addViewer(player);
+        }
     }
 
     public void remove() {
         this.blockEntity.remove();
+        if (textEntity != null) {
+            textEntity.remove();
+        }
     }
 
     public void teleport(Pos pos) {
         this.pos = pos;
         this.blockEntity.teleport(pos);
+        if (textEntity != null) {
+            textEntity.teleport(pos.add(0, TEXT_Y_OFFSET, 0));
+        }
     }
 
     public void setValue(int value) {
-        // Numeric overlays are intentionally disabled for grid visualizations.
+        if (textEntity == null) {
+            return;
+        }
+        var meta = (TextDisplayMeta) textEntity.getEntityMeta();
+        meta.setText(Component.text(Integer.toString(value), NamedTextColor.GOLD));
     }
 
     public void setGlowing(boolean highlighted) {
         blockEntity.setGlowing(highlighted);
+        if (textEntity != null) {
+            textEntity.setGlowing(highlighted);
+        }
     }
 
 
@@ -78,6 +126,6 @@ public class BlockDisplay implements IBlockStateDisplay {
     }
 
     public boolean isSpawned() {
-        return blockEntity.isActive();
+        return blockEntity.isActive() || (textEntity != null && textEntity.isActive());
     }
 }
