@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_ID_TAG;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_INTERACTION_TAG;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR_TAG;
@@ -71,6 +72,11 @@ public final class AlgoCraft {
                 return;
             }
 
+            if(itemStack.hasTag(ALGO_INTERACTION_TAG) && itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
+                spawnAction.accept(player);
+                return;
+            }
+
             if(controls == null) {
                 System.err.println("No controls for player " + player.getUsername());
                 return;
@@ -84,11 +90,10 @@ public final class AlgoCraft {
                     case RESUME -> controls.resume();
                     case FORWARD -> controls.step();
                     case BACKWARD -> controls.back();
-                    case CLEAR -> {
+                    default -> {
                         ui.applyDefaultLayout(player);
                         removeVisualization(player);
                     }
-                    case SPAWN -> spawnAction.accept(player);
                 }
             }
         });
