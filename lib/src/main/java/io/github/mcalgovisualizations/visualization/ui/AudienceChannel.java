@@ -22,4 +22,6 @@ public interface AudienceChannel {
      * @param message the message to send
      */
     void sendMessage(Component message);
+
+    void sendActionBar(Component message);
 }

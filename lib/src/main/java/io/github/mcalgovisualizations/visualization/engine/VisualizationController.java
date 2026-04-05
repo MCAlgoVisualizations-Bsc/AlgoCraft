@@ -174,7 +174,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     }
 
     @Override
-    public void changeSpeed() {
+    public int changeSpeed() {
         // Lower ticks/step means faster stepping + faster animation playback.
         int nextSpeed = this.delayPerStep - 1;
         if (nextSpeed < MIN_TICKS_PER_STEP) {
@@ -182,6 +182,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         }
         setSpeed(nextSpeed);
         audience.sendMessage(Component.text("Ticks/step: " + this.delayPerStep));
+        return this.delayPerStep;
     }
 
     private void setSpeed(int ticksPerStep) {

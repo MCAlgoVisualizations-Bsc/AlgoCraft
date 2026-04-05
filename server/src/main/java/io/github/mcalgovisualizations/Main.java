@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
+import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;

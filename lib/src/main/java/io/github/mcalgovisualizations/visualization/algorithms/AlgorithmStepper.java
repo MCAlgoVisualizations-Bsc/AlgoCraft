@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
 public class AlgorithmStepper<T extends Comparable<T>> {
     private final ArrayList<IAlgorithmEvent> history = new ArrayList<>();
@@ -79,6 +78,10 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         historyPointer = 0;
         algorithm.sort(collection);
         history.addAll(collection.events());
+    }
+
+    public int getHistorySize() {
+        return history.size();
     }
 
     public String getAlgoName() {

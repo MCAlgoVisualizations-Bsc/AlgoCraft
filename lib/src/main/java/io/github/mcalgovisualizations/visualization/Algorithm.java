@@ -125,7 +125,6 @@ public record Algorithm<T extends Comparable<T>>(
                 var size = collection.copy().size();
 
                 var plan = AnimationPlan.builder()
-                        .step(ISceneOps::stopAnimations)
                         .step(sceneOps -> {
                             var component = Component.text(
                                     "Algorithm is complete, click on randomize or step through the steps!",
