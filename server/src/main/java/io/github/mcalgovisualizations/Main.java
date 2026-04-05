@@ -30,7 +30,6 @@ import java.util.Arrays;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
-//hello
 public final class Main {
     private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
 
