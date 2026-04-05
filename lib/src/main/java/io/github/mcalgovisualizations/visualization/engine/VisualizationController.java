@@ -57,7 +57,12 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     public void start() {
         if (state == State.RUNNING) return;
 
-        if (state != State.INITIALIZED && state != State.PAUSED) {
+        if(state == State.PAUSED) {
+            resume();
+            return;
+        }
+
+        if (state != State.INITIALIZED) {
             throw new IllegalStateException("VisualizationController must be initialized or paused before starting");
         }
 
@@ -67,7 +72,6 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         audience.start();
     }
 
-    @Override
     public void resume() {
         if (state != State.PAUSED) {
             throw new IllegalStateException("VisualizationController is not paused");
@@ -76,17 +80,16 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         renderer.resume();
         scheduleSteppingTask();
         state = State.RUNNING;
-        audience.resume();
     }
 
     @Override
-    public void stop() {
+    public void pause() {
         if (state == State.CLEARED) return;
         if (state == State.PAUSED) return;
 
         cancelRunningTask();
-        renderer.stop();
-        audience.stop();
+        renderer.pause();
+        audience.pause();
 
         if (state != State.COMPLETED) {
             state = State.PAUSED;

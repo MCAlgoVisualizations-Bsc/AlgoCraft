@@ -22,7 +22,7 @@ public interface PlayerControls {
     /**
      * Stops or halts execution.
      */
-    void stop();
+    void pause();
 
     /**
      * Advances execution by a single step.
@@ -33,11 +33,6 @@ public interface PlayerControls {
      * Moves execution one step backward.
      */
     void back();
-
-    /**
-     * Resumes execution after being paused or stopped.
-     */
-    void resume();
 
     /**
      * Clears the visualization.

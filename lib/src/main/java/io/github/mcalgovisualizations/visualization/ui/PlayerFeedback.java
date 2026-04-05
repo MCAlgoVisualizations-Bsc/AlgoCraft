@@ -86,7 +86,7 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      * Plays a sound indicating a stop action.
      */
     @Override
-    public void stop() {
+    public void pause() {
         playSound("minecraft:block.note_block.bass", 0.9f, 0.9f);
     }
 
@@ -107,20 +107,11 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
     }
 
     /**
-     * Handles resume feedback.
-     */
-    @Override
-    public void resume() {
-        // TODO : some sound engineering here
-        System.err.println("no feedback defined for resume");
-    }
-
-    /**
      * Handles clear/reset feedback.
      */
     @Override
     public void clear() {
-        // TODO : some sound engineering here
-        System.err.println("no feedback defined for clear");
+        playSound("minecraft:block.note_block.Amethyst", 0.7f, 1.2f);
     }
+
 }

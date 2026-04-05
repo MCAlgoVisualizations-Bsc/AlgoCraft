@@ -96,18 +96,7 @@ public final class Main {
         ));
 
 
-//         final int gridX = 20;
-//         final int gridY = 20;
-//         var aStarGrid = buildPathGrid(gridX, gridY);
 
-//         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
-//         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
-//         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
-//         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
-//         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
-//         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
-//         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
-//
 
 
         algo.registerAlgorithm(
@@ -172,35 +161,55 @@ public final class Main {
                 )
         );
 
+        final int gridX = 20;
+        final int gridY = 20;
+//         var aStarGrid = buildPathGrid(gridX, gridY);
 
-//        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
-//                "A* Pathfinding",
-//                net.minestom.server.item.Material.COMPASS,
-//                "4-way A* on a fixed 2D obstacle map",
-//                "Colors show open, closed, and final path.",
-//                "Time: O(E log V) | Space: O(V)"
-//        ));
-//        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
-//                "BFS Pathfinding",
-//                net.minestom.server.item.Material.RECOVERY_COMPASS,
-//                "4-way BFS explores breadth-first",
-//                "Queue-based level-by-level expansion.",
-//                "Time: O(V + E) | Space: O(V)"
-//        ));
-//        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
-//                "DFS Pathfinding",
-//                net.minestom.server.item.Material.LOOM,
-//                "4-way DFS explores depth-first",
-//                "Stack-based backtracking expansion.",
-//                "Time: O(V + E) | Space: O(V)"
-//        ));
-//        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
-//                "Greedy Best-First",
-//                net.minestom.server.item.Material.REDSTONE_TORCH,
-//                "Fast heuristic-only pathfinding",
-//                "Prioritizes closeness to goal, may miss optimal paths.",
-//                "Time: O(E log V) | Space: O(V)"
-//        ));
+//         algo.registerAlgorithm("insertion sort (ints)", PlayerInsertion::new, integerCollection1, new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT);
+//         algo.registerAlgorithm("small insertion sort (ints)", PlayerInsertion::new, integerCollection2, new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT);
+//         algo.registerAlgorithm("insertion sort (string)", PlayerInsertion::new, stringCollection1, new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT);
+//         algo.registerAlgorithm("a* pathfinding (4-way)", () -> new PlayerAStar(gridX), aStarGrid, new GridLayout(gridX), ASTAR_2D_PLACEMENT);
+//         algo.registerAlgorithm("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX), aStarGrid, new GridLayout(gridX), BFS_2D_PLACEMENT);
+//         algo.registerAlgorithm("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX), aStarGrid, new GridLayout(gridX), DFS_2D_PLACEMENT);
+//         algo.registerAlgorithm("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX), aStarGrid, new GridLayout(gridX), GREEDY_2D_PLACEMENT);
+//
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("A* Pathfinding (4 way)", new PlayerAStar(gridX))
+                        .withData(sortedStringCollection)
+                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                )
+
+        algo.registerAlgorithmPresentation("a* pathfinding (4-way)", new AlgorithmPresentation(
+                "A* Pathfinding",
+                net.minestom.server.item.Material.COMPASS,
+                "4-way A* on a fixed 2D obstacle map",
+                "Colors show open, closed, and final path.",
+                "Time: O(E log V) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("bfs pathfinding (4-way)", new AlgorithmPresentation(
+                "BFS Pathfinding",
+                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                "4-way BFS explores breadth-first",
+                "Queue-based level-by-level expansion.",
+                "Time: O(V + E) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("dfs pathfinding (4-way)", new AlgorithmPresentation(
+                "DFS Pathfinding",
+                net.minestom.server.item.Material.LOOM,
+                "4-way DFS explores depth-first",
+                "Stack-based backtracking expansion.",
+                "Time: O(V + E) | Space: O(V)"
+        ));
+        algo.registerAlgorithmPresentation("greedy best-first (4-way)", new AlgorithmPresentation(
+                "Greedy Best-First",
+                net.minestom.server.item.Material.REDSTONE_TORCH,
+                "Fast heuristic-only pathfinding",
+                "Prioritizes closeness to goal, may miss optimal paths.",
+                "Time: O(E log V) | Space: O(V)"
+        ));
         algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
 

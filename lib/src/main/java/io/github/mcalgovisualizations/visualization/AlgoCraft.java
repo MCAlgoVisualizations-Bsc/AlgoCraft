@@ -86,7 +86,7 @@ public final class AlgoCraft {
                 switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
                     case RANDOMIZE -> controls.randomize();
                     case START -> controls.start();
-                    case STOP -> controls.stop();
+                    case STOP -> controls.pause();
                     case RESUME -> controls.resume();
                     case FORWARD -> controls.step();
                     case BACKWARD -> controls.back();

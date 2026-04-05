@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
@@ -47,7 +46,7 @@ public final class Renderer {
      * Stop animation activity but keep the scene alive so you can resume.
      * Typical use: controller.pause().
      */
-    public void stop() {
+    public void pause() {
         executor.pause();
     }
 

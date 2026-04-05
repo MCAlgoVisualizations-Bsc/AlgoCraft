@@ -92,12 +92,6 @@ public class AlgorithmUI implements IAlgorithmUI {
                         .set(ALGO_INTERACTION_TAG, InteractionType.BACKWARD)
                         .build()
         );
-        inv.setItemStack(5,
-                ItemStack.builder(Material.CLOCK)
-                        .customName(Component.text("Resume"))
-                        .set(ALGO_INTERACTION_TAG, InteractionType.RESUME)
-                        .build()
-        );
         inv.setItemStack(8,
                 ItemStack.builder(Material.BARRIER)
                         .customName(Component.text("Clear Algorithm"))
