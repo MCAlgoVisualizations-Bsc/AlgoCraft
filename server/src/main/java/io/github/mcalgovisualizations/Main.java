@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.commands.*;
+import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
@@ -10,7 +11,6 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateT
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
-import io.github.mcalgovisualizations.visualization.layouts.DynamicBstLayout;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
@@ -25,32 +25,16 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.item.Material;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
 
 public final class Main {
-    private static final Pos HUB_SPAWN = new Pos(194, 137, -38);
-
-    private static final AlgorithmPlacement INSERTION_INTS_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement INSERTION_SMALL_PLACEMENT =
-            new AlgorithmPlacement(new Pos(193, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement INSERTION_STRINGS_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));
-    private static final AlgorithmPlacement ASTAR_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 200, 145), new Pos(194.5, 200, 148));
-    private static final AlgorithmPlacement BFS_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(200, 200, 145), new Pos(207.5, 200, 148));
-    private static final AlgorithmPlacement DFS_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(213, 200, 145), new Pos(220.5, 200, 148));
-    private static final AlgorithmPlacement GREEDY_2D_PLACEMENT =
-            new AlgorithmPlacement(new Pos(226, 200, 145), new Pos(233.5, 200, 148));
-    private static final AlgorithmPlacement BST_SEARCH_PLACEMENT =
-            new AlgorithmPlacement(new Pos(187, 138, 120), new Pos(194.5, 139, 136));
-
     private static AlgoCraft algo = null;
 
     static void main(String[] args) {
@@ -62,219 +46,15 @@ public final class Main {
         instance.setTime(6000);   // Sets time to noon
 
         algo = new AlgoCraft(instance);
-        var integerCollection1 = new ArrayList<>(Arrays.asList(
-                new Data<>(3),
-                new Data<>(7),
-                new Data<>(8),
-                new Data<>(1),
-                new Data<>(6),
-                new Data<>(4),
-                new Data<>(9),
-                new Data<>(5),
-                new Data<>(2)
-        ));
 
-        var integerCollection2 = new ArrayList<>(Arrays.asList(
-                new Data<>(8),
-                new Data<>(3),
-                new Data<>(1)
-        ));
+        registerSortingAlgo();
+        registerPathFindingAlgo();
 
-        var sortedStringCollection = new ArrayList<>(Arrays.asList(
-                new Data<>("a"),
-                new Data<>("b"),
-                new Data<>("c")
-        ));
-
-        var stringCollection1 = new ArrayList<>(Arrays.asList(
-                new Data<>("a"),
-                new Data<>("b"),
-                new Data<>("k"),
-                new Data<>("x"),
-                new Data<>("d"),
-                new Data<>("h"),
-                new Data<>("a"),
-                new Data<>("b"),
-                new Data<>("e")
-        ));
-
-        var bstCollection = new ArrayList<>(Arrays.asList(
-                new Data<>(50),
-                new Data<>(30),
-                new Data<>(70),
-                new Data<>(21),
-                new Data<>(40),
-                new Data<>(60),
-                new Data<>(80),
-                new Data<>(10),
-                new Data<>(25),
-                new Data<>(35),
-                new Data<>(45),
-                new Data<>(55),
-                new Data<>(65),
-                new Data<>(74),
-                new Data<>(90)
-        ));
-
-
-
-
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("insertion sort (ints)", PlayerInsertion::new)
-                        .withData(integerCollection1)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Insertion Sort",
-                                net.minestom.server.item.Material.IRON_SWORD,
-                                "A simple sorting algorithm that builds",
-                                "the final sorted array one item at a time.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
-        ));
-
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
-                        .withData(integerCollection2)
-                        .positioning(new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Small Insertion Sort",
-                                net.minestom.server.item.Material.GOLDEN_SWORD,
-                                "A compact insertion-sort demo",
-                                "with fewer values for quick runs.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
-        ));
-
-
-        algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
-                        .withIdentity("insertion sort (string)", PlayerInsertion::new)
-                        .withData(stringCollection1)
-                        .positioning(new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-                        .onCompletion(_ -> AnimationPlan.empty())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Insertion Sort (Strings)",
-                                net.minestom.server.item.Material.BOOK,
-                                "Insertion-sort using string values",
-                                "to demonstrate generic ordering.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
-        ));
-
-
-        algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
-                        .withIdentity("sorted insertion", PlayerInsertion::new)
-                        .withData(sortedStringCollection)
-                        .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
-                        .onEvent(Compare.class, new CompareHandler())
-                        .onEvent(Swap.class, new SwapHandler())
-                )
-        );
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("bst search", PlayerBSTSearch::new)
-                        .withData(bstCollection)
-                        .positioning(new DynamicBstLayout(), BST_SEARCH_PLACEMENT)
-                        .onEvent(Compare.class, new BstCompareHandler())
-                )
-        );
-        algo.registerAlgorithmPresentation("bst search", new AlgorithmPresentation(
-                "Binary Search Tree (Search)",
-                net.minestom.server.item.Material.SPYGLASS,
-                "Builds a BST from the current values",
-                "then searches for one value using branch decisions.",
-                "Tip: use Randomize before Start to explore new search paths"
-        ));
-
-        final int gridX = 20;
-        final int gridY = 20;
-        var aStarGrid = buildPathGrid(gridX, gridY);
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
-                        .withData(aStarGrid)
-                        .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "A* Pathfinding",
-                                net.minestom.server.item.Material.COMPASS,
-                                "4-way A* on a fixed 2D obstacle map",
-                                "Colors show open, closed, and final path.",
-                                "Time: O(E log V) | Space: O(V)"
-                        ))
-                )
-        );
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
-                        .withData(aStarGrid)
-                        .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "BFS Pathfinding",
-                                net.minestom.server.item.Material.RECOVERY_COMPASS,
-                                "4-way BFS explores breadth-first",
-                                "Queue-based level-by-level expansion.",
-                                "Time: O(V + E) | Space: O(V)"
-                        ))
-                )
-        );
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
-                        .withData(aStarGrid)
-                        .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "DFS Pathfinding",
-                                net.minestom.server.item.Material.LOOM,
-                                "4-way DFS explores depth-first",
-                                "Stack-based backtracking expansion.",
-                                "Time: O(V + E) | Space: O(V)"
-                        ))
-                )
-        );
-
-        algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
-                        .withData(aStarGrid)
-                        .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Greedy Best-First",
-                                net.minestom.server.item.Material.REDSTONE_TORCH,
-                                "Fast heuristic-only pathfinding",
-                                "Prioritizes closeness to goal, may miss optimal paths.",
-                                "Time: O(E log V) | Space: O(V)"
-                        ))
-                )
-        );
-
-        algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
+        algo.setSpawnAction(player -> player.teleport(MapConstants.HUB_SPAWN));
         algo.addListeners(MinecraftServer.getGlobalEventHandler());
 
-        // Register visualization control listeners (item interactions)
+        // Some default configurations
         registerListeners(instance);
-        // registerControls(instance, algo.visualizationManager);
         registerCommands(MinecraftServer.getCommandManager());
 
         server.start("0.0.0.0", 25565);
@@ -287,7 +67,7 @@ public final class Main {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             event.setSpawningInstance(instance);
-            player.setRespawnPoint(HUB_SPAWN);
+            player.setRespawnPoint(MapConstants.HUB_SPAWN);
         });
 
         // Player spawn - give items and assign visualization (player is now fully in the world)
@@ -307,12 +87,6 @@ public final class Main {
             SystemMessages.sendTo(player, SystemMessages.WELCOME);
             SystemMessages.sendTo(player, SystemMessages.SELECT_ALGORITHM_HINT);
         });
-
-        // Cleanup visualization when player disconnects
-        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-            // VisualizationManager.removeVisualization(event.getPlayer());
-        });
-
     }
 
 
@@ -351,5 +125,188 @@ public final class Main {
             }
         }
         return grid;
+    }
+
+    private static void registerSortingAlgo() {
+        var integerCollection1 = new ArrayList<>(Arrays.asList(
+                new Data<>(3),
+                new Data<>(7),
+                new Data<>(8),
+                new Data<>(1),
+                new Data<>(6),
+                new Data<>(4),
+                new Data<>(9),
+                new Data<>(5),
+                new Data<>(2)
+        ));
+
+        var integerCollection2 = new ArrayList<>(Arrays.asList(
+                new Data<>(8),
+                new Data<>(3),
+                new Data<>(1)
+        ));
+
+
+
+        var sortedStringCollection = new ArrayList<>(Arrays.asList(
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("c")
+        ));
+
+
+
+        var stringCollection1 = new ArrayList<>(Arrays.asList(
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("k"),
+                new Data<>("x"),
+                new Data<>("d"),
+                new Data<>("h"),
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("e")
+        ));
+
+
+
+
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("insertion sort (ints)", PlayerInsertion::new)
+                        .withData(integerCollection1)
+                        .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion Sort",
+                                net.minestom.server.item.Material.IRON_SWORD,
+                                "A simple sorting algorithm that builds",
+                                "the final sorted array one item at a time.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                ));
+
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
+                        .withData(integerCollection2)
+                        .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_SMALL_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Small Insertion Sort",
+                                net.minestom.server.item.Material.GOLDEN_SWORD,
+                                "A compact insertion-sort demo",
+                                "with fewer values for quick runs.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                ));
+
+
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("insertion sort (string)", PlayerInsertion::new)
+                        .withData(stringCollection1)
+                        .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_STRINGS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                        .onCompletion(_ -> AnimationPlan.empty())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion Sort (Strings)",
+                                net.minestom.server.item.Material.BOOK,
+                                "Insertion-sort using string values",
+                                "to demonstrate generic ordering.",
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                ));
+
+
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("sorted insertion", PlayerInsertion::new)
+                        .withData(sortedStringCollection)
+                        .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_INTS_PLACEMENT)
+                        .onEvent(Compare.class, new CompareHandler())
+                        .onEvent(Swap.class, new SwapHandler())
+                )
+        );
+    }
+
+    private static void registerPathFindingAlgo() {
+        final int gridX = 20;
+        final int gridY = 20;
+        var aStarGrid = buildPathGrid(gridX, gridY);
+
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), MapConstants.ASTAR_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "A* Pathfinding",
+                                Material.NETHER_STAR,
+                                "4-way A* on a fixed 2D obstacle map",
+                                "Colors show open, closed, and final path.",
+                                "Time: O(E log V) | Space: O(V)"
+                        ))
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), MapConstants.BFS_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "BFS Pathfinding",
+                                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                                "4-way BFS explores breadth-first",
+                                "Queue-based level-by-level expansion.",
+                                "Time: O(V + E) | Space: O(V)"
+                        ))
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), MapConstants.DFS_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "DFS Pathfinding",
+                                net.minestom.server.item.Material.LOOM,
+                                "4-way DFS explores depth-first",
+                                "Stack-based backtracking expansion.",
+                                "Time: O(V + E) | Space: O(V)"
+                        ))
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
+                        .withData(aStarGrid)
+                        .positioning(new GridLayout(gridX), MapConstants.GREEDY_2D_PLACEMENT)
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Greedy Best-First",
+                                net.minestom.server.item.Material.REDSTONE_TORCH,
+                                "Fast heuristic-only pathfinding",
+                                "Prioritizes closeness to goal, may miss optimal paths.",
+                                "Time: O(E log V) | Space: O(V)"
+                        ))
+                )
+        );
     }
 }
