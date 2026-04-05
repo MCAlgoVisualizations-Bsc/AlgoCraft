@@ -112,6 +112,8 @@ public final class AlgoCraft {
                         algo.onComplete()
                 )
         );
+        if (algo.presentation() != null)
+            algorithmPresentations.put(algo.id(), algo.presentation());
     }
 
     public void selectAlgorithm(Player player) {
@@ -144,10 +146,6 @@ public final class AlgoCraft {
 
     public void setSelectorUI(IAlgorithmUI ui) {
         this.ui = ui;
-    }
-
-    public void registerAlgorithmPresentation(String algorithmId, AlgorithmPresentation presentation) {
-        algorithmPresentations.put(algorithmId, presentation);
     }
 
     public void setSpawnAction(Consumer<Player> spawnAction) {
