@@ -68,8 +68,15 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
             return;
         }
 
+        if (state == State.COMPLETED) {
+            // Allow START to act as resume if playback was paused during completion.
+            renderer.resume();
+            audience.start();
+            return;
+        }
+
         if (state != State.INITIALIZED) {
-            throw new IllegalStateException("VisualizationController must be initialized or paused before starting");
+            throw new IllegalStateException("VisualizationController must be initialized, paused, or completed before starting");
         }
 
         renderer.resume();
