@@ -13,7 +13,7 @@ repositories {
 
 sourceSets {
     main {
-        java.srcDirs("src")
+        java.srcDirs("src/main/java")
         resources.srcDir("resources")
     }
 }
