@@ -8,17 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public final class BstCompareHandler implements IAnimationHandler<Compare> {
 
-    public enum Mode {
-        BUILD,
-        SEARCH
-    }
-
-    private final Mode mode;
-
-    public BstCompareHandler(Mode mode) {
-        this.mode = mode;
-    }
-
     @Override
     public AnimationPlan handle(Compare event) {
         String narration = buildNarration(event);
@@ -54,19 +43,13 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
         }
 
         if (candidate < current) {
-            return mode == Mode.SEARCH
-                    ? "Go left from " + current
-                    : "Try inserting " + candidate + " to the left of " + current;
+            return "Go left from " + current;
         }
         if (candidate > current) {
-            return mode == Mode.SEARCH
-                    ? "Go right from " + current
-                    : "Try inserting " + candidate + " to the right of " + current;
+            return "Go right from " + current;
         }
 
-        return mode == Mode.SEARCH
-                ? "Found " + candidate
-                : "Value equals current node " + current;
+        return "Found " + candidate;
     }
 }
 
