@@ -42,5 +42,5 @@ public interface PlayerControls {
     /**
      * Sets the speed of the visualization.
      */
-    void changeSpeed();
+    int changeSpeed();
 }

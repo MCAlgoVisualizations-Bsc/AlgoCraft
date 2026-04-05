@@ -137,6 +137,7 @@ public class AlgorithmUI implements IAlgorithmUI {
                         .customName(Component.text("Change Speed"))
                         .set(ALGO_INTERACTION_TAG, InteractionType.SET_SPEED)
                         .build()
+
         );
         inv.setItemStack(8,
                 ItemStack.builder(Material.BARRIER)

@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.handlers;
+package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import net.kyori.adventure.audience.Audience;
@@ -30,6 +30,4 @@ public final class SystemMessages {
     public static void sendTo(Audience audience, Component message) {
         audience.sendMessage(message);
     }
-
-    private SystemMessages() {}
 }

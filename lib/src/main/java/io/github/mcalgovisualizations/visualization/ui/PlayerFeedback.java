@@ -44,8 +44,9 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         this.audience = Audience.audience(newAudience);
     }
 
-    public Audience audience() {
-        return this.audience;
+    @Override
+    public void sendActionBar(@NotNull final Component message) {
+        this.audience.sendActionBar(message);
     }
 
     /**
@@ -122,7 +123,8 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      * Plays a sound indicating a speed change.
      */
     @Override
-    public void changeSpeed() {
+    public int changeSpeed() {
         playSound("minecraft:block.note_block.amethyst", 0.7f, 1.2f);
+        return 0;
     }
 }

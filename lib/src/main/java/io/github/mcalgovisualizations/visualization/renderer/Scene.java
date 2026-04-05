@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
@@ -52,6 +53,17 @@ public final class Scene implements ISceneOps {
 
         boolean useBlockGridDisplay = isAStarGrid(layoutResults);
 
+        List<T> sorted = List.of();
+        int uniqueCount = 0;
+        if (!useBlockGridDisplay) {
+            sorted = Arrays.stream(layoutResults)
+                    .map(r -> r.value().value())
+                    .distinct()
+                    .sorted()
+                    .toList();
+            uniqueCount = sorted.size();
+        }
+
         for(int i = 0; i < layoutResults.length; i++) {
             var pos = layoutResults[i].pos();
             var value = layoutResults[i].value();
@@ -60,10 +72,16 @@ public final class Scene implements ISceneOps {
             if (useBlockGridDisplay) {
                 CellState initialState = initialCellState(value.value());
                 Block initialBlock = blockForState(initialState);
-                dv = new BlockDisplay(instance, pos, initialBlock, value.toString(), false);
+                dv = new BlockDisplay(instance, pos, initialBlock, value.toString());
                 slotStates.put(i, initialState);
             } else {
-                dv = layoutResults[i].getDisplayValue();
+                int rank0 = sorted.indexOf(value.value());
+                int mobValue = Math.clamp(
+                        (int) Math.round((rank0 / (double) Math.max(uniqueCount - 1, 1)) * 9) + 1,
+                        1,
+                        10
+                );
+                dv = new MobDisplay(pos, value.toString());
             }
 
             displaysBySlot.put(i, dv);
