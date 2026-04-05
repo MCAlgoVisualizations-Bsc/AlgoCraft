@@ -10,14 +10,17 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 
 public class BlockDisplay implements IBlockStateDisplay {
+    public final Instance instance;
     public final Entity blockEntity;
 
     private Pos pos;
 
-    public BlockDisplay(Pos pos, Block block, String text) {
+    public BlockDisplay(Instance instance, Pos pos, Block block, String text) {
         if (block == null) throw new NullPointerException("block cannot be null");
+        if (instance == null) throw new NullPointerException("instance cannot be null");
         if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
 
+        this.instance = instance;
 
         this.blockEntity = new Entity(EntityType.BLOCK_DISPLAY);
 
