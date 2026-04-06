@@ -117,11 +117,6 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
         values.emit(new Message("Greedy Best-First: path found", Message.MessageType.SUCCESS));
     }
 
-    @Override
-    public String getName() {
-        return "Greedy Best-First (4-way grid)";
-    }
-
     private static int heuristic(int from, int to, int columns) {
         int fromRow = from / columns;
         int fromCol = from % columns;

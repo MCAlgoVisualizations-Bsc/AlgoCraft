@@ -116,11 +116,6 @@ public class PlayerBFS implements IPlayerSort {
         values.emit(new Message("BFS: path found", Message.MessageType.SUCCESS));
     }
 
-    @Override
-    public String getName() {
-        return "BFS (4-way grid)";
-    }
-
     private static int index(int row, int col, int rows, int columns, int size) {
         if (row < 0 || row >= rows || col < 0 || col >= columns) return -1;
         int idx = (row * columns) + col;

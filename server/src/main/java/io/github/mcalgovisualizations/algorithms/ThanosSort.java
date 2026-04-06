@@ -15,9 +15,4 @@ public class ThanosSort implements IPlayerSort {
             }
         }
     }
-
-    @Override
-    public String getName() {
-        return "Thanos Sort";
-    }
 }

@@ -84,10 +84,6 @@ public class AlgorithmStepper<T extends Comparable<T>> {
         return history.size();
     }
 
-    public String getAlgoName() {
-        return algorithm.getName();
-    }
-
     private void assertNotEmpty() {
         if(history.isEmpty()) throw new IllegalStateException("Cannot step from empty history");
     }
