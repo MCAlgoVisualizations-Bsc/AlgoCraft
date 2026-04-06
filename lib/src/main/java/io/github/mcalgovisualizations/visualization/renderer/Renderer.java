@@ -13,14 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-public final class Renderer {
-    private final Scene scene;
+public final class Renderer<O extends ISceneOps> {
+    private final ISceneOps scene;
     private final Instance instance;
-    private final Dispatcher dispatcher;
-    private final Executor executor;
+    private final Dispatcher<O> dispatcher;
+    private final Executor<O> executor;
+    private final AnimationPlan<O> complete;
     private final Pos origin;
     private final ILayout layout;
-    private final AnimationPlan complete;
     private boolean collapseAnimationDelays = false;
 
     public Renderer(
@@ -29,11 +29,12 @@ public final class Renderer {
             @NotNull ILayout layout,
             @NotNull AudienceChannel audience,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
-            @NotNull AnimationPlan complete
+            @NotNull AnimationPlan<O> complete,
+            @NotNull O scene
     ) {
-        this.scene = new Scene(instance, origin, audience);
-        this.executor = new Executor(scene);
-        this.dispatcher = new Dispatcher(handlers);
+        this.scene = scene;
+        this.executor = new Executor<>(scene);
+        this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
 
         // make these into context?
@@ -98,12 +99,12 @@ public final class Renderer {
         scene.setLayout(layoutResult);
     }
 
-    private AnimationPlan normalizePlan(AnimationPlan plan) {
+    private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
         if (!collapseAnimationDelays || plan.isEmpty()) {
             return plan;
         }
 
-        var builder = AnimationPlan.builder();
+        AnimationPlan.Builder<O> builder = AnimationPlan.builder();
         for (var step : plan.steps()) {
             builder.step(0, step.op());
         }

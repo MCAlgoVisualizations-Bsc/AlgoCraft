@@ -6,7 +6,6 @@ import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
-import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
 import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
@@ -15,22 +14,22 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.renderer.GridScene;
+import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.Material;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
@@ -169,12 +168,8 @@ public final class Main {
                 new Data<>("e")
         ));
 
-
-
-
-
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
                         .withData(integerCollection1)
                         .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_INTS_PLACEMENT)
@@ -185,13 +180,17 @@ public final class Main {
                                 net.minestom.server.item.Material.IRON_SWORD,
                                 "A simple sorting algorithm that builds",
                                 "the final sorted array one item at a time.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
+                                "Time: O(n^2) | Space: O(1)"))
+                        .withScene(sceneContext ->
+                                new DefaultScene(
+                                        sceneContext.instance(),
+                                        sceneContext.audience(),
+                                        sceneContext.origin()))
                 ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
                         .withData(integerCollection2)
                         .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_SMALL_PLACEMENT)
@@ -202,13 +201,17 @@ public final class Main {
                                 net.minestom.server.item.Material.GOLDEN_SWORD,
                                 "A compact insertion-sort demo",
                                 "with fewer values for quick runs.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
+                                "Time: O(n^2) | Space: O(1)"))
+                        .withScene(sceneContext ->
+                                new DefaultScene(
+                                        sceneContext.instance(),
+                                        sceneContext.audience(),
+                                        sceneContext.origin()))
                 ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("insertion sort (string)", PlayerInsertion::new)
                         .withData(stringCollection1)
                         .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_STRINGS_PLACEMENT)
@@ -220,18 +223,27 @@ public final class Main {
                                 net.minestom.server.item.Material.BOOK,
                                 "Insertion-sort using string values",
                                 "to demonstrate generic ordering.",
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
+                                "Time: O(n^2) | Space: O(1)"))
+                        .withScene(sceneContext ->
+                                new DefaultScene(
+                                        sceneContext.instance(),
+                                        sceneContext.audience(),
+                                        sceneContext.origin()))
                 ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("sorted insertion", PlayerInsertion::new)
                         .withData(sortedStringCollection)
                         .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
+                        .withScene(sceneContext ->
+                                new DefaultScene(
+                                        sceneContext.instance(),
+                                        sceneContext.audience(),
+                                        sceneContext.origin()))
                 )
         );
     }
@@ -241,9 +253,8 @@ public final class Main {
         final int gridY = 20;
         var aStarGrid = buildPathGrid(gridX, gridY);
 
-
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), MapConstants.ASTAR_2D_PLACEMENT)
@@ -254,13 +265,13 @@ public final class Main {
                                 Material.NETHER_STAR,
                                 "4-way A* on a fixed 2D obstacle map",
                                 "Colors show open, closed, and final path.",
-                                "Time: O(E log V) | Space: O(V)"
-                        ))
+                                "Time: O(E log V) | Space: O(V)"))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), MapConstants.BFS_2D_PLACEMENT)
@@ -271,13 +282,13 @@ public final class Main {
                                 net.minestom.server.item.Material.RECOVERY_COMPASS,
                                 "4-way BFS explores breadth-first",
                                 "Queue-based level-by-level expansion.",
-                                "Time: O(V + E) | Space: O(V)"
-                        ))
+                                "Time: O(V + E) | Space: O(V)"))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), MapConstants.DFS_2D_PLACEMENT)
@@ -288,13 +299,13 @@ public final class Main {
                                 net.minestom.server.item.Material.LOOM,
                                 "4-way DFS explores depth-first",
                                 "Stack-based backtracking expansion.",
-                                "Time: O(V + E) | Space: O(V)"
-                        ))
+                                "Time: O(V + E) | Space: O(V)"))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), MapConstants.GREEDY_2D_PLACEMENT)
@@ -305,8 +316,11 @@ public final class Main {
                                 net.minestom.server.item.Material.REDSTONE_TORCH,
                                 "Fast heuristic-only pathfinding",
                                 "Prioritizes closeness to goal, may miss optimal paths.",
-                                "Time: O(E log V) | Space: O(V)"
-                        ))
+                                "Time: O(E log V) | Space: O(V)"))
+                        .withScene(sceneContext ->
+                                new GridScene(sceneContext.instance(),
+                                        sceneContext.origin(),
+                                        sceneContext.audience()))
                 )
         );
     }

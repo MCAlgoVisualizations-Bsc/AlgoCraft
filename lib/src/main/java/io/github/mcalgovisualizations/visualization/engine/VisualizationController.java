@@ -28,7 +28,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     }
 
     private final AlgorithmStepper<T> stepper;
-    private final Renderer renderer;
+    private final Renderer<?> renderer;
     private final PlayerFeedback audience;
 
     private static final int MIN_TICKS_PER_STEP = 1;
@@ -41,7 +41,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
 
     public VisualizationController(
             @NotNull IPlayerSort algorithm,
-            @NotNull Renderer renderer,
+            @NotNull Renderer<?> renderer,
             @NotNull ISort<T> collection,
             @NotNull PlayerFeedback audience
     ) {

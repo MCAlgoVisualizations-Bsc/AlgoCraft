@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.renderer.Displays;
 
-import io.github.mcalgovisualizations.visualization.renderer.IBlockStateDisplay;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;

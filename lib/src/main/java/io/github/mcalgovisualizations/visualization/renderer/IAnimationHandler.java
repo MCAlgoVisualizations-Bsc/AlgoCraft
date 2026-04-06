@@ -5,5 +5,5 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 
 @FunctionalInterface
 public interface IAnimationHandler<E extends IAlgorithmEvent> {
-    AnimationPlan handle(E event);
+    <O extends ISceneOps> AnimationPlan<O> handle(E event);
 }

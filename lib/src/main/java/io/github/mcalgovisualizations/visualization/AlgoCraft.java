@@ -6,13 +6,10 @@ import io.github.mcalgovisualizations.visualization.engine.VisualizationControll
 import io.github.mcalgovisualizations.visualization.layouts.ILayout;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
-import io.github.mcalgovisualizations.visualization.renderer.Renderer;
+import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
-import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
-import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
-import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
-import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
+import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
+import io.github.mcalgovisualizations.visualization.ui.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -35,13 +32,14 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR
 
 public final class AlgoCraft {
 
-    private record AlgorithmEntry<T extends Comparable<T>>(
+    private record AlgorithmEntry<T extends Comparable<T>, O extends ISceneOps>(
             IPlayerSort algorithm,
             ISort<T> collection,
             ILayout layout,
             AlgorithmPlacement placement,
             Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> eventHandlers,
-            Function<? super ISort<T>, ? extends AnimationPlan> completeHandler
+            Function<? super ISort<T>, ? extends AnimationPlan<O>> completeHandler,
+            Function<SceneContext, O> scene
     ) {
         @Override
         public ISort<T> collection() {
@@ -52,7 +50,7 @@ public final class AlgoCraft {
     private IAlgorithmUI ui = new AlgorithmUI();
     private final InstanceContainer instanceContainer;
     private final Map<UUID, PlayerControls> playerSteppers = new HashMap<>();
-    private final Map<String, AlgorithmEntry<?>> algorithms = new HashMap<>();
+    private final Map<String, AlgorithmEntry<?, ?>> algorithms = new HashMap<>();
     private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
     private Consumer<Player> spawnAction = player -> {};
 
@@ -100,7 +98,7 @@ public final class AlgoCraft {
         handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
-    public <T extends Comparable<T>> void registerAlgorithm(Algorithm<T> algo) {
+    public <T extends Comparable<T>, O extends ISceneOps> void registerAlgorithm(Algorithm<T, O> algo) {
         algorithms.put(
                 algo.id(),
                 new AlgorithmEntry<>(
@@ -109,7 +107,8 @@ public final class AlgoCraft {
                         algo.layout(),
                         algo.placement(),
                         algo.handlerRegistry(),
-                        algo.onComplete()
+                        algo.onComplete(),
+                        algo.scene()
                 )
         );
         if (algo.presentation() != null)
@@ -167,41 +166,44 @@ public final class AlgoCraft {
                 : AlgorithmPresentation.fallback(algorithmId);
     }
 
-    private <T extends Comparable<T>> void assignVisualization(
+    private <T extends Comparable<T>, O extends ISceneOps> void assignVisualization(
             Player player,
             InstanceContainer instance,
-            AlgorithmEntry<T> entry
+            AlgorithmEntry<T, O> entry
     ) {
         assignVisualizationCaptured(player, instance, entry);
     }
 
-    private <T extends Comparable<T>> void assignVisualizationCaptured(
+    private <T extends Comparable<T>, O extends ISceneOps> void assignVisualizationCaptured(
             Player player,
             InstanceContainer instance,
-            AlgorithmEntry<T> algo
+            AlgorithmEntry<T, O> algo
     ) {
         removeVisualization(player);
         // implementation for sounds and messages directly to the player
         final var audience = new PlayerFeedback(player);
 
         // should probably not be here, but it works for now
-        // sorts the collection and returns the complete plan
+        // sorts the collection and returns the complete plan,
+        // so users can make onCompletion with the sorted collection
         final var collection = algo.collection().copy();
         final var algorithm = algo.algorithm();
         algorithm.sort(collection);
         final var onCompletePlan = algo.completeHandler().apply(collection);
+        final var scene = algo.scene().apply(new SceneContext(instance, audience, algo.placement().renderOrigin()));
 
 
-        final var renderer = new Renderer(
+        final var renderer = new Renderer<O>(
                 instance,
                 algo.placement().renderOrigin(),
                 algo.layout(),
                 audience,
                 algo.eventHandlers(),
-                onCompletePlan
+                onCompletePlan,
+                scene
         );
 
-        final var controller = new VisualizationController<>(
+        final var controller = new VisualizationController<T>(
                 algo.algorithm(),
                 renderer,
                 algo.collection(),

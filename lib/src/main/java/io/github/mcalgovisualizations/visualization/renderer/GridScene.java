@@ -1,0 +1,108 @@
+package io.github.mcalgovisualizations.visualization.renderer;
+
+import io.github.mcalgovisualizations.visualization.renderer.Displays.IBlockStateDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
+import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
+import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
+
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+
+/**
+ * Scene = Minestom world state.
+ *
+ */
+public class GridScene extends AbstractScene {
+    // Visual state
+    private final Map<Integer, CellState> slotStates = new HashMap<>();
+
+    public GridScene(@NotNull Instance instance, @NotNull Pos origin, @NotNull AudienceChannel audience) {
+        super(instance, audience, origin);
+    }
+
+    @Override
+    public void setLayout(LayoutResult[] layoutResults) {
+        cleanUp();
+        boolean useBlockGridDisplay = isAStarGrid(layoutResults);
+
+        for(int i = 0; i < layoutResults.length; i++) {
+            var pos = layoutResults[i].pos();
+            var value = layoutResults[i].value();
+
+            IDisplayValue dv;
+            if (useBlockGridDisplay) {
+                CellState initialState = initialCellState(value.value());
+                Block initialBlock = blockForState(initialState);
+                dv = new BlockDisplay(pos, initialBlock, value.toString());
+                slotStates.put(i, initialState);
+            } else {
+                dv = new MobDisplay(pos, value.toString());
+            }
+
+            displaysBySlot.put(i, dv);
+            dv.setInstance(instance);
+        }
+    }
+
+    @Override
+    public void setValue(int slot, int value) {
+        var display = requireDisplay(slot);
+        display.setValue(value);
+    }
+
+    public void toggleCellState(int slot, CellState first, CellState second) {
+        var current = slotStates.getOrDefault(slot, CellState.DEFAULT);
+        var next = current == first ? second : first;
+        slotStates.put(slot, next);
+        applyCellState(slot, next);
+    }
+
+
+    private void applyCellState(int slot, CellState state) {
+        var display = requireDisplay(slot);
+        if (!(display instanceof IBlockStateDisplay blockDisplay)) {
+            return;
+        }
+        blockDisplay.setBlock(blockForState(state));
+    }
+
+    private static CellState initialCellState(Object value) {
+        if (!(value instanceof Integer number)) {
+            return CellState.DEFAULT;
+        }
+        return switch (number) {
+            case 1 -> CellState.WALL;
+            case 2 -> CellState.START;
+            case 3 -> CellState.GOAL;
+            default -> CellState.DEFAULT;
+        };
+    }
+
+    private static Block blockForState(CellState state) {
+        return switch (state) {
+            case DEFAULT -> Block.SMOOTH_STONE;
+            case WALL -> Block.BLACK_CONCRETE;
+            case START -> Block.LIME_CONCRETE;
+            case GOAL -> Block.RED_CONCRETE;
+            case OPEN -> Block.LIGHT_BLUE_CONCRETE;
+            case CLOSED -> Block.GREEN_CONCRETE;
+            case PATH -> Block.ORANGE_CONCRETE;
+        };
+    }
+
+    private boolean isAStarGrid(LayoutResult[] layoutResults) {
+        if (layoutResults.length == 0) return false;
+        for (var layoutResult : layoutResults) {
+            Object raw = layoutResult.value().value();
+            if (!(raw instanceof Integer number)) return false;
+            if (number < 0 || number > 3) return false;
+        }
+        return true;
+    }
+}

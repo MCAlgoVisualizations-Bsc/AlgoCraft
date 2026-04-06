@@ -1,8 +1,9 @@
 package io.github.mcalgovisualizations.handlers;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.HologramDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.GridScene;
+import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public final class CompareHandler implements IAnimationHandler<Compare> {
 
     @Override
-    public AnimationPlan handle(Compare event) {
+    public AnimationPlan<ISceneOps> handle(Compare event) {
         return AnimationPlan.builder()
                 .step(1, sceneOps -> {
                     sceneOps.sendActionBar(Component.text("Comparing [" + event.xValue() + "] and [" + event.yValue() + "]", NamedTextColor.GREEN));

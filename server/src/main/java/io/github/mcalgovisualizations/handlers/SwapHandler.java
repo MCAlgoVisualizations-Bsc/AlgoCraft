@@ -1,15 +1,15 @@
 package io.github.mcalgovisualizations.handlers;
 
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.HologramDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public final class SwapHandler implements IAnimationHandler<Swap> {
     @Override
-    public AnimationPlan handle(Swap event) {
+    public AnimationPlan<ISceneOps> handle(Swap event) {
         return AnimationPlan.builder()
                 .step(1, sceneOps -> {
                     sceneOps.sendActionBar(Component.text("Swapping [" + event.xValue() + "] and [" + event.yValue() + "]", NamedTextColor.GREEN));
