@@ -9,6 +9,8 @@ import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -18,6 +20,7 @@ import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -132,11 +135,20 @@ public final class AlgoCraft {
             final var entry = algorithms.get(algorithmId);
             if (entry == null) return;
 
-            assignVisualization(player, instanceContainer, entry);
-            player.teleport(entry.placement().teleportPoint());
-
-            ui.applyRunningLayout(player);
             player.closeInventory();
+            player.teleport(entry.placement().teleportPoint());
+            ui.applyRunningLayout(player);
+
+            MinecraftServer.getSchedulerManager()
+                    .buildTask(() -> {
+                        try {
+                            assignVisualization(player, instanceContainer, entry);
+                        } catch (IllegalStateException e) {
+                            player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
+                        }
+                    })
+                    .delay(Duration.ofMillis(200))
+                    .schedule();
         });
 
         player.openInventory(inventory);
@@ -170,7 +182,12 @@ public final class AlgoCraft {
             InstanceContainer instance,
             AlgorithmEntry<T, O> entry
     ) {
-        assignVisualizationCaptured(player, instance, entry);
+        try {
+            assignVisualizationCaptured(player, instance, entry);
+        } catch (IllegalStateException e) {
+            System.err.println("Failed to assign visualization: " + e.getMessage());
+            throw e;
+        }
     }
 
     private <T extends Comparable<T>, O extends ISceneOps> void assignVisualizationCaptured(
@@ -179,18 +196,14 @@ public final class AlgoCraft {
             AlgorithmEntry<T, O> algo
     ) {
         removeVisualization(player);
-        // implementation for sounds and messages directly to the player
+
         final var audience = new PlayerFeedback(player);
 
-        // should probably not be here, but it works for now
-        // sorts the collection and returns the complete plan,
-        // so users can make onCompletion with the sorted collection
         final var collection = algo.collection().copy();
         final var algorithm = algo.algorithm();
         algorithm.sort(collection);
         final var onCompletePlan = algo.completeHandler().apply(collection);
         final var scene = algo.scene().apply(new SceneContext(instance, audience, algo.placement().renderOrigin()));
-
 
         final var renderer = new Renderer<O>(
                 instance,
@@ -209,7 +222,8 @@ public final class AlgoCraft {
                 audience
         );
 
-        controller.startVisualization();
+        controller.startVisualization(); // throws if chunks are not loaded
+
         playerSteppers.put(player.getUuid(), controller);
     }
 

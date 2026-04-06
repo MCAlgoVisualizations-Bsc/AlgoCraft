@@ -10,6 +10,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +97,17 @@ public final class Renderer<O extends ISceneOps> {
 
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
+        requireChunksLoaded(layoutResult);
         scene.setLayout(layoutResult);
+    }
+
+    private <T extends Comparable<T>> void requireChunksLoaded(LayoutResult<T>[] layoutResult) {
+        final var allLoaded = Arrays.stream(layoutResult)
+                .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
+
+        if (!allLoaded) {
+            throw new IllegalStateException("Visualization area is not loaded yet.");
+        }
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {

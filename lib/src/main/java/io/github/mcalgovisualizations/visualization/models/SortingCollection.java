@@ -44,7 +44,6 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
     @Override
     public void swap(int i, int j) {
         if (i == j) return;
-        events.add(new Swap(i, j, data.get(i), data.get(j)));
         Data<T> temp = data.get(i);
         data.set(i, data.get(j));
         data.set(j, temp);
@@ -52,7 +51,6 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
 
     @Override
     public int compare(int i, int j) {
-        events.add(new Compare(i, j, data.get(i), data.get(j)));
         return data.get(i).value().compareTo(data.get(j).value());
     }
 
@@ -66,7 +64,6 @@ public class SortingCollection<T extends Comparable<T>> extends AbstractCollecti
     }
 
     public void clear() {
-        this.data.clear();
         this.events.clear();
     }
 

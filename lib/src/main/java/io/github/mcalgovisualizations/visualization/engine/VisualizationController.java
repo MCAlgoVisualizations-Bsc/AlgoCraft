@@ -1,13 +1,13 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
 import io.github.mcalgovisualizations.visualization.PlayerControls;
-import io.github.mcalgovisualizations.visualization.algorithms.AlgorithmStepper;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.*;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,8 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         CLEARED
     }
 
-    private final AlgorithmStepper<T> stepper;
+    private final AlgorithmTraceBuilder<T> traceBuilder;
+    private Stepper stepper;
     private final Renderer<?> renderer;
     private final PlayerFeedback audience;
 
@@ -45,17 +46,16 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
             @NotNull ISort<T> collection,
             @NotNull PlayerFeedback audience
     ) {
-        this.stepper = new AlgorithmStepper<>(algorithm, collection);
+        this.traceBuilder = new AlgorithmTraceBuilder<>(algorithm, collection);
+        this.stepper = new Stepper(traceBuilder.build().history());
         this.renderer = renderer;
         this.audience = audience;
     }
 
     public void startVisualization() {
         assertNotCleared();
-
-        var model = stepper.getBackingCollection();
         applyPlaybackSpeed();
-        renderer.initialize(model);
+        renderer.initialize(traceBuilder.getInitialData());
         state = State.INITIALIZED;
     }
 
@@ -76,7 +76,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         }
 
         if (state != State.INITIALIZED) {
-            throw new IllegalStateException("VisualizationController must be initialized, paused, or completed before starting");
+            throw new IllegalStateException("VisualizationController must be initialized, paused, or completed before starting: " + state);
         }
 
         renderer.resume();
@@ -202,7 +202,6 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     public void clear() {
         cancelRunningTask();
         renderer.onCleanup();
-        stepper.onCleanup();
         audience.clear();
         state = State.CLEARED;
     }
@@ -210,10 +209,11 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     @Override
     public void randomize() {
         cancelRunningTask();
-
         renderer.onCleanup();
-        var layout = stepper.randomizeCollection(24);
-        renderer.initialize(layout);
+
+        var trace = traceBuilder.randomizeAndBuild(24);
+        this.stepper = new Stepper(trace.history());
+        renderer.initialize(trace.initialData());
         audience.randomize();
         state = State.INITIALIZED;
     }

@@ -6,13 +6,6 @@ import io.github.mcalgovisualizations.visualization.models.ISort;
 public class ThanosSort implements IPlayerSort {
     @Override
     public <T extends Comparable<T>> void sort(ISort<T> values) {
-        int n = values.size();
-        for (int i = 1; i < n; i++) {
-            int j = i;
-            while (j > 0 && values.compare(j, j - 1) < 0) {
-                values.swap(j, j - 1);
-                j--;
-            }
-        }
+
     }
 }
