@@ -3,13 +3,18 @@ package io.github.mcalgovisualizations.visualization.layouts;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.entity.Player;
-import net.minestom.server.instance.block.Block;
+import net.minestom.server.timer.ExecutionType;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Places values by simulating a ternary search tree insertion to determine logical
@@ -138,26 +143,25 @@ public record TSTNodeLayout(
 
         @Override
         public io.github.mcalgovisualizations.visualization.renderer.IDisplayValue applyStyle(String value, Pos pos) {
-            Block nodeBlock = switch (role) {
+            var nodeBlock = switch (role) {
                 case ROOT -> net.minestom.server.instance.block.Block.OAK_LOG;
                 case LEAF -> net.minestom.server.instance.block.Block.OAK_LEAVES;
                 case INTERNAL -> net.minestom.server.instance.block.Block.OAK_PLANKS;
             };
-            return new TstNodeWithConnectors(new BlockDisplay(pos, nodeBlock, value), pos, leftPos, middlePos, rightPos);
+            return new TstNodeWithParticles(new BlockDisplay(pos, nodeBlock, value), leftPos, middlePos, rightPos);
         }
     }
 
-    private static final class TstNodeWithConnectors implements io.github.mcalgovisualizations.visualization.renderer.IDisplayValue {
+    private static final class TstNodeWithParticles implements io.github.mcalgovisualizations.visualization.renderer.IDisplayValue {
         private final BlockDisplay base;
-        private final Pos nodePos;
         private final Pos leftPos;
         private final Pos middlePos;
         private final Pos rightPos;
-        private final List<BlockDisplay> connectors = new ArrayList<>();
+        private Instance instance;
+        private Task task;
 
-        private TstNodeWithConnectors(BlockDisplay base, Pos nodePos, Pos leftPos, Pos middlePos, Pos rightPos) {
+        private TstNodeWithParticles(BlockDisplay base, Pos leftPos, Pos middlePos, Pos rightPos) {
             this.base = base;
-            this.nodePos = nodePos;
             this.leftPos = leftPos;
             this.middlePos = middlePos;
             this.rightPos = rightPos;
@@ -175,27 +179,30 @@ public record TSTNodeLayout(
 
         @Override
         public void setInstance(Instance instance) {
+            this.instance = instance;
             base.setInstance(instance);
-            createConnectors(instance, nodePos, leftPos);
-            createConnectors(instance, nodePos, middlePos);
-            createConnectors(instance, nodePos, rightPos);
+
+            if (leftPos != null || middlePos != null || rightPos != null) {
+                task = MinecraftServer.getSchedulerManager()
+                        .buildTask(this::emitParticles)
+                        .executionType(ExecutionType.TICK_END)
+                        .repeat(TaskSchedule.tick(1))
+                        .schedule();
+            }
         }
 
         @Override
         public void addViewer(Player player) {
             base.addViewer(player);
-            for (var connector : connectors) {
-                connector.addViewer(player);
-            }
         }
 
         @Override
         public void remove() {
-            base.remove();
-            for (var connector : connectors) {
-                connector.remove();
+            if (task != null) {
+                task.cancel();
+                task = null;
             }
-            connectors.clear();
+            base.remove();
         }
 
         @Override
@@ -213,8 +220,18 @@ public record TSTNodeLayout(
             return base.isSpawned();
         }
 
-        private void createConnectors(Instance instance, Pos from, Pos to) {
-            if (to == null || instance == null) {
+        private void emitParticles() {
+            if (instance == null || instance.getPlayers().isEmpty()) {
+                return;
+            }
+
+            emitLine(base.getPos(), leftPos);
+            emitLine(base.getPos(), middlePos);
+            emitLine(base.getPos(), rightPos);
+        }
+
+        private void emitLine(Pos from, Pos to) {
+            if (to == null) {
                 return;
             }
 
@@ -222,7 +239,7 @@ public record TSTNodeLayout(
             double dy = to.y() - from.y();
             double dz = to.z() - from.z();
             double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            int steps = Math.max(3, (int) Math.ceil(distance * 2.0));
+            int steps = Math.max(5, (int) Math.ceil(distance * 6.0));
 
             for (int i = 1; i < steps; i++) {
                 double t = (double) i / steps;
@@ -231,8 +248,18 @@ public record TSTNodeLayout(
                         from.y() + (dy * t),
                         from.z() + (dz * t)
                 );
-                BlockDisplay connector = new BlockDisplay(instance, point, Block.GRAY_CONCRETE, "");
-                connectors.add(connector);
+                ParticlePacket packet = new ParticlePacket(
+                        Particle.END_ROD,
+                        true,
+                        true,
+                        point,
+                        new Vec(0, 0, 0),
+                        0f,
+                        1
+                );
+                for (var player : instance.getPlayers()) {
+                    player.sendPacket(packet);
+                }
             }
         }
     }
