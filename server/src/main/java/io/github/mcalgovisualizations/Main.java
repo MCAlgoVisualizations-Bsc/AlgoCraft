@@ -25,8 +25,12 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.item.Material;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static io.github.mcalgovisualizations.config.MapConstants.*;
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
@@ -175,6 +179,26 @@ public final class Main {
                                 "Builds a BST from the current values",
                                 "then searches for one value using branch decisions.",
                                 "Tip: use Randomize before Start to explore new search paths"
+                        ))
+                )
+        );
+
+        var e = new ArrayList<>(bstCollection);
+        Collections.shuffle(e);
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
+                        .withData(e)
+                        // Use the new Unordered Layout to ensure Root is at index 0 (the top)
+                        .positioning(new UnorderedTreeLayout(), BST_SEARCH_PLACEMENT)
+                        .onEvent(Compare.class, new BstCompareHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Unordered Binary Tree (Linear Search)",
+                                Material.DARK_OAK_LOG,
+                                "A tree filled level-by-level.",
+                                "Search must visit nodes in order",
+                                "until the target is found."
                         ))
                 )
         );
