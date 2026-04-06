@@ -22,7 +22,7 @@ public class GridScene extends AbstractScene {
     // Visual state
     private final Map<Integer, CellState> slotStates = new HashMap<>();
 
-    public GridScene(@NotNull Instance instance, @NotNull Pos origin, @NotNull AudienceChannel audience) {
+    public GridScene(@NotNull Instance instance, @NotNull AudienceChannel audience, @NotNull Pos origin) {
         super(instance, audience, origin);
     }
 

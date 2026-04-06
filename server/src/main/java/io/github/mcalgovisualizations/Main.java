@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.commands.*;
+import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
@@ -25,6 +26,7 @@ import net.minestom.server.command.CommandManager;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.Material;
@@ -32,7 +34,6 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static io.github.mcalgovisualizations.config.MapConstants.*;
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
@@ -108,7 +109,7 @@ public final class Main {
 
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
                         .withData(integerCollection1)
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
@@ -116,16 +117,17 @@ public final class Main {
                         .onEvent(Swap.class, new SwapHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort",
-                                net.minestom.server.item.Material.IRON_SWORD,
+                                Material.IRON_SWORD,
                                 "A simple sorting algorithm that builds",
                                 "the final sorted array one item at a time.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
         ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
                         .withData(integerCollection2)
                         .positioning(new FloatingLinearLayout(), INSERTION_SMALL_PLACEMENT)
@@ -133,16 +135,17 @@ public final class Main {
                         .onEvent(Swap.class, new SwapHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Small Insertion Sort",
-                                net.minestom.server.item.Material.GOLDEN_SWORD,
+                                Material.GOLDEN_SWORD,
                                 "A compact insertion-sort demo",
                                 "with fewer values for quick runs.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
         ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("insertion sort (string)", PlayerInsertion::new)
                         .withData(stringCollection1)
                         .positioning(new FloatingLinearLayout(), INSERTION_STRINGS_PLACEMENT)
@@ -151,37 +154,40 @@ public final class Main {
                         .onCompletion(_ -> AnimationPlan.empty())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort (Strings)",
-                                net.minestom.server.item.Material.BOOK,
+                                Material.BOOK,
                                 "Insertion-sort using string values",
                                 "to demonstrate generic ordering.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
         ));
 
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("sorted insertion", PlayerInsertion::new)
                         .withData(sortedStringCollection)
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("bst search", PlayerBSTSearch::new)
                         .withData(bstCollection)
                         .positioning(new BSTNodeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Binary Search Tree (Search)",
-                                net.minestom.server.item.Material.SPYGLASS,
+                                Material.SPYGLASS,
                                 "Builds a BST from the current values",
                                 "then searches for one value using branch decisions.",
                                 "Tip: use Randomize before Start to explore new search paths"
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -189,7 +195,7 @@ public final class Main {
         Collections.shuffle(unordered_tree_search_data);
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
                         .withData(unordered_tree_search_data)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
@@ -202,11 +208,12 @@ public final class Main {
                                 "Search must visit nodes in order",
                                 "until the target is found."
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<String>build(ctx -> ctx
+                Algorithm.<String, ISceneOps>build(ctx -> ctx
                         .withIdentity("tst search", PlayerTSTSearch::new)
                         .withData(stringCollection1)
                         .positioning(new TSTNodeLayout(), BST_SEARCH_PLACEMENT)
@@ -214,11 +221,12 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Ternary Search Tree (Search)",
-                                net.minestom.server.item.Material.SPYGLASS,
+                                Material.SPYGLASS,
                                 "Builds a ternary search tree from the current strings",
                                 "then searches for one value using left, middle, and right branches.",
                                 "Tip: equal matches follow the middle branch"
                         ))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -226,7 +234,7 @@ public final class Main {
         final int gridY = 20;
         var aStarGrid = buildPathGrid(gridX, gridY);
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
@@ -234,16 +242,17 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
-                                net.minestom.server.item.Material.COMPASS,
+                                Material.COMPASS,
                                 "4-way A* on a fixed 2D obstacle map",
                                 "Colors show open, closed, and final path.",
                                 "Time: O(E log V) | Space: O(V)"
                         ))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
@@ -251,16 +260,17 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
-                                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                                Material.RECOVERY_COMPASS,
                                 "4-way BFS explores breadth-first",
                                 "Queue-based level-by-level expansion.",
                                 "Time: O(V + E) | Space: O(V)"
                         ))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
@@ -268,16 +278,17 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
-                                net.minestom.server.item.Material.LOOM,
+                                Material.LOOM,
                                 "4-way DFS explores depth-first",
                                 "Stack-based backtracking expansion.",
                                 "Time: O(V + E) | Space: O(V)"
                         ))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<Integer, GridScene>build(ctx -> ctx
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
@@ -285,11 +296,12 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
-                                net.minestom.server.item.Material.REDSTONE_TORCH,
+                                Material.REDSTONE_TORCH,
                                 "Fast heuristic-only pathfinding",
                                 "Prioritizes closeness to goal, may miss optimal paths.",
                                 "Time: O(E log V) | Space: O(V)"
                         ))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -427,7 +439,7 @@ public final class Main {
                         .onEvent(Swap.class, new SwapHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort",
-                                net.minestom.server.item.Material.IRON_SWORD,
+                                Material.IRON_SWORD,
                                 "A simple sorting algorithm that builds",
                                 "the final sorted array one item at a time.",
                                 "Time: O(n^2) | Space: O(1)"))
@@ -448,7 +460,7 @@ public final class Main {
                         .onEvent(Swap.class, new SwapHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Small Insertion Sort",
-                                net.minestom.server.item.Material.GOLDEN_SWORD,
+                                Material.GOLDEN_SWORD,
                                 "A compact insertion-sort demo",
                                 "with fewer values for quick runs.",
                                 "Time: O(n^2) | Space: O(1)"))
@@ -470,7 +482,7 @@ public final class Main {
                         .onCompletion(_ -> AnimationPlan.empty())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort (Strings)",
-                                net.minestom.server.item.Material.BOOK,
+                                Material.BOOK,
                                 "Insertion-sort using string values",
                                 "to demonstrate generic ordering.",
                                 "Time: O(n^2) | Space: O(1)"))
@@ -516,7 +528,7 @@ public final class Main {
                                 "4-way A* on a fixed 2D obstacle map",
                                 "Colors show open, closed, and final path.",
                                 "Time: O(E log V) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -529,11 +541,11 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
-                                net.minestom.server.item.Material.RECOVERY_COMPASS,
+                                Material.RECOVERY_COMPASS,
                                 "4-way BFS explores breadth-first",
                                 "Queue-based level-by-level expansion.",
                                 "Time: O(V + E) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -546,11 +558,11 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
-                                net.minestom.server.item.Material.LOOM,
+                                Material.LOOM,
                                 "4-way DFS explores depth-first",
                                 "Stack-based backtracking expansion.",
                                 "Time: O(V + E) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.origin(), sceneContext.audience()))
+                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
                 )
         );
 
@@ -563,14 +575,14 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
-                                net.minestom.server.item.Material.REDSTONE_TORCH,
+                                Material.REDSTONE_TORCH,
                                 "Fast heuristic-only pathfinding",
                                 "Prioritizes closeness to goal, may miss optimal paths.",
                                 "Time: O(E log V) | Space: O(V)"))
                         .withScene(sceneContext ->
                                 new GridScene(sceneContext.instance(),
-                                        sceneContext.origin(),
-                                        sceneContext.audience()))
+                                        sceneContext.audience(), sceneContext.origin()
+                                ))
                 )
         );
     }
