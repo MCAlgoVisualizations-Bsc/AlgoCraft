@@ -84,21 +84,21 @@ public final class Main {
         ));
 
         var bstCollection = new ArrayList<>(Arrays.asList(
-                new Data<>(50),
-                new Data<>(30),
-                new Data<>(70),
-                new Data<>(21),
-                new Data<>(40),
-                new Data<>(60),
-                new Data<>(80),
-                new Data<>(10),
-                new Data<>(25),
-                new Data<>(35),
-                new Data<>(45),
-                new Data<>(55),
-                new Data<>(65),
-                new Data<>(74),
-                new Data<>(90)
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("k"),
+                new Data<>("x"),
+                new Data<>("d"),
+                new Data<>("h"),
+                new Data<>("a"),
+                new Data<>("b"),
+                new Data<>("e"),
+                new Data<>("h"),
+                new Data<>("s"),
+                new Data<>("j"),
+                new Data<>("s"),
+                new Data<>("v"),
+                new Data<>("k")
         ));
 
 
@@ -168,7 +168,7 @@ public final class Main {
         );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<String>build(ctx -> ctx
                         .withIdentity("bst search", PlayerBSTSearch::new)
                         .withData(bstCollection)
                         .positioning(new BSTNodeLayout(), BST_SEARCH_PLACEMENT)
@@ -184,10 +184,11 @@ public final class Main {
         );
 
         var e = new ArrayList<>(bstCollection);
+        e.addAll(new ArrayList<>(bstCollection));
         Collections.shuffle(e);
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
+                Algorithm.<String>build(ctx -> ctx
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
                         .withData(e)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)

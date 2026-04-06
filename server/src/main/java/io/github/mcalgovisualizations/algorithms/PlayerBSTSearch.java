@@ -4,7 +4,9 @@ import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public final class PlayerBSTSearch implements IPlayerSort {
 
@@ -15,8 +17,8 @@ public final class PlayerBSTSearch implements IPlayerSort {
             return;
         }
 
-        int[] data = readIntInput(values);
-        if (data.length == 0) {
+        List<T> data = readIntInput(values);
+        if (data.isEmpty()) {
             return;
         }
 
@@ -27,10 +29,10 @@ public final class PlayerBSTSearch implements IPlayerSort {
 
         int root = 0;
         for (int insert = 1; insert < size; insert++) {
-            int candidate = data[insert];
+            T candidate = data.get(insert);
             int cursor = root;
             while (true) {
-                if (candidate < data[cursor]) {
+                if (candidate.compareTo(data.get(cursor)) < 0) {
                     if (left[cursor] == -1) {
                         left[cursor] = insert;
                         break;
@@ -47,18 +49,19 @@ public final class PlayerBSTSearch implements IPlayerSort {
         }
 
         int targetIndex = size / 2;
-        int target = data[targetIndex];
+        T target = data.get(targetIndex);
 
         int cursor = root;
         while (cursor != -1) {
-            int current = data[cursor];
+            T current = data.get(cursor);
             values.emit(new Compare(cursor, targetIndex, current, target));
 
             if (current == target) {
                 return;
             }
 
-            if (target < current) {
+            int cmp = target.compareTo(current);
+            if (cmp < 0) {
                 cursor = left[cursor];
             } else {
                 cursor = right[cursor];
@@ -71,14 +74,11 @@ public final class PlayerBSTSearch implements IPlayerSort {
         return "BST Search";
     }
 
-    private static <T extends Comparable<T>> int[] readIntInput(ISort<T> values) {
-        int[] out = new int[values.size()];
+    private static <T extends Comparable<T>> List<T> readIntInput(ISort<T> values) {
+        List<T> out = new ArrayList<>(values.size());
         for (int i = 0; i < values.size(); i++) {
             T raw = values.get(i);
-            if (!(raw instanceof Integer number)) {
-                return new int[0];
-            }
-            out[i] = number;
+            out.add(i, raw);
         }
         return out;
     }

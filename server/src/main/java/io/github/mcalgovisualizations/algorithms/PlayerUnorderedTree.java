@@ -4,6 +4,9 @@ import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public final class PlayerUnorderedTree implements IPlayerSort {
 
@@ -11,14 +14,14 @@ public final class PlayerUnorderedTree implements IPlayerSort {
     @Override
     public <T extends Comparable<T>> void sort(ISort<T> values) {
         int size = values.size();
-        int[] data = readIntInput(values);
+        List<T> data = readIntInput(values);
 
         int targetIndex = size - 1; // Let's search for the last element
-        int targetValue = data[targetIndex];
+        T targetValue = data.get(targetIndex);
 
         // In an unordered tree, we just check every index from 0 to N
         for (int i = 0; i < size; i++) {
-            int currentVal = data[i];
+            T currentVal = data.get(i);
 
             // Emit the comparison for EVERY node until we find it
             values.emit(new Compare(i, targetIndex, currentVal, targetValue));
@@ -34,12 +37,11 @@ public final class PlayerUnorderedTree implements IPlayerSort {
         return "Red-Black Tree Search";
     }
 
-    private static <T extends Comparable<T>> int[] readIntInput(ISort<T> values) {
-        int[] out = new int[values.size()];
+    private static <T extends Comparable<T>> List<T> readIntInput(ISort<T> values) {
+        List<T> out = new ArrayList<>(values.size());
         for (int i = 0; i < values.size(); i++) {
             T raw = values.get(i);
-            if (!(raw instanceof Integer number)) return new int[0];
-            out[i] = number;
+            out.add(i, raw);
         }
         return out;
     }
