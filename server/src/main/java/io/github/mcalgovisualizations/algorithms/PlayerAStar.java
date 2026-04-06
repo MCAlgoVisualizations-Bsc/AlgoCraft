@@ -133,11 +133,6 @@ public class PlayerAStar implements IPlayerSort {
         values.emit(new Message("A*: path found", Message.MessageType.SUCCESS));
     }
 
-    @Override
-    public String getName() {
-        return "A* (4-way grid)";
-    }
-
     private static int heuristic(int from, int to, int columns) {
         int fromRow = from / columns;
         int fromCol = from % columns;

@@ -67,11 +67,6 @@ public final class PlayerBSTBuild implements IPlayerSort {
         values.emit(new Message("BST build complete", Message.MessageType.SUCCESS));
     }
 
-    @Override
-    public String getName() {
-        return "BST Build";
-    }
-
     private static <T extends Comparable<T>> int[] readIntInput(ISort<T> values) {
         int[] out = new int[values.size()];
         for (int i = 0; i < values.size(); i++) {

@@ -104,11 +104,6 @@ class AlgorithmStepperTest {
             public <T extends Comparable<T>> void sort(ISort<T> values) {
                 values.emit(new Message("hello", Message.MessageType.INFO));
             }
-
-            @Override
-            public String getName() {
-                return "Emitter";
-            }
         };
 
         var stepper = new AlgorithmStepper<>(algorithm, createCollection(1, 2));

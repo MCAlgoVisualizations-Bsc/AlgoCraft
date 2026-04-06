@@ -53,11 +53,6 @@ public final class PlayerTSTSearch implements IPlayerSort {
         }
     }
 
-    @Override
-    public String getName() {
-        return "TST Search";
-    }
-
     private static void insert(int root, int insert, String[] data, int[] left, int[] middle, int[] right) {
         int cursor = root;
         String candidate = data[insert];

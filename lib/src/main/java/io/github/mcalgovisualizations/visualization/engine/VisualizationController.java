@@ -218,11 +218,6 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         state = State.INITIALIZED;
     }
 
-    @Override
-    public String toString() {
-        return stepper.getAlgoName();
-    }
-
     // private helpers to ensure state transitions are correct
     private void completeVisualization() {
         cancelRunningTask();

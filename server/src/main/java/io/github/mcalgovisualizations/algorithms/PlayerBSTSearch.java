@@ -69,11 +69,6 @@ public final class PlayerBSTSearch implements IPlayerSort {
         }
     }
 
-    @Override
-    public String getName() {
-        return "BST Search";
-    }
-
     private static <T extends Comparable<T>> List<T> readIntInput(ISort<T> values) {
         List<T> out = new ArrayList<>(values.size());
         for (int i = 0; i < values.size(); i++) {
