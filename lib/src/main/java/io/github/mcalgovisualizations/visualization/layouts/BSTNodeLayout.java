@@ -11,18 +11,18 @@ import java.util.List;
  * Places items by simulating a Binary Search Tree insertion to determine logical
  * parent/child relationships, then assigns coordinates based on tree depth.
  */
-public record DynamicBstLayout(
+public record BSTNodeLayout(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing,
         double zOffset
 ) implements ILayout {
 
-    public DynamicBstLayout() {
+    public BSTNodeLayout() {
         this(4.0, 2.0, 0.5, 0.0);
     }
 
-    public DynamicBstLayout {
+    public BSTNodeLayout {
         if (levelDrop <= 0) throw new IllegalArgumentException("levelDrop must be > 0");
         if (horizontalSpacing <= 0) throw new IllegalArgumentException("horizontalSpacing must be > 0");
     }

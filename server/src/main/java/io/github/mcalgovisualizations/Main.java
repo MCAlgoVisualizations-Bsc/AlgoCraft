@@ -10,9 +10,10 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateT
 import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
-import io.github.mcalgovisualizations.visualization.layouts.DynamicBstLayout;
+import io.github.mcalgovisualizations.visualization.layouts.BSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
+import io.github.mcalgovisualizations.visualization.layouts.TSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
@@ -166,7 +167,7 @@ public final class Main {
                 Algorithm.<Integer>build(ctx -> ctx
                         .withIdentity("bst search", PlayerBSTSearch::new)
                         .withData(bstCollection)
-                        .positioning(new DynamicBstLayout(), BST_SEARCH_PLACEMENT)
+                        .positioning(new BSTNodeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Binary Search Tree (Search)",
@@ -174,6 +175,23 @@ public final class Main {
                                 "Builds a BST from the current values",
                                 "then searches for one value using branch decisions.",
                                 "Tip: use Randomize before Start to explore new search paths"
+                        ))
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<String>build(ctx -> ctx
+                        .withIdentity("tst search", PlayerTSTSearch::new)
+                        .withData(stringCollection1)
+                        .positioning(new TSTNodeLayout(), BST_SEARCH_PLACEMENT)
+                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Ternary Search Tree (Search)",
+                                net.minestom.server.item.Material.SPYGLASS,
+                                "Builds a ternary search tree from the current strings",
+                                "then searches for one value using left, middle, and right branches.",
+                                "Tip: equal matches follow the middle branch"
                         ))
                 )
         );

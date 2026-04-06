@@ -38,6 +38,16 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
 
     private String buildNarration(Compare event) {
         if (!(event.xValue() instanceof Integer current) || !(event.yValue() instanceof Integer candidate)) {
+            if (event.xValue() instanceof String currentText && event.yValue() instanceof String candidateText) {
+                int cmp = candidateText.compareTo(currentText);
+                if (cmp < 0) {
+                    return "Go left of " + currentText;
+                }
+                if (cmp > 0) {
+                    return "Go right of " + currentText;
+                }
+                return "Equal, go middle from " + currentText;
+            }
             return "BST step";
         }
 
