@@ -2,17 +2,10 @@ package io.github.mcalgovisualizations.visualization.layouts;
 
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
+import io.github.mcalgovisualizations.visualization.renderer.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
-import net.minestom.server.network.packet.server.play.ParticlePacket;
-import net.minestom.server.particle.Particle;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.entity.Player;
-import net.minestom.server.timer.ExecutionType;
-import net.minestom.server.timer.Task;
-import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
 
@@ -152,115 +145,21 @@ public record TSTNodeLayout(
         }
     }
 
-    private static final class TstNodeWithParticles implements io.github.mcalgovisualizations.visualization.renderer.IDisplayValue {
-        private final BlockDisplay base;
+    private static final class TstNodeWithParticles extends AbstractParticleDisplay {
         private final Pos leftPos;
         private final Pos middlePos;
         private final Pos rightPos;
-        private Instance instance;
-        private Task task;
 
         private TstNodeWithParticles(BlockDisplay base, Pos leftPos, Pos middlePos, Pos rightPos) {
-            this.base = base;
+            super(base);
             this.leftPos = leftPos;
             this.middlePos = middlePos;
             this.rightPos = rightPos;
         }
 
         @Override
-        public Pos getPos() {
-            return base.getPos();
-        }
-
-        @Override
-        public void setValue(int value) {
-            base.setValue(value);
-        }
-
-        @Override
-        public void setInstance(Instance instance) {
-            this.instance = instance;
-            base.setInstance(instance);
-
-            if (leftPos != null || middlePos != null || rightPos != null) {
-                task = MinecraftServer.getSchedulerManager()
-                        .buildTask(this::emitParticles)
-                        .executionType(ExecutionType.TICK_END)
-                        .repeat(TaskSchedule.tick(1))
-                        .schedule();
-            }
-        }
-
-        @Override
-        public void addViewer(Player player) {
-            base.addViewer(player);
-        }
-
-        @Override
-        public void remove() {
-            if (task != null) {
-                task.cancel();
-                task = null;
-            }
-            base.remove();
-        }
-
-        @Override
-        public void teleport(Pos pos) {
-            base.teleport(pos);
-        }
-
-        @Override
-        public void setGlowing(boolean highlighted) {
-            base.setGlowing(highlighted);
-        }
-
-        @Override
-        public boolean isSpawned() {
-            return base.isSpawned();
-        }
-
-        private void emitParticles() {
-            if (instance == null || instance.getPlayers().isEmpty()) {
-                return;
-            }
-
-            emitLine(base.getPos(), leftPos);
-            emitLine(base.getPos(), middlePos);
-            emitLine(base.getPos(), rightPos);
-        }
-
-        private void emitLine(Pos from, Pos to) {
-            if (to == null) {
-                return;
-            }
-
-            double dx = to.x() - from.x();
-            double dy = to.y() - from.y();
-            double dz = to.z() - from.z();
-            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            int steps = Math.max(5, (int) Math.ceil(distance * 6.0));
-
-            for (int i = 1; i < steps; i++) {
-                double t = (double) i / steps;
-                Pos point = new Pos(
-                        from.x() + (dx * t),
-                        from.y() + (dy * t),
-                        from.z() + (dz * t)
-                );
-                ParticlePacket packet = new ParticlePacket(
-                        Particle.END_ROD,
-                        true,
-                        true,
-                        point,
-                        new Vec(0, 0, 0),
-                        0f,
-                        1
-                );
-                for (var player : instance.getPlayers()) {
-                    player.sendPacket(packet);
-                }
-            }
+        protected List<Pos> targets() {
+            return List.of(leftPos, middlePos, rightPos);
         }
     }
 
