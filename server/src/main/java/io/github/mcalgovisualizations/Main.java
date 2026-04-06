@@ -11,6 +11,7 @@ import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
 import io.github.mcalgovisualizations.visualization.layouts.BSTNodeLayout;
+import io.github.mcalgovisualizations.visualization.layouts.CircleLayout;
 import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
 import io.github.mcalgovisualizations.visualization.layouts.TSTNodeLayout;
@@ -30,7 +31,6 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static io.github.mcalgovisualizations.config.MapConstants.*;
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
@@ -99,6 +99,14 @@ public final class Main {
                 new Data<>(65),
                 new Data<>(74),
                 new Data<>(90)
+        ));
+
+        var flowMatrix = new ArrayList<>(Arrays.asList(
+                new Data<>(0), new Data<>(0), new Data<>(6), new Data<>(3), new Data<>(0),
+                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(6),
+                new Data<>(0), new Data<>(3), new Data<>(0), new Data<>(2), new Data<>(3),
+                new Data<>(0), new Data<>(3), new Data<>(0), new Data<>(0), new Data<>(0),
+                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0)
         ));
 
 
@@ -287,6 +295,22 @@ public final class Main {
                                 "Fast heuristic-only pathfinding",
                                 "Prioritizes closeness to goal, may miss optimal paths.",
                                 "Time: O(E log V) | Space: O(V)"
+                        ))
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer>build(ctx -> ctx
+                        .withIdentity("ford fulkerson flow", PlayerFordFulkerson::new)
+                        .withData(flowMatrix)
+                        .positioning(new CircleLayout(12.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Ford-Fulkerson",
+                                Material.WATER_BUCKET,
+                                "Graph max-flow from source (0) to sink (n-1)",
+                                "Circle graph view with particle edges",
+                                "Edge thickness scales with allowed capacity"
                         ))
                 )
         );

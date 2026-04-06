@@ -31,6 +31,18 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
 
     protected abstract List<Pos> targets();
 
+    protected Pos particleSource() {
+        return base.getPos();
+    }
+
+    protected int particlesPerStep() {
+        return 1;
+    }
+
+    protected int stepsForDistance(double distance) {
+        return Math.max(5, (int) Math.ceil(distance * 6.0));
+    }
+
     protected final List<Pos> nonNullTargets(Pos... positions) {
         List<Pos> out = new ArrayList<>(positions.length);
         for (Pos position : positions) {
@@ -92,7 +104,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
             return;
         }
 
-        Pos from = base.getPos();
+        Pos from = particleSource();
         for (Pos to : targets()) {
             emitLine(from, to);
         }
@@ -132,7 +144,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
         double dy = to.y() - from.y();
         double dz = to.z() - from.z();
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        int steps = Math.max(5, (int) Math.ceil(distance * 6.0));
+        int steps = Math.max(2, stepsForDistance(distance));
 
         for (int i = 1; i < steps; i++) {
             double t = (double) i / steps;
@@ -148,7 +160,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
                     point,
                     new Vec(0, 0, 0),
                     0f,
-                    1
+                    Math.max(1, particlesPerStep())
             );
             for (var viewer : instance.getPlayers()) {
                 viewer.sendPacket(packet);
