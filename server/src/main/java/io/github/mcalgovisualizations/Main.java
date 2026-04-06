@@ -16,7 +16,7 @@ import io.github.mcalgovisualizations.layouts.FloatingLinearLayout;
 import io.github.mcalgovisualizations.layouts.GridLayout;
 import io.github.mcalgovisualizations.layouts.TSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;

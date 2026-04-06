@@ -2,7 +2,7 @@ package io.github.mcalgovisualizations.handlers;
 
 import io.github.mcalgovisualizations.events.Swap;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -2,7 +2,6 @@ package io.github.mcalgovisualizations.visualization.renderer.scene;
 
 import com.google.common.collect.Maps;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import net.kyori.adventure.text.Component;

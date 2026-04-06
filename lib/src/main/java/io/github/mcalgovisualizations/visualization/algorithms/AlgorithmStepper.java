@@ -5,11 +5,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public final class Stepper {
+public final class AlgorithmStepper {
     private final List<IAlgorithmEvent> history;
     private int historyPointer = 0;
 
-    public Stepper(@NotNull List<IAlgorithmEvent> history) {
+    public AlgorithmStepper(@NotNull List<IAlgorithmEvent> history) {
         this.history = List.copyOf(history);
     }
 

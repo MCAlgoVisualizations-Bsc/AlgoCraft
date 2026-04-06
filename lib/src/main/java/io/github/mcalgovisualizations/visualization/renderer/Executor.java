@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;

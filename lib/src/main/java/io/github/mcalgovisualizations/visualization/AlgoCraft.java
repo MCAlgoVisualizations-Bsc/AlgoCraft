@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;
 import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.*;
 import net.kyori.adventure.text.Component;
@@ -203,9 +204,11 @@ public final class AlgoCraft {
         final var algorithm = algo.algorithm();
         algorithm.sort(collection);
         final var onCompletePlan = algo.completeHandler().apply(collection);
-        final var scene = algo.scene().apply(new SceneContext(instance, audience, algo.placement().renderOrigin()));
 
-        final var renderer = new Renderer<O>(
+        final var sceneCtx = new SceneContext(instance, audience, algo.placement().renderOrigin());
+        final var scene = algo.scene().apply(sceneCtx);
+
+        final Renderer<O> renderer = new Renderer<>(
                 instance,
                 algo.placement().renderOrigin(),
                 algo.layout(),
@@ -215,14 +218,14 @@ public final class AlgoCraft {
                 scene
         );
 
-        final var controller = new VisualizationController<T>(
+        final VisualizationController<T> controller = new VisualizationController<>(
                 algo.algorithm(),
                 renderer,
                 algo.collection(),
                 audience
         );
 
-        controller.startVisualization(); // throws if chunks are not loaded
+        controller.startVisualization();
 
         playerSteppers.put(player.getUuid(), controller);
     }

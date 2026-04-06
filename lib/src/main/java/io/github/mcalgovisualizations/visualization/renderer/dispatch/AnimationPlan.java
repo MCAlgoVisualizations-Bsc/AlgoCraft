@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 
 import java.util.ArrayList;
 import java.util.Collections;
