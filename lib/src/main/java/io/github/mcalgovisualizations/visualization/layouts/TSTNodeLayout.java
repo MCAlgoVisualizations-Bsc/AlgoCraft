@@ -2,8 +2,6 @@ package io.github.mcalgovisualizations.visualization.layouts;
 
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.AbstractParticleDisplay;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
@@ -106,7 +104,11 @@ public record TSTNodeLayout(
         Pos middlePos = node.middle != null ? buildPosition(origin, depth + 1, xOffset) : null;
         Pos rightPos = node.right != null ? buildPosition(origin, depth + 1, xOffset + step) : null;
 
-        out[node.originalIndex] = new LayoutResult<>(node.data, currentPos, new TstNodeStylingProfile(role, leftPos, middlePos, rightPos));
+        out[node.originalIndex] = new LayoutResult<>(
+                node.data,
+                currentPos,
+                new ParticleTreeNodeStylingProfile(role, leftPos, middlePos, rightPos)
+        );
 
         assignPositions(node.left, origin, depth + 1, xOffset - step, maxDepth, out);
         assignPositions(node.middle, origin, depth + 1, xOffset, maxDepth, out);
@@ -119,48 +121,6 @@ public record TSTNodeLayout(
                 origin.y() + rootYOffset - (depth * levelDrop),
                 origin.z() + zOffset + (depth * 0.45)
         );
-    }
-
-    private static final class TstNodeStylingProfile implements IStylingProfile {
-        private final BstNodeStylingProfile.NodeRole role;
-        private final Pos leftPos;
-        private final Pos middlePos;
-        private final Pos rightPos;
-
-        private TstNodeStylingProfile(BstNodeStylingProfile.NodeRole role, Pos leftPos, Pos middlePos, Pos rightPos) {
-            this.role = role;
-            this.leftPos = leftPos;
-            this.middlePos = middlePos;
-            this.rightPos = rightPos;
-        }
-
-        @Override
-        public io.github.mcalgovisualizations.visualization.renderer.IDisplayValue applyStyle(String value, Pos pos) {
-            var nodeBlock = switch (role) {
-                case ROOT -> net.minestom.server.instance.block.Block.OAK_LOG;
-                case LEAF -> net.minestom.server.instance.block.Block.OAK_LEAVES;
-                case INTERNAL -> net.minestom.server.instance.block.Block.OAK_PLANKS;
-            };
-            return new TstNodeWithParticles(new BlockDisplay(pos, nodeBlock, value), leftPos, middlePos, rightPos);
-        }
-    }
-
-    private static final class TstNodeWithParticles extends AbstractParticleDisplay {
-        private final Pos leftPos;
-        private final Pos middlePos;
-        private final Pos rightPos;
-
-        private TstNodeWithParticles(BlockDisplay base, Pos leftPos, Pos middlePos, Pos rightPos) {
-            super(base);
-            this.leftPos = leftPos;
-            this.middlePos = middlePos;
-            this.rightPos = rightPos;
-        }
-
-        @Override
-        protected List<Pos> targets() {
-            return List.of(leftPos, middlePos, rightPos);
-        }
     }
 
     private static class Node<T extends Comparable<T>> {

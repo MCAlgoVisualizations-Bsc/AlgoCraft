@@ -13,6 +13,7 @@ import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {
     protected final BlockDisplay base;
@@ -25,10 +26,20 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
     }
 
     protected Particle particle() {
-        return Particle.END_ROD;
+        return Particle.CRIT;
     }
 
     protected abstract List<Pos> targets();
+
+    protected final List<Pos> nonNullTargets(Pos... positions) {
+        List<Pos> out = new ArrayList<>(positions.length);
+        for (Pos position : positions) {
+            if (position != null) {
+                out.add(position);
+            }
+        }
+        return out;
+    }
 
     @Override
     public Pos getPos() {
@@ -145,4 +156,6 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
         }
     }
 }
+
+
 

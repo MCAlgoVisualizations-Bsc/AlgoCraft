@@ -84,26 +84,38 @@ public record BSTNodeLayout(
     private <T extends Comparable<T>> void assignPositions(Node<T> node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult<T>[] out) {
         if (node == null) return;
 
-        // Calculate physical coordinates
         double x = origin.x() + xOffset;
         double y = origin.y() + rootYOffset - (depth * levelDrop);
         double z = origin.z() + zOffset;
 
-        // Place the LayoutResult into the exact original array index
         BstNodeStylingProfile.NodeRole role = depth == 0
                 ? BstNodeStylingProfile.NodeRole.ROOT
                 : (node.left == null && node.right == null
                 ? BstNodeStylingProfile.NodeRole.LEAF
                 : BstNodeStylingProfile.NodeRole.INTERNAL);
-        out[node.originalIndex] = new LayoutResult<>(node.data, new Pos(x, y, z), new BstNodeStylingProfile(role));
 
-        // Keep branch spacing bounded so randomized skewed trees do not drift too far away.
-        // This shrinks by depth but does not explode with total tree height.
         double widthScale = Math.pow(2, Math.max(0, 4 - depth));
         double step = Math.max(1.25, horizontalSpacing * widthScale);
 
+        Pos leftPos = node.left != null ? buildPosition(origin, depth + 1, xOffset - step) : null;
+        Pos rightPos = node.right != null ? buildPosition(origin, depth + 1, xOffset + step) : null;
+
+        out[node.originalIndex] = new LayoutResult<>(
+                node.data,
+                new Pos(x, y, z),
+                new ParticleTreeNodeStylingProfile(role, leftPos, rightPos)
+        );
+
         assignPositions(node.left, origin, depth + 1, xOffset - step, maxDepth, out);
         assignPositions(node.right, origin, depth + 1, xOffset + step, maxDepth, out);
+    }
+
+    private Pos buildPosition(Pos origin, int depth, double xOffset) {
+        return new Pos(
+                origin.x() + xOffset,
+                origin.y() + rootYOffset - (depth * levelDrop),
+                origin.z() + zOffset
+        );
     }
 
     // --- Inner Helper Class ---
