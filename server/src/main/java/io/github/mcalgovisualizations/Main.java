@@ -7,16 +7,15 @@ import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.SystemMessages;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Swap;
-import io.github.mcalgovisualizations.visualization.layouts.BSTNodeLayout;
-import io.github.mcalgovisualizations.visualization.layouts.FloatingLinearLayout;
-import io.github.mcalgovisualizations.visualization.layouts.GridLayout;
-import io.github.mcalgovisualizations.visualization.layouts.TSTNodeLayout;
+import io.github.mcalgovisualizations.events.CellStateTransition;
+import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.visualization.algorithms.Message;
+import io.github.mcalgovisualizations.events.Swap;
+import io.github.mcalgovisualizations.layouts.BSTNodeLayout;
+import io.github.mcalgovisualizations.layouts.FloatingLinearLayout;
+import io.github.mcalgovisualizations.layouts.GridLayout;
+import io.github.mcalgovisualizations.layouts.TSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
-import io.github.mcalgovisualizations.visualization.renderer.GridScene;
 import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
@@ -122,7 +121,7 @@ public final class Main {
                                 "the final sorted array one item at a time.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
         ));
 
 
@@ -140,7 +139,7 @@ public final class Main {
                                 "with fewer values for quick runs.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
         ));
 
 
@@ -159,7 +158,7 @@ public final class Main {
                                 "to demonstrate generic ordering.",
                                 "Time: O(n^2) | Space: O(1)"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
         ));
 
 
@@ -170,7 +169,7 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
                 )
         );
 
@@ -187,7 +186,7 @@ public final class Main {
                                 "then searches for one value using branch decisions.",
                                 "Tip: use Randomize before Start to explore new search paths"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
                 )
         );
 
@@ -208,7 +207,7 @@ public final class Main {
                                 "Search must visit nodes in order",
                                 "until the target is found."
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
                 )
         );
 
@@ -226,7 +225,7 @@ public final class Main {
                                 "then searches for one value using left, middle, and right branches.",
                                 "Tip: equal matches follow the middle branch"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(sceneContext -> new DefaultScene(sceneContext))
                 )
         );
 
@@ -247,7 +246,7 @@ public final class Main {
                                 "Colors show open, closed, and final path.",
                                 "Time: O(E log V) | Space: O(V)"
                         ))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -265,7 +264,7 @@ public final class Main {
                                 "Queue-based level-by-level expansion.",
                                 "Time: O(V + E) | Space: O(V)"
                         ))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -283,7 +282,7 @@ public final class Main {
                                 "Stack-based backtracking expansion.",
                                 "Time: O(V + E) | Space: O(V)"
                         ))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -301,7 +300,7 @@ public final class Main {
                                 "Prioritizes closeness to goal, may miss optimal paths.",
                                 "Time: O(E log V) | Space: O(V)"
                         ))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -443,13 +442,8 @@ public final class Main {
                                 "A simple sorting algorithm that builds",
                                 "the final sorted array one item at a time.",
                                 "Time: O(n^2) | Space: O(1)"))
-                        .withScene(sceneContext ->
-                                new DefaultScene(
-                                        sceneContext.instance(),
-                                        sceneContext.audience(),
-                                        sceneContext.origin()))
+                        .withScene(DefaultScene::new)
                 ));
-
 
         algo.registerAlgorithm(
                 Algorithm.<Integer, ISceneOps>build(ctx -> ctx
@@ -464,13 +458,8 @@ public final class Main {
                                 "A compact insertion-sort demo",
                                 "with fewer values for quick runs.",
                                 "Time: O(n^2) | Space: O(1)"))
-                        .withScene(sceneContext ->
-                                new DefaultScene(
-                                        sceneContext.instance(),
-                                        sceneContext.audience(),
-                                        sceneContext.origin()))
+                        .withScene(DefaultScene::new)
                 ));
-
 
         algo.registerAlgorithm(
                 Algorithm.<String, ISceneOps>build(ctx -> ctx
@@ -486,11 +475,7 @@ public final class Main {
                                 "Insertion-sort using string values",
                                 "to demonstrate generic ordering.",
                                 "Time: O(n^2) | Space: O(1)"))
-                        .withScene(sceneContext ->
-                                new DefaultScene(
-                                        sceneContext.instance(),
-                                        sceneContext.audience(),
-                                        sceneContext.origin()))
+                        .withScene(DefaultScene::new)
                 ));
 
 
@@ -501,11 +486,7 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), MapConstants.INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .withScene(sceneContext ->
-                                new DefaultScene(
-                                        sceneContext.instance(),
-                                        sceneContext.audience(),
-                                        sceneContext.origin()))
+                        .withScene(DefaultScene::new)
                 )
         );
     }
@@ -528,7 +509,7 @@ public final class Main {
                                 "4-way A* on a fixed 2D obstacle map",
                                 "Colors show open, closed, and final path.",
                                 "Time: O(E log V) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -545,7 +526,7 @@ public final class Main {
                                 "4-way BFS explores breadth-first",
                                 "Queue-based level-by-level expansion.",
                                 "Time: O(V + E) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -562,7 +543,7 @@ public final class Main {
                                 "4-way DFS explores depth-first",
                                 "Stack-based backtracking expansion.",
                                 "Time: O(V + E) | Space: O(V)"))
-                        .withScene(sceneContext -> new GridScene(sceneContext.instance(), sceneContext.audience(), sceneContext.origin()))
+                        .withScene(GridScene::new)
                 )
         );
 
@@ -579,11 +560,7 @@ public final class Main {
                                 "Fast heuristic-only pathfinding",
                                 "Prioritizes closeness to goal, may miss optimal paths.",
                                 "Time: O(E log V) | Space: O(V)"))
-                        .withScene(sceneContext ->
-                                new GridScene(sceneContext.instance(),
-                                        sceneContext.audience(), sceneContext.origin()
-                                ))
-                )
-        );
+                        .withScene(GridScene::new)
+        ));
     }
 }

@@ -1,6 +1,5 @@
-package io.github.mcalgovisualizations.visualization.renderer.Displays;
+package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.minestom.server.instance.block.Block;
 
 public interface IBlockStateDisplay extends IDisplayValue {

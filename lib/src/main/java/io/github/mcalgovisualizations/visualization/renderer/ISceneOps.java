@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 

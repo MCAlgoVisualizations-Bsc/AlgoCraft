@@ -1,7 +1,7 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
+import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.ArrayList;

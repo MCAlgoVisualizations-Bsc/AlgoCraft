@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.layouts;
+package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;

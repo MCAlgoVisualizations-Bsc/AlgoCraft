@@ -2,8 +2,8 @@ package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.layouts.ILayout;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;

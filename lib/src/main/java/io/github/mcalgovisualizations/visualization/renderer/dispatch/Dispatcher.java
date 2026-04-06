@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.models.SortingCollection;

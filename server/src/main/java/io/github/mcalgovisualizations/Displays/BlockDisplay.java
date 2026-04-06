@@ -1,5 +1,6 @@
-package io.github.mcalgovisualizations.visualization.renderer.Displays;
+package io.github.mcalgovisualizations.Displays;
 
+import io.github.mcalgovisualizations.visualization.renderer.IBlockStateDisplay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;

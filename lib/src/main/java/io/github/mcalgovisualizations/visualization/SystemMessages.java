@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
+import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

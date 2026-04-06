@@ -1,11 +1,14 @@
-package io.github.mcalgovisualizations.visualization.renderer;
+package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.visualization.renderer.Displays.IBlockStateDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.IBlockStateDisplay;
+import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
+import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
+import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.visualization.renderer.Displays.MobDisplay;
+import io.github.mcalgovisualizations.events.CellState;
+import io.github.mcalgovisualizations.Displays.BlockDisplay;
+import io.github.mcalgovisualizations.Displays.MobDisplay;
 
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -22,8 +25,8 @@ public class GridScene extends AbstractScene {
     // Visual state
     private final Map<Integer, CellState> slotStates = new HashMap<>();
 
-    public GridScene(@NotNull Instance instance, @NotNull AudienceChannel audience, @NotNull Pos origin) {
-        super(instance, audience, origin);
+    public GridScene(SceneContext context) {
+        super(context);
     }
 
     @Override

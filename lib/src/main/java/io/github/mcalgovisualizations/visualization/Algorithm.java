@@ -1,13 +1,11 @@
 package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.layouts.ILayout;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.kyori.adventure.text.Component;

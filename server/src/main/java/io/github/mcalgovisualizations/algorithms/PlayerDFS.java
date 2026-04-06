@@ -1,9 +1,9 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
+import io.github.mcalgovisualizations.events.CellState;
+import io.github.mcalgovisualizations.events.CellStateTransition;
+import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;

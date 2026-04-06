@@ -3,7 +3,7 @@ package io.github.mcalgovisualizations.visualization.engine;
 import io.github.mcalgovisualizations.visualization.PlayerControls;
 import io.github.mcalgovisualizations.visualization.algorithms.AlgorithmStepper;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;

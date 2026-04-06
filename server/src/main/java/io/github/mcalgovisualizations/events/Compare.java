@@ -1,5 +1,6 @@
-package io.github.mcalgovisualizations.visualization.algorithms.events;
+package io.github.mcalgovisualizations.events;
 
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import org.jetbrains.annotations.NotNull;
 
 public record Compare(int x, int y, Object xValue, Object yValue) implements IAlgorithmEvent {

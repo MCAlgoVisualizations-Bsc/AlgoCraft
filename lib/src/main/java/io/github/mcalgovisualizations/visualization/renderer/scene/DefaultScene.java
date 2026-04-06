@@ -7,8 +7,8 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
 public class DefaultScene extends AbstractScene {
-    public DefaultScene(Instance instance, AudienceChannel audience, Pos origin) {
-        super(instance, audience, origin);
+    public DefaultScene(SceneContext context) {
+        super(context);
     }
 
     @Override

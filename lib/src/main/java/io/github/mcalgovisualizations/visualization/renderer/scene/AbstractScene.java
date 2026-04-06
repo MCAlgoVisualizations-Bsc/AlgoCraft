@@ -24,14 +24,10 @@ public abstract class AbstractScene implements ISceneOps {
     protected final AudienceChannel audience;
     protected final Pos origin;
 
-    public AbstractScene(
-            @NotNull Instance instance,
-            @NotNull AudienceChannel audience,
-            @NotNull Pos origin
-    ) {
-        this.instance = instance;
-        this.audience = audience;
-        this.origin = origin;
+    public AbstractScene(@NotNull SceneContext context) {
+        this.instance = context.instance();
+        this.audience = context.audience();
+        this.origin = context.origin();
     }
 
     public abstract void setLayout(LayoutResult[] layoutResults);
