@@ -14,17 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AlgorithmStepperTest {
     @Test
-    void step_returns_noop_when_empty() {
+    void step_throws_when_empty() {
         var stepper = createStepper();
-        var event = stepper.step();
-        //assertInstanceOf(NoOp.class, event);
+        var ex = assertThrows(IllegalStateException.class, stepper::step);
+        assertEquals("Cannot step from empty history", ex.getMessage());
     }
 
     @Test
-    void back_returns_noop_when_empty() {
+    void back_throws_when_empty() {
         var stepper = createStepper();
-        var event = stepper.back();
-        //assertInstanceOf(NoOp.class, event);
+        var ex = assertThrows(IllegalStateException.class, stepper::back);
+        assertEquals("Cannot step from empty history", ex.getMessage());
     }
 
     @Test
@@ -57,8 +57,9 @@ class AlgorithmStepperTest {
         var first = stepper.step();
         var second = stepper.step();
 
-        assertSame(second, stepper.back());
+        assertNull(second);
         assertSame(first, stepper.back());
+        assertNull(stepper.back());
     }
 
     @Test
