@@ -183,14 +183,13 @@ public final class Main {
                 )
         );
 
-        var e = new ArrayList<>(bstCollection);
-        e.addAll(new ArrayList<>(bstCollection));
-        Collections.shuffle(e);
+        var unordered_tree_search_data = new ArrayList<>(bstCollection);
+        Collections.shuffle(unordered_tree_search_data);
 
         algo.registerAlgorithm(
                 Algorithm.<String>build(ctx -> ctx
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
-                        .withData(e)
+                        .withData(unordered_tree_search_data)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
                         .positioning(new UnorderedTreeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
