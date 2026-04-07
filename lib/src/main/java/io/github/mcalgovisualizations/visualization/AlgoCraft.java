@@ -10,6 +10,7 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.*;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -24,6 +25,7 @@ import net.minestom.server.item.ItemStack;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -50,9 +52,27 @@ public final class AlgoCraft {
         }
     }
 
+    private static final class VisualizationSession {
+        private final VisualizationController controls;
+        private final PlayerFeedback audience;
+
+        VisualizationSession(VisualizationController controls, Audience... audience) {
+            this.controls = controls;
+            this.audience = new PlayerFeedback(audience);
+        }
+
+        PlayerControls controls() { return controls; }
+
+        void start() { controls.startVisualization(); }
+
+        void clear() { controls.clear(); }
+
+        PlayerFeedback audience() { return audience; }
+    }
+
     private IAlgorithmUI ui = new AlgorithmUI();
     private final InstanceContainer instanceContainer;
-    private final Map<UUID, PlayerControls> playerSteppers = new HashMap<>();
+    private final Map<UUID, VisualizationSession> sessions = new HashMap<>();
     private final Map<String, AlgorithmEntry<?, ?>> algorithms = new HashMap<>();
     private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
     private Consumer<Player> spawnAction = player -> {};
@@ -64,7 +84,7 @@ public final class AlgoCraft {
     public void addListeners(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, event -> {
             final var player = event.getPlayer();
-            final var controls = getVisualization(player);
+            final var session = getSession(player.getUuid());
             final ItemStack itemStack = event.getItemStack();
             event.setCancelled(true); // Prevent teleportation
 
@@ -78,19 +98,20 @@ public final class AlgoCraft {
                 return;
             }
 
-            if(controls == null) {
+            if(session == null) {
                 System.err.println("No controls for player " + player.getUsername());
                 return;
             }
 
+
             if (itemStack.hasTag(ALGO_INTERACTION_TAG)) {
                 switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-                    case RANDOMIZE -> controls.randomize();
-                    case START -> controls.start();
-                    case STOP -> controls.pause();
-                    case FORWARD -> controls.step();
-                    case BACKWARD -> controls.back();
-                    case SET_SPEED -> controls.changeSpeed();
+                    case RANDOMIZE -> session.controls().randomize();
+                    case START -> session.controls().start();
+                    case STOP -> session.controls().pause();
+                    case FORWARD -> session.controls().step();
+                    case BACKWARD -> session.controls().back();
+                    case SET_SPEED -> session.controls().changeSpeed();
                     default -> {
                         ui.applyDefaultLayout(player);
                         removeVisualization(player);
@@ -114,8 +135,11 @@ public final class AlgoCraft {
                         algo.scene()
                 )
         );
-        if (algo.presentation() != null)
-            algorithmPresentations.put(algo.id(), algo.presentation());
+
+        var presentation = Objects.isNull(algo.presentation())
+                ? new AlgorithmPresentation(algo.id())
+                : algo.presentation();
+        algorithmPresentations.put(algo.id(), presentation);
     }
 
     public void selectAlgorithm(Player player) {
@@ -136,6 +160,8 @@ public final class AlgoCraft {
             final var entry = algorithms.get(algorithmId);
             if (entry == null) return;
 
+            var originalpos = player.getPosition();
+
             player.closeInventory();
             player.teleport(entry.placement().teleportPoint());
             ui.applyRunningLayout(player);
@@ -143,9 +169,14 @@ public final class AlgoCraft {
             MinecraftServer.getSchedulerManager()
                     .buildTask(() -> {
                         try {
-                            assignVisualization(player, instanceContainer, entry);
+                            var session = assignVisualization(entry, instanceContainer, player);
+                            session.start();
                         } catch (IllegalStateException e) {
                             player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
+                        } catch (NullPointerException e) {
+                            player.sendMessage(Component.text("Failed to assign visualization : ", NamedTextColor.RED));
+                            player.teleport(originalpos);
+                            ui.applyDefaultLayout(player);
                         }
                     })
                     .delay(Duration.ofMillis(200))
@@ -160,41 +191,39 @@ public final class AlgoCraft {
     }
 
     public void setSpawnAction(Consumer<Player> spawnAction) {
-        this.spawnAction = spawnAction == null ? player -> {} : spawnAction;
+        this.spawnAction = spawnAction == null ? _ -> {} : spawnAction;
     }
 
     public void applyDefaultLayout(Player player) {
         ui.applyDefaultLayout(player);
     }
 
-    public PlayerControls getVisualization(Player player) {
-        return playerSteppers.get(player.getUuid());
+    private VisualizationSession getSession(UUID uuid) {
+        return sessions.get(uuid);
     }
 
     private AlgorithmPresentation resolvePresentation(String algorithmId) {
         AlgorithmPresentation presentation = algorithmPresentations.get(algorithmId);
         return presentation != null
                 ? presentation
-                : AlgorithmPresentation.fallback(algorithmId);
+                : new AlgorithmPresentation(algorithmId);
     }
 
-    private <T extends Comparable<T>, O extends ISceneOps> void assignVisualization(
-            Player player,
-            InstanceContainer instance,
-            AlgorithmEntry<T, O> entry
+    private <T extends Comparable<T>, O extends ISceneOps> VisualizationSession assignVisualization(
+            AlgorithmEntry<T, O> entry, InstanceContainer instance, Player player
     ) {
         try {
-            assignVisualizationCaptured(player, instance, entry);
+            return assignVisualizationCaptured(instance, entry, player);
         } catch (IllegalStateException e) {
             System.err.println("Failed to assign visualization: " + e.getMessage());
             throw e;
         }
     }
 
-    private <T extends Comparable<T>, O extends ISceneOps> void assignVisualizationCaptured(
-            Player player,
+    private <T extends Comparable<T>, O extends ISceneOps> VisualizationSession assignVisualizationCaptured(
             InstanceContainer instance,
-            AlgorithmEntry<T, O> algo
+            AlgorithmEntry<T, O> algo,
+            Player player
     ) {
         removeVisualization(player);
 
@@ -218,22 +247,22 @@ public final class AlgoCraft {
                 scene
         );
 
-        final VisualizationController<T> controller = new VisualizationController<>(
+        final var controller = new VisualizationController(
                 algo.algorithm(),
                 renderer,
                 algo.collection(),
                 audience
         );
 
-        controller.startVisualization();
-
-        playerSteppers.put(player.getUuid(), controller);
+        var session = new VisualizationSession(controller);
+        sessions.put(player.getUuid(), session);
+        return session;
     }
 
     private void removeVisualization(Player player) {
-        final var controls = playerSteppers.remove(player.getUuid());
-        if (controls != null) {
-            controls.clear();
+        final var session = sessions.remove(player.getUuid());
+        if (session != null) {
+            session.clear();
         }
     }
 }

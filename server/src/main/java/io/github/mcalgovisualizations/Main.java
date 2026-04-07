@@ -117,11 +117,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort",
                                 Material.IRON_SWORD,
-                                "A simple sorting algorithm that builds",
-                                "the final sorted array one item at a time.",
-                                "Time: O(n^2) | Space: O(1)"
+                                "Time: O(n^2) | Space: O(1)", "the final sorted array one item at a time.", "A simple sorting algorithm that builds"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
         ));
 
 
@@ -135,11 +133,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Small Insertion Sort",
                                 Material.GOLDEN_SWORD,
-                                "A compact insertion-sort demo",
-                                "with fewer values for quick runs.",
-                                "Time: O(n^2) | Space: O(1)"
+                                "Time: O(n^2) | Space: O(1)", "with fewer values for quick runs.", "A compact insertion-sort demo"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
         ));
 
 
@@ -154,11 +150,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort (Strings)",
                                 Material.BOOK,
-                                "Insertion-sort using string values",
-                                "to demonstrate generic ordering.",
-                                "Time: O(n^2) | Space: O(1)"
+                                "Time: O(n^2) | Space: O(1)", "to demonstrate generic ordering.", "Insertion-sort using string values"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
         ));
 
 
@@ -169,7 +163,7 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
                 )
         );
 
@@ -182,11 +176,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Binary Search Tree (Search)",
                                 Material.SPYGLASS,
-                                "Builds a BST from the current values",
-                                "then searches for one value using branch decisions.",
-                                "Tip: use Randomize before Start to explore new search paths"
+                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
                 )
         );
 
@@ -203,11 +195,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Unordered Binary Tree (Linear Search)",
                                 Material.DARK_OAK_LOG,
-                                "A tree filled level-by-level.",
-                                "Search must visit nodes in order",
-                                "until the target is found."
+                                "until the target is found.", "Search must visit nodes in order", "A tree filled level-by-level."
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
                 )
         );
 
@@ -221,11 +211,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Ternary Search Tree (Search)",
                                 Material.SPYGLASS,
-                                "Builds a ternary search tree from the current strings",
-                                "then searches for one value using left, middle, and right branches.",
-                                "Tip: equal matches follow the middle branch"
+                                "Tip: equal matches follow the middle branch", "then searches for one value using left, middle, and right branches.", "Builds a ternary search tree from the current strings"
                         ))
-                        .withScene(sceneContext -> new DefaultScene(sceneContext))
+                        .withScene(DefaultScene::new)
                 )
         );
 
@@ -242,9 +230,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
                                 Material.COMPASS,
-                                "4-way A* on a fixed 2D obstacle map",
+                                "Time: O(E log V) | Space: O(V)",
                                 "Colors show open, closed, and final path.",
-                                "Time: O(E log V) | Space: O(V)"
+                                "4-way A* on a fixed 2D obstacle map"
                         ))
                         .withScene(GridScene::new)
                 )
@@ -260,9 +248,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
                                 Material.RECOVERY_COMPASS,
-                                "4-way BFS explores breadth-first",
+                                "Time: O(V + E) | Space: O(V)",
                                 "Queue-based level-by-level expansion.",
-                                "Time: O(V + E) | Space: O(V)"
+                                "4-way BFS explores breadth-first"
                         ))
                         .withScene(GridScene::new)
                 )
@@ -278,9 +266,9 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
                                 Material.LOOM,
-                                "4-way DFS explores depth-first",
+                                "Time: O(V + E) | Space: O(V)",
                                 "Stack-based backtracking expansion.",
-                                "Time: O(V + E) | Space: O(V)"
+                                "4-way DFS explores depth-first"
                         ))
                         .withScene(GridScene::new)
                 )
@@ -296,9 +284,7 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
                                 Material.REDSTONE_TORCH,
-                                "Fast heuristic-only pathfinding",
-                                "Prioritizes closeness to goal, may miss optimal paths.",
-                                "Time: O(E log V) | Space: O(V)"
+                                "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
                         ))
                         .withScene(GridScene::new)
                 )
@@ -439,9 +425,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort",
                                 Material.IRON_SWORD,
-                                "A simple sorting algorithm that builds",
-                                "the final sorted array one item at a time.",
-                                "Time: O(n^2) | Space: O(1)"))
+                                "Time: O(n^2) | Space: O(1)", "the final sorted array one item at a time.", "A simple sorting algorithm that builds"
+                        ))
                         .withScene(DefaultScene::new)
                 ));
 
@@ -455,9 +440,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Small Insertion Sort",
                                 Material.GOLDEN_SWORD,
-                                "A compact insertion-sort demo",
-                                "with fewer values for quick runs.",
-                                "Time: O(n^2) | Space: O(1)"))
+                                "Time: O(n^2) | Space: O(1)", "with fewer values for quick runs.", "A compact insertion-sort demo"
+                        ))
                         .withScene(DefaultScene::new)
                 ));
 
@@ -472,9 +456,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort (Strings)",
                                 Material.BOOK,
-                                "Insertion-sort using string values",
-                                "to demonstrate generic ordering.",
-                                "Time: O(n^2) | Space: O(1)"))
+                                "Time: O(n^2) | Space: O(1)", "to demonstrate generic ordering.", "Insertion-sort using string values"
+                        ))
                         .withScene(DefaultScene::new)
                 ));
 
@@ -506,9 +489,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
                                 Material.NETHER_STAR,
-                                "4-way A* on a fixed 2D obstacle map",
-                                "Colors show open, closed, and final path.",
-                                "Time: O(E log V) | Space: O(V)"))
+                                "Time: O(E log V) | Space: O(V)", "Colors show open, closed, and final path.", "4-way A* on a fixed 2D obstacle map"
+                        ))
                         .withScene(GridScene::new)
                 )
         );
@@ -523,9 +505,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
                                 Material.RECOVERY_COMPASS,
-                                "4-way BFS explores breadth-first",
-                                "Queue-based level-by-level expansion.",
-                                "Time: O(V + E) | Space: O(V)"))
+                                "Time: O(V + E) | Space: O(V)", "Queue-based level-by-level expansion.", "4-way BFS explores breadth-first"
+                        ))
                         .withScene(GridScene::new)
                 )
         );
@@ -540,9 +521,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
                                 Material.LOOM,
-                                "4-way DFS explores depth-first",
-                                "Stack-based backtracking expansion.",
-                                "Time: O(V + E) | Space: O(V)"))
+                                "Time: O(V + E) | Space: O(V)", "Stack-based backtracking expansion.", "4-way DFS explores depth-first"
+                        ))
                         .withScene(GridScene::new)
                 )
         );
@@ -557,9 +537,8 @@ public final class Main {
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
                                 Material.REDSTONE_TORCH,
-                                "Fast heuristic-only pathfinding",
-                                "Prioritizes closeness to goal, may miss optimal paths.",
-                                "Time: O(E log V) | Space: O(V)"))
+                                "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
+                        ))
                         .withScene(GridScene::new)
         ));
     }

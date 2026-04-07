@@ -15,7 +15,7 @@ import java.time.Duration;
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.
  */
-public class VisualizationController<T extends Comparable<T>> implements PlayerControls {
+public class VisualizationController implements PlayerControls {
     private enum State {
         NEW,
         INITIALIZED,
@@ -25,7 +25,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
         CLEARED
     }
 
-    private final AlgorithmTraceBuilder<T> traceBuilder;
+    private final AlgorithmTraceBuilder<?> traceBuilder;
     private AlgorithmStepper algorithmStepper;
     private final Renderer<?> renderer;
     private final PlayerFeedback audience;
@@ -41,7 +41,7 @@ public class VisualizationController<T extends Comparable<T>> implements PlayerC
     public VisualizationController(
             @NotNull IPlayerSort algorithm,
             @NotNull Renderer<?> renderer,
-            @NotNull ISort<T> collection,
+            @NotNull ISort<?> collection,
             @NotNull PlayerFeedback audience
     ) {
         this.traceBuilder = new AlgorithmTraceBuilder<>(algorithm, collection);
