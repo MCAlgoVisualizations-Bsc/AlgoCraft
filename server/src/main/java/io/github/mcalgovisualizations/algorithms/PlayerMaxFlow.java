@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
 import io.github.mcalgovisualizations.events.FlowEdgeVisit;
 import io.github.mcalgovisualizations.events.FlowPathEdge;
 import io.github.mcalgovisualizations.events.FlowStatus;
+import io.github.mcalgovisualizations.layouts.FlowNetworkRules;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
@@ -11,29 +12,15 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public final class PlayerMaxFlow implements IPlayerSort {
-    // Directed adjacency constraints for A..F, matching the flow layout.
-    private static final boolean[][] ALLOWED = {
-            {false, true,  true,  false, false, false},
-            {true,  false, true,  true,  true,  false},
-            {true,  true,  false, true,  true,  false},
-            {false, true,  true,  false, true,  true },
-            {false, true,  true,  true,  false, true },
-            {false, false, false, true,  true,  false}
-    };
-
     @Override
     public <T extends Comparable<T>> void sort(ISort<T> values) {
         int size = values.size();
-        if (size == 0) {
+        if (size != FlowNetworkRules.MATRIX_SIZE) {
             values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
             return;
         }
 
-        int nodeCount = (int) Math.sqrt(size);
-        if (nodeCount * nodeCount != size) {
-            values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
-            return;
-        }
+        int nodeCount = FlowNetworkRules.NODE_COUNT;
 
         int[][] residual = new int[nodeCount][nodeCount];
         int[][] capacity = new int[nodeCount][nodeCount];
@@ -115,7 +102,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
             int u = queue.poll();
 
             for (int v = 0; v < nodeCount; v++) {
-                if (parent[v] != -1 || residual[u][v] <= 0 || !isAllowedDirectedEdge(u, v, nodeCount)) {
+                if (parent[v] != -1 || residual[u][v] <= 0)  { //|| !isAllowedDirectedEdge(u, v, nodeCount))
                     continue;
                 }
 
@@ -160,13 +147,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
     }
 
     private static boolean isAllowedDirectedEdge(int from, int to, int nodeCount) {
-        if (from < 0 || to < 0 || from >= nodeCount || to >= nodeCount) {
-            return false;
-        }
-        if (nodeCount != ALLOWED.length) {
-            return from != to;
-        }
-        return ALLOWED[from][to];
+        return FlowNetworkRules.isAllowedDirectedEdge(from, to, nodeCount);
     }
 
     private static char nodeName(int index) {

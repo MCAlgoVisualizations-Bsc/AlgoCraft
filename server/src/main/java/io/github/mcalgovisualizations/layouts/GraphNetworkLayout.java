@@ -15,22 +15,16 @@ import net.minestom.server.particle.Particle;
 import java.util.ArrayList;
 import java.util.List;
 
-public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILayout {
-    private static final int NODE_COUNT = 6;
-    private static final int MATRIX_SIZE = NODE_COUNT * NODE_COUNT;
+public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILayout {
+    private static final int NODE_COUNT = FlowNetworkRules.NODE_COUNT;
+    private static final int MATRIX_SIZE = FlowNetworkRules.MATRIX_SIZE;
     private static final double Z_SPREAD = 7.0;
+    private static final int NODE_B = 1;
+    private static final int NODE_C = 2;
+    private static final int NODE_D = 3;
+    private static final int NODE_E = 4;
 
-    // Directed adjacency constraints for A..F requested by the flow-graph spec.
-    private static final boolean[][] ALLOWED = {
-            {false, true,  true,  false, false, false},
-            {true,  false, true,  true,  true,  false},
-            {true,  true,  false, true,  true,  false},
-            {false, true,  true,  false, true,  true },
-            {false, true,  true,  true,  false, true },
-            {false, false, false, true,  true,  false}
-    };
-
-    public FlowNetworkLayout() {
+    public GraphNetworkLayout() {
         this(8.0, 5.0);
     }
 
@@ -72,8 +66,11 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
 
                 Pos fromPos = nodePositions[from];
                 Pos toPos = nodePositions[to];
-                int offsetSign = reciprocalOffsetSign(from, to);
-                boolean reciprocal = offsetSign != 0;
+                int reciprocalSign = reciprocalOffsetSign(from, to);
+                int offsetSign = reciprocalSign != 0
+                        ? reciprocalSign
+                        : crossingOffsetSign(from, to, model);
+                boolean reciprocal = reciprocalSign != 0;
                 Pos labelPos = edgeLabelPos(fromPos, toPos, y, offsetSign, reciprocal);
 
                 out[idx] = new LayoutResult<>(
@@ -130,7 +127,7 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
     }
 
     private static boolean isAllowedDirectedEdge(int from, int to) {
-        return from >= 0 && to >= 0 && from < NODE_COUNT && to < NODE_COUNT && ALLOWED[from][to];
+        return FlowNetworkRules.isAllowedDirectedEdge(from, to);
     }
 
     private static int reciprocalOffsetSign(int from, int to) {
@@ -138,6 +135,22 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
             return 0;
         }
         return from < to ? 1 : -1;
+    }
+
+    private static <T extends Comparable<T>> int crossingOffsetSign(int from, int to, List<Data<T>> model) {
+        boolean isBtoE = from == NODE_B && to == NODE_E;
+        boolean isCtoD = from == NODE_C && to == NODE_D;
+        if (!isBtoE && !isCtoD) {
+            return 0;
+        }
+
+        int bToECapacity = readCapacity(model.get((NODE_B * NODE_COUNT) + NODE_E).value());
+        int cToDCapacity = readCapacity(model.get((NODE_C * NODE_COUNT) + NODE_D).value());
+        if (bToECapacity <= 0 || cToDCapacity <= 0) {
+            return 0;
+        }
+
+        return isBtoE ? 1 : -1;
     }
 
     private static <T extends Comparable<T>> boolean isFixedFlowMatrix(List<Data<T>> model) {
@@ -246,11 +259,15 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         private FlowEdgeParticles(BlockDisplay base, int capacity, Pos from, Pos to, char fromName, char toName, int offsetSign) {
             super(base);
             this.capacity = capacity;
-            this.from = from;
-            this.to = to;
+            this.from = particleAnchor(from);
+            this.to = particleAnchor(to);
             this.fromName = fromName;
             this.toName = toName;
             this.offsetSign = offsetSign;
+        }
+
+        private static Pos particleAnchor(Pos nodePos) {
+            return nodePos.add(0.5, 0.5, 0.5);
         }
 
         @Override
@@ -319,14 +336,7 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         }
 
         private Pos offsetPoint(Pos point) {
-            if (offsetSign == 0) return point;
-            double dx = to.x() - from.x();
-            double dz = to.z() - from.z();
-            double length = Math.sqrt((dx * dx) + (dz * dz));
-            if (length <= 0.0001) return point;
-            double nx = (-dz / length) * 0.5 * offsetSign;
-            double nz = (dx / length) * 0.5 * offsetSign;
-            return new Pos(point.x() + nx, point.y(), point.z() + nz);
+            return point;
         }
 
         private Pos applyLateralOffset(Pos point, double amount) {

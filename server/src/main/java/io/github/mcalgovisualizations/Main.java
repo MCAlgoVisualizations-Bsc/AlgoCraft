@@ -320,7 +320,7 @@ public final class Main {
                 Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
                         .withData(flowMatrix)
-                        .positioning(new FlowNetworkLayout(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+                        .positioning(new GraphNetworkLayout(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
                         .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
                         .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
                         .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())

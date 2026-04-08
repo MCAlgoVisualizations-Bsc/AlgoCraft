@@ -11,6 +11,7 @@ import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.
@@ -209,7 +210,7 @@ public class VisualizationController implements PlayerControls {
         cancelRunningTask();
         renderer.onCleanup();
 
-        var trace = traceBuilder.randomizeAndBuild(24);
+        var trace = traceBuilder.randomizeAndBuild(ThreadLocalRandom.current().nextInt());
         this.algorithmStepper = new AlgorithmStepper(trace.history());
         renderer.initialize(trace.initialData());
         audience.randomize();
