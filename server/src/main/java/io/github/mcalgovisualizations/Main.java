@@ -309,22 +309,6 @@ public final class Main {
                         .withScene(GridScene::new)
                 )
         );
-// Onlyy focusing on MaxFlow for now
-//        algo.registerAlgorithm(
-//                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
-//                        .withIdentity("ford fulkerson flow", PlayerFordFulkerson::new)
-//                        .withData(flowMatrix)
-//                        .positioning(new CircleLayout(12.0, 5.0), MAX_FLOW_2D_PLACEMENT)
-//                        .onEvent(Message.class, new MessageHandler())
-//                        .withPresentation(new AlgorithmPresentation(
-//                                "Ford-Fulkerson",
-//                                Material.WATER_BUCKET,
-//                                "Graph max-flow from source (0) to sink (n-1)",
-//                                "Circle graph view with particle edges",
-//                                "Edge thickness scales with allowed capacity"
-//                        ))
-//                )
-//        );
 
         algo.registerAlgorithm(
                 Algorithm.<Integer, ISceneOps>build(ctx -> ctx
