@@ -4,17 +4,19 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.handlers.*;
+import io.github.mcalgovisualizations.layouts.*;
+import io.github.mcalgovisualizations.ui.GroupedAlgorithmUI;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
+import io.github.mcalgovisualizations.events.FlowEdgeVisit;
+import io.github.mcalgovisualizations.events.FlowPathEdge;
+import io.github.mcalgovisualizations.events.FlowStatus;
 import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.events.Swap;
-import io.github.mcalgovisualizations.layouts.BSTNodeLayout;
-import io.github.mcalgovisualizations.layouts.FloatingLinearLayout;
-import io.github.mcalgovisualizations.layouts.GridLayout;
-import io.github.mcalgovisualizations.layouts.TSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
@@ -51,6 +53,7 @@ public final class Main {
         instance.setTime(6000);   // Sets time to noon
 
         algo = new AlgoCraft(instance);
+        algo.setSelectorUI(new GroupedAlgorithmUI());
         var integerCollection1 = new ArrayList<>(Arrays.asList(
                 new Data<>(3),
                 new Data<>(7),
@@ -105,6 +108,15 @@ public final class Main {
                 new Data<>("k")
         ));
 
+        var flowMatrix = new ArrayList<>(Arrays.asList(
+                new Data<>(0), new Data<>(16), new Data<>(13), new Data<>(0),  new Data<>(0),  new Data<>(0),
+                new Data<>(0), new Data<>(0),  new Data<>(10), new Data<>(12), new Data<>(0),  new Data<>(0),
+                new Data<>(0), new Data<>(4),  new Data<>(0),  new Data<>(0),  new Data<>(14), new Data<>(0),
+                new Data<>(0), new Data<>(0),  new Data<>(9),  new Data<>(0),  new Data<>(0),  new Data<>(20),
+                new Data<>(0), new Data<>(0),  new Data<>(0),  new Data<>(7),  new Data<>(0),  new Data<>(4),
+                new Data<>(0), new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0)
+        ));
+
 
 
 
@@ -151,7 +163,7 @@ public final class Main {
                         .onCompletion(_ -> AnimationPlan.empty())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort (Strings)",
-                                Material.BOOK,
+                                Material.DIAMOND_SWORD,
                                 "Time: O(n^2) | Space: O(1)", "to demonstrate generic ordering.", "Insertion-sort using string values"
                         ))
                         .withScene(DefaultScene::new)
@@ -165,6 +177,12 @@ public final class Main {
                         .positioning(new FloatingLinearLayout(), INSERTION_INTS_PLACEMENT)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Sorted Insertion",
+                                Material.NETHERITE_SWORD,
+                                "Best-case: O(n) | Worst-case: O(n^2)",
+                                "Already sorted input demo for insertion sort"
+                        ))
                         .withScene(DefaultScene::new)
                 )
         );
@@ -196,7 +214,7 @@ public final class Main {
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Unordered Binary Tree (Linear Search)",
-                                Material.DARK_OAK_LOG,
+                                Material.SPYGLASS,
                                 "until the target is found.", "Search must visit nodes in order", "A tree filled level-by-level."
                         ))
                         .withScene(DefaultScene::new)
@@ -249,7 +267,7 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
-                                Material.RECOVERY_COMPASS,
+                                Material.COMPASS,
                                 "Time: O(V + E) | Space: O(V)",
                                 "Queue-based level-by-level expansion.",
                                 "4-way BFS explores breadth-first"
@@ -267,7 +285,7 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
-                                Material.LOOM,
+                                Material.COMPASS,
                                 "Time: O(V + E) | Space: O(V)",
                                 "Stack-based backtracking expansion.",
                                 "4-way DFS explores depth-first"
@@ -285,10 +303,30 @@ public final class Main {
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
-                                Material.REDSTONE_TORCH,
+                                Material.COMPASS,
                                 "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
                         ))
                         .withScene(GridScene::new)
+                )
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
+                        .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
+                        .withData(flowMatrix)
+                        .positioning(new GraphNetworkLayout(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+                        .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
+                        .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
+                        .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
+                        .onEvent(FlowStatus.class, new FlowStatusHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Max Flow (Edmonds-Karp)",
+                                Material.WATER_BUCKET,
+                                "Graph max-flow from source (0) to sink (n-1)",
+                                "Fixed 6-node flow graph with edge current/max labels",
+                                "Selected augmenting path edges turn particle color"
+                        ))
+                        .withScene(DefaultScene::new)
                 )
         );
 

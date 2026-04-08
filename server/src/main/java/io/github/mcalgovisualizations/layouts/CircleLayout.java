@@ -13,34 +13,34 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
     public CircleLayout() {
         this(2.0, 2.0);
     }
-    public CircleLayout (double radius) {
+
+    public CircleLayout(double radius) {
         this(radius, 2.0);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
-        var size = model.size();
+        int size = model.size();
+        if (size == 0) {
+            return new LayoutResult[0];
+        }
+
         var out = new LayoutResult[size];
-
         double y = origin.y() + yOffset;
-
-        if (size == 0) return new LayoutResult[0];
 
         if (size == 1) {
             out[0] = new LayoutResult<>(model.getFirst(), origin, new StylingProfile());
             return out;
         }
- 
+
         for (int i = 0; i < size; i++) {
             double angle = (2.0 * Math.PI * i) / size;
             double x = origin.x() + (Math.cos(angle) * radius);
             double z = origin.z() + (Math.sin(angle) * radius);
-            final var pos = new Pos(x, y, z);
-            out[i] = new LayoutResult<>(model.get(i), pos, new StylingProfile());
+            out[i] = new LayoutResult<>(model.get(i), new Pos(x, y, z), new StylingProfile());
         }
 
         return out;
     }
-
 }

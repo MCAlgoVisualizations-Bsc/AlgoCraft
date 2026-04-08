@@ -47,6 +47,7 @@ public final class AlgorithmTraceBuilder<T extends Comparable<T>> {
         return build();
     }
 
+
     /**
      * Replaces the source data entirely.
      */

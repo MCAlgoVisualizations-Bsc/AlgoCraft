@@ -1,8 +1,6 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.layouts.BstNodeStylingProfile;
 import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.layouts.ParticleTreeNodeStylingProfile;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
