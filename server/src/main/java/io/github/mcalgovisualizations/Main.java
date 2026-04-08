@@ -21,10 +21,12 @@ import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -42,7 +44,7 @@ public final class Main {
     private static AlgoCraft algo = null;
 
     static void main(String[] args) {
-        MinecraftServer server = MinecraftServer.init();
+        MinecraftServer server = MinecraftServer.init(new Auth.Online());
         InstanceContainer instance = createMainInstance();
 
         // Sets the game time
@@ -353,6 +355,10 @@ public final class Main {
         // Player configuration - set spawn instance and respawn point
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
+            PlayerSkin skin = PlayerSkin.fromUsername(player.getUsername());
+            if (skin != null) {
+                player.setSkin(skin);
+            }
             event.setSpawningInstance(instance);
             player.setRespawnPoint(HUB_SPAWN);
         });
