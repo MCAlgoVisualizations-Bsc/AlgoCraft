@@ -34,13 +34,9 @@ public final class PlayerMaxFlow implements IPlayerSort {
             }
             int row = i / nodeCount;
             int col = i % nodeCount;
-            if (isAllowedDirectedEdge(row, col, nodeCount)) {
-                residual[row][col] = number;
-                capacity[row][col] = number;
-            } else {
-                residual[row][col] = 0;
-                capacity[row][col] = 0;
-            }
+            int effective = FlowNetworkRules.effectiveCapacity(row, col, number);
+            residual[row][col] = effective;
+            capacity[row][col] = effective;
         }
 
         int source = 0;

@@ -48,14 +48,14 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
             for (int to = 0; to < NODE_COUNT; to++) {
                 int idx = (from * NODE_COUNT) + to;
                 Data<T> data = model.get(idx);
-                int capacity = readCapacity(data.value());
+                int capacity = FlowNetworkRules.effectiveCapacity(from, to, readCapacity(data.value()));
 
                 if (from == to) {
                     out[idx] = new LayoutResult<>(data, nodePositions[from], new NodeStylingProfile(nodeName(from), from == NODE_COUNT - 1));
                     continue;
                 }
 
-                if (!isAllowedDirectedEdge(from, to) || capacity <= 0) {
+                if (capacity <= 0) {
                     out[idx] = new LayoutResult<>(
                             data,
                             edgeLabelPos(nodePositions[from], nodePositions[to], y, 0, false),
