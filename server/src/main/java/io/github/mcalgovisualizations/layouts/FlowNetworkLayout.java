@@ -18,6 +18,15 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
     private static final int NODE_COUNT = 6;
     private static final int MATRIX_SIZE = NODE_COUNT * NODE_COUNT;
     private static final double Z_SPREAD = 7.0;
+    // Directed adjacency constraints for A..F requested by the flow-graph spec.
+    private static final boolean[][] ALLOWED = {
+            {false, true,  true,  false, false, false}, // A -> B,C
+            {true,  false, true,  true,  true,  false}, // B -> A,C,D,E
+            {true,  true,  false, true,  true,  false}, // C -> A,B,D,E
+            {false, true,  true,  false, true,  true }, // D -> B,C,E,F
+            {false, true,  true,  true,  false, true }, // E -> B,C,D,F
+            {false, false, false, true,  true,  false}  // F -> D,E
+    };
 
     public FlowNetworkLayout() {
         this(8.0, 5.0);
@@ -45,15 +54,24 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
                 Data<T> data = model.get(idx);
                 int capacity = readCapacity(data.value());
 
-                Pos a = nodePositions[from];
-                Pos b = nodePositions[to];
-                Pos midpoint = new Pos(
-                        (a.x() + b.x()) * 0.5,
-                        y + 0.8,
-                        (a.z() + b.z()) * 0.5
-                );
+                if (from == to) {
+                    out[idx] = new LayoutResult<>(data, nodePositions[from], new NodeStylingProfile(nodeName(from)));
+                    continue;
+                }
 
-                out[idx] = new LayoutResult<>(data, midpoint, new FlowEdgeStylingProfile(capacity, a, b));
+                if (!isAllowedDirectedEdge(from, to) || capacity <= 0) {
+                    out[idx] = new LayoutResult<>(data, edgeMidpoint(nodePositions[from], nodePositions[to], y, 0), new HiddenStylingProfile());
+                    continue;
+                }
+
+                Pos fromPos = nodePositions[from];
+                Pos toPos = nodePositions[to];
+                Pos midpoint = edgeMidpoint(fromPos, toPos, y, shouldOffsetLabel(from, to));
+                out[idx] = new LayoutResult<>(
+                        data,
+                        midpoint,
+                        new FlowEdgeStylingProfile(capacity, fromPos, toPos, nodeName(from), nodeName(to))
+                );
             }
         }
 
@@ -77,6 +95,39 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         };
     }
 
+    private static Pos edgeMidpoint(Pos from, Pos to, double baseY, int offsetSign) {
+        double dx = to.x() - from.x();
+        double dz = to.z() - from.z();
+        double length = Math.sqrt((dx * dx) + (dz * dz));
+        double nx = 0.0;
+        double nz = 0.0;
+        if (length > 0.0001 && offsetSign != 0) {
+            // Perpendicular offset keeps opposite-direction labels from overlapping.
+            nx = (-dz / length) * 0.9 * offsetSign;
+            nz = (dx / length) * 0.9 * offsetSign;
+        }
+        return new Pos(
+                ((from.x() + to.x()) * 0.5) + nx,
+                baseY + 1.0,
+                ((from.z() + to.z()) * 0.5) + nz
+        );
+    }
+
+    private static boolean isAllowedDirectedEdge(int from, int to) {
+        return from >= 0 && to >= 0 && from < NODE_COUNT && to < NODE_COUNT && ALLOWED[from][to];
+    }
+
+    private static int shouldOffsetLabel(int from, int to) {
+        if (!isAllowedDirectedEdge(from, to) || !isAllowedDirectedEdge(to, from)) {
+            return 0;
+        }
+        return from < to ? 1 : -1;
+    }
+
+    private static char nodeName(int idx) {
+        return (char) ('A' + idx);
+    }
+
     private static <T extends Comparable<T>> boolean isFixedFlowMatrix(List<Data<T>> model) {
         if (model.size() != MATRIX_SIZE) {
             return false;
@@ -93,24 +144,46 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         return raw instanceof Integer number ? Math.max(0, number) : 0;
     }
 
-    private static final class FlowEdgeStylingProfile implements IStylingProfile {
-        private final int capacity;
-        private final Pos from;
-        private final Pos to;
+    private static final class NodeStylingProfile implements IStylingProfile {
+        private final char name;
 
-        private FlowEdgeStylingProfile(int capacity, Pos from, Pos to) {
-            this.capacity = capacity;
-            this.from = from;
-            this.to = to;
+        private NodeStylingProfile(char name) {
+            this.name = name;
         }
 
         @Override
         public IDisplayValue applyStyle(String value, Pos pos) {
-            boolean hasCapacity = capacity > 0;
-            Block block = hasCapacity ? Block.LIGHT_BLUE_CONCRETE : Block.GRAY_CONCRETE;
-            String label = hasCapacity ? Integer.toString(capacity) : "";
-            BlockDisplay base = new BlockDisplay(pos, block, label, hasCapacity);
-            return new FlowEdgeParticles(base, capacity, from, to);
+            return new BlockDisplay(pos, Block.BLACK_CONCRETE, Character.toString(name), true);
+        }
+    }
+
+    private static final class HiddenStylingProfile implements IStylingProfile {
+        @Override
+        public IDisplayValue applyStyle(String value, Pos pos) {
+            return new BlockDisplay(pos, Block.AIR, "", false);
+        }
+    }
+
+    private static final class FlowEdgeStylingProfile implements IStylingProfile {
+        private final int capacity;
+        private final Pos from;
+        private final Pos to;
+        private final char fromName;
+        private final char toName;
+
+        private FlowEdgeStylingProfile(int capacity, Pos from, Pos to, char fromName, char toName) {
+            this.capacity = capacity;
+            this.from = from;
+            this.to = to;
+            this.fromName = fromName;
+            this.toName = toName;
+        }
+
+        @Override
+        public IDisplayValue applyStyle(String value, Pos pos) {
+            String label = fromName + "->" + toName + " 0/" + capacity;
+            BlockDisplay base = new BlockDisplay(pos, Block.AIR, label, true);
+            return new FlowEdgeParticles(base, capacity, from, to, fromName, toName);
         }
     }
 
@@ -118,13 +191,24 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         private final int capacity;
         private final Pos from;
         private final Pos to;
+        private final char fromName;
+        private final char toName;
         private boolean selectedPath;
+        private int currentFlow;
 
-        private FlowEdgeParticles(BlockDisplay base, int capacity, Pos from, Pos to) {
+        private FlowEdgeParticles(BlockDisplay base, int capacity, Pos from, Pos to, char fromName, char toName) {
             super(base);
             this.capacity = capacity;
             this.from = from;
             this.to = to;
+            this.fromName = fromName;
+            this.toName = toName;
+        }
+
+        @Override
+        public void setValue(int value) {
+            this.currentFlow = Math.max(0, value);
+            base.setText(fromName + "->" + toName + " " + currentFlow + "/" + capacity);
         }
 
         @Override
@@ -140,9 +224,6 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
 
         @Override
         protected List<Pos> targets() {
-            if (capacity <= 0 || from.samePoint(to)) {
-                return List.of();
-            }
             return List.of(to);
         }
 
@@ -157,3 +238,5 @@ public record FlowNetworkLayout(double xSpacing, double yOffset) implements ILay
         }
     }
 }
+
+

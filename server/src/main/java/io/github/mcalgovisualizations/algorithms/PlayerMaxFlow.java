@@ -1,38 +1,59 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
+import io.github.mcalgovisualizations.events.FlowEdgeVisit;
+import io.github.mcalgovisualizations.events.FlowPathEdge;
+import io.github.mcalgovisualizations.events.FlowStatus;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public final class PlayerMaxFlow implements IPlayerSort {
+    // Directed adjacency constraints for A..F, matching the flow layout.
+    private static final boolean[][] ALLOWED = {
+            {false, true,  true,  false, false, false},
+            {true,  false, true,  true,  true,  false},
+            {true,  true,  false, true,  true,  false},
+            {false, true,  true,  false, true,  true },
+            {false, true,  true,  true,  false, true },
+            {false, false, false, true,  true,  false}
+    };
 
     @Override
     public <T extends Comparable<T>> void sort(ISort<T> values) {
         int size = values.size();
         if (size == 0) {
-            values.emit(new Message("Max-Flow: empty graph", Message.MessageType.ERROR));
+            values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
             return;
         }
 
         int nodeCount = (int) Math.sqrt(size);
         if (nodeCount * nodeCount != size) {
-            values.emit(new Message("Max-Flow: expected flattened NxN capacity matrix", Message.MessageType.ERROR));
+            values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
             return;
         }
 
         int[][] residual = new int[nodeCount][nodeCount];
+        int[][] capacity = new int[nodeCount][nodeCount];
+        int[][] flow = new int[nodeCount][nodeCount];
+
         for (int i = 0; i < size; i++) {
             T raw = values.get(i);
             if (!(raw instanceof Integer number) || number < 0) {
-                values.emit(new Message("Max-Flow: expected non-negative integer capacities", Message.MessageType.ERROR));
+                values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
                 return;
             }
-            residual[i / nodeCount][i % nodeCount] = number;
+            int row = i / nodeCount;
+            int col = i % nodeCount;
+            if (isAllowedDirectedEdge(row, col, nodeCount)) {
+                residual[row][col] = number;
+                capacity[row][col] = number;
+            } else {
+                residual[row][col] = 0;
+                capacity[row][col] = 0;
+            }
         }
 
         int source = 0;
@@ -49,26 +70,27 @@ public final class PlayerMaxFlow implements IPlayerSort {
 
             for (int v = sink; v != source; v = parent[v]) {
                 int u = parent[v];
+                int slot = (u * nodeCount) + v;
+                values.emit(new FlowPathEdge(u, v, slot, pathFlow));
+
                 residual[u][v] -= pathFlow;
                 residual[v][u] += pathFlow;
 
-                int matrixIndex = (u * nodeCount) + v;
-                values.emit(new CellStateTransition(matrixIndex, CellState.OPEN, CellState.PATH));
+                if (capacity[u][v] > 0) {
+                    flow[u][v] += pathFlow;
+                    values.emit(new FlowEdgeFlowUpdate(slot, flow[u][v]));
+                } else if (capacity[v][u] > 0) {
+                    flow[v][u] -= pathFlow;
+                    int reverseSlot = (v * nodeCount) + u;
+                    values.emit(new FlowEdgeFlowUpdate(reverseSlot, flow[v][u]));
+                }
             }
 
             maxFlow += pathFlow;
-            values.emit(new Message(
-                    "Max-Flow augment: +" + pathFlow + " (total " + maxFlow + ")",
-                    Message.MessageType.INFO
-            ));
+            values.emit(new FlowStatus(FlowStatus.Type.AUGMENTED, pathFlow, maxFlow));
         }
 
-        values.emit(new Message("Max-Flow complete: " + maxFlow, Message.MessageType.SUCCESS));
-    }
-
-    @Override
-    public String getName() {
-        return "Max Flow (Edmonds-Karp)";
+        values.emit(new FlowStatus(FlowStatus.Type.COMPLETE, maxFlow, maxFlow));
     }
 
     private static <T extends Comparable<T>> boolean bfs(
@@ -89,13 +111,13 @@ public final class PlayerMaxFlow implements IPlayerSort {
             int u = queue.poll();
 
             for (int v = 0; v < nodeCount; v++) {
-                if (parent[v] != -1 || residual[u][v] <= 0) {
+                if (parent[v] != -1 || residual[u][v] <= 0 || !isAllowedDirectedEdge(u, v, nodeCount)) {
                     continue;
                 }
 
                 parent[v] = u;
                 int matrixIndex = (u * nodeCount) + v;
-                values.emit(new CellStateTransition(matrixIndex, CellState.DEFAULT, CellState.OPEN));
+                values.emit(new FlowEdgeVisit(u, v, matrixIndex, residual[u][v]));
 
                 if (v == sink) {
                     return true;
@@ -105,6 +127,16 @@ public final class PlayerMaxFlow implements IPlayerSort {
         }
 
         return false;
+    }
+
+    private static boolean isAllowedDirectedEdge(int from, int to, int nodeCount) {
+        if (from < 0 || to < 0 || from >= nodeCount || to >= nodeCount) {
+            return false;
+        }
+        if (nodeCount != ALLOWED.length) {
+            return from != to;
+        }
+        return ALLOWED[from][to];
     }
 }
 

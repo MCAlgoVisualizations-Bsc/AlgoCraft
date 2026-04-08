@@ -4,17 +4,18 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.handlers.*;
+import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
+import io.github.mcalgovisualizations.events.FlowEdgeVisit;
+import io.github.mcalgovisualizations.events.FlowPathEdge;
+import io.github.mcalgovisualizations.events.FlowStatus;
 import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.events.Swap;
-import io.github.mcalgovisualizations.layouts.BSTNodeLayout;
-import io.github.mcalgovisualizations.layouts.FloatingLinearLayout;
-import io.github.mcalgovisualizations.layouts.GridLayout;
-import io.github.mcalgovisualizations.layouts.TSTNodeLayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
@@ -104,11 +105,12 @@ public final class Main {
         ));
 
         var flowMatrix = new ArrayList<>(Arrays.asList(
-                new Data<>(0), new Data<>(0), new Data<>(6), new Data<>(3), new Data<>(0),
-                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(6),
-                new Data<>(0), new Data<>(3), new Data<>(0), new Data<>(2), new Data<>(3),
-                new Data<>(0), new Data<>(3), new Data<>(0), new Data<>(0), new Data<>(0),
-                new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0), new Data<>(0)
+                new Data<>(0), new Data<>(16), new Data<>(13), new Data<>(0),  new Data<>(0),  new Data<>(0),
+                new Data<>(0), new Data<>(0),  new Data<>(10), new Data<>(12), new Data<>(0),  new Data<>(0),
+                new Data<>(0), new Data<>(4),  new Data<>(0),  new Data<>(0),  new Data<>(14), new Data<>(0),
+                new Data<>(0), new Data<>(0),  new Data<>(9),  new Data<>(0),  new Data<>(0),  new Data<>(20),
+                new Data<>(0), new Data<>(0),  new Data<>(0),  new Data<>(7),  new Data<>(0),  new Data<>(4),
+                new Data<>(0), new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0)
         ));
 
 
@@ -297,20 +299,40 @@ public final class Main {
                         .withScene(GridScene::new)
                 )
         );
+// Onlyy focusing on MaxFlow for now
+//        algo.registerAlgorithm(
+//                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
+//                        .withIdentity("ford fulkerson flow", PlayerFordFulkerson::new)
+//                        .withData(flowMatrix)
+//                        .positioning(new CircleLayout(12.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+//                        .onEvent(Message.class, new MessageHandler())
+//                        .withPresentation(new AlgorithmPresentation(
+//                                "Ford-Fulkerson",
+//                                Material.WATER_BUCKET,
+//                                "Graph max-flow from source (0) to sink (n-1)",
+//                                "Circle graph view with particle edges",
+//                                "Edge thickness scales with allowed capacity"
+//                        ))
+//                )
+//        );
 
         algo.registerAlgorithm(
-                Algorithm.<Integer>build(ctx -> ctx
-                        .withIdentity("ford fulkerson flow", PlayerFordFulkerson::new)
+                Algorithm.<Integer, ISceneOps>build(ctx -> ctx
+                        .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
                         .withData(flowMatrix)
-                        .positioning(new CircleLayout(12.0, 5.0), MAX_FLOW_2D_PLACEMENT)
-                        .onEvent(Message.class, new MessageHandler())
+                        .positioning(new FlowNetworkLayout(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+                        .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
+                        .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
+                        .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
+                        .onEvent(FlowStatus.class, new FlowStatusHandler())
                         .withPresentation(new AlgorithmPresentation(
-                                "Ford-Fulkerson",
+                                "Max Flow (Edmonds-Karp)",
                                 Material.WATER_BUCKET,
                                 "Graph max-flow from source (0) to sink (n-1)",
-                                "Circle graph view with particle edges",
-                                "Edge thickness scales with allowed capacity"
+                                "Fixed 6-node flow graph with edge current/max labels",
+                                "Selected augmenting path edges turn particle color"
                         ))
+                        .withScene(DefaultScene::new)
                 )
         );
 
