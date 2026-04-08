@@ -14,6 +14,7 @@ import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {
     protected final BlockDisplay base;
@@ -33,6 +34,11 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
 
     protected Pos particleSource() {
         return base.getPos();
+    }
+
+    protected List<Pos> particleSources() {
+        Pos source = particleSource();
+        return source == null ? List.of() : Collections.singletonList(source);
     }
 
     protected int particlesPerStep() {
@@ -104,8 +110,18 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
             return;
         }
 
+        List<Pos> sources = particleSources();
+        List<Pos> targets = targets();
+
+        if (sources.size() == targets.size() && !sources.isEmpty()) {
+            for (int i = 0; i < targets.size(); i++) {
+                emitLine(sources.get(i), targets.get(i));
+            }
+            return;
+        }
+
         Pos from = particleSource();
-        for (Pos to : targets()) {
+        for (Pos to : targets) {
             emitLine(from, to);
         }
     }

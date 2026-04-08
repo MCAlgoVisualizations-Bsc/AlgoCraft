@@ -60,6 +60,9 @@ public final class PlayerMaxFlow implements IPlayerSort {
         int sink = nodeCount - 1;
         int maxFlow = 0;
 
+        // Initialize node fills and sink total text.
+        emitNodeLoads(values, capacity, flow, nodeCount, maxFlow);
+
         int[] parent = new int[nodeCount];
         while (bfs(residual, source, sink, parent, values, nodeCount)) {
             int pathFlow = Integer.MAX_VALUE;
@@ -71,7 +74,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
             for (int v = sink; v != source; v = parent[v]) {
                 int u = parent[v];
                 int slot = (u * nodeCount) + v;
-                values.emit(new FlowPathEdge(u, v, slot, pathFlow));
+                values.emit(new FlowPathEdge(nodeName(u), nodeName(v), slot, pathFlow));
 
                 residual[u][v] -= pathFlow;
                 residual[v][u] += pathFlow;
@@ -87,6 +90,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
             }
 
             maxFlow += pathFlow;
+            emitNodeLoads(values, capacity, flow, nodeCount, maxFlow);
             values.emit(new FlowStatus(FlowStatus.Type.AUGMENTED, pathFlow, maxFlow));
         }
 
@@ -117,7 +121,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
 
                 parent[v] = u;
                 int matrixIndex = (u * nodeCount) + v;
-                values.emit(new FlowEdgeVisit(u, v, matrixIndex, residual[u][v]));
+                values.emit(new FlowEdgeVisit(nodeName(u), nodeName(v), matrixIndex, residual[u][v]));
 
                 if (v == sink) {
                     return true;
@@ -129,6 +133,32 @@ public final class PlayerMaxFlow implements IPlayerSort {
         return false;
     }
 
+    private static <T extends Comparable<T>> void emitNodeLoads(
+            ISort<T> values,
+            int[][] capacity,
+            int[][] flow,
+            int nodeCount,
+            int maxFlow
+    ) {
+        for (int node = 0; node < nodeCount; node++) {
+            if (node == nodeCount - 1) {
+                // F always shows current total max flow value.
+                int sinkSlot = (node * nodeCount) + node;
+                values.emit(new FlowEdgeFlowUpdate(sinkSlot, maxFlow));
+                continue;
+            }
+
+            int load = 0;
+            for (int to = 0; to < nodeCount; to++) {
+                if (capacity[node][to] > 0) {
+                    load += Math.max(0, flow[node][to]);
+                }
+            }
+            int slot = (node * nodeCount) + node;
+            values.emit(new FlowEdgeFlowUpdate(slot, load));
+        }
+    }
+
     private static boolean isAllowedDirectedEdge(int from, int to, int nodeCount) {
         if (from < 0 || to < 0 || from >= nodeCount || to >= nodeCount) {
             return false;
@@ -137,6 +167,10 @@ public final class PlayerMaxFlow implements IPlayerSort {
             return from != to;
         }
         return ALLOWED[from][to];
+    }
+
+    private static char nodeName(int index) {
+        return (char) ('A' + index);
     }
 }
 
