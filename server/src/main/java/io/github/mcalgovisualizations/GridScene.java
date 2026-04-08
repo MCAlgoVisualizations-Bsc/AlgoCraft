@@ -42,7 +42,8 @@ public class GridScene extends AbstractScene {
             if (useBlockGridDisplay) {
                 CellState initialState = initialCellState(value.value());
                 Block initialBlock = blockForState(initialState);
-                dv = new BlockDisplay(pos, initialBlock, value.toString());
+                // Maze cells are pure block visuals; hide numeric labels.
+                dv = new BlockDisplay(instance, pos, initialBlock, "maze", false);
                 slotStates.put(i, initialState);
             } else {
                 dv = new MobDisplay(pos, value.toString());
