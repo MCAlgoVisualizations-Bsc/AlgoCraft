@@ -1,16 +1,18 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.visualization.algorithms.Message;
+import io.github.mcalgovisualizations.visualization.models.AbstractContext;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PlayerBFS implements IPlayerSort {
+public class PlayerBFS implements IPlayerSort<SortingContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -24,8 +26,9 @@ public class PlayerBFS implements IPlayerSort {
     }
 
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
-        int size = values.size();
+    public void run(SortingContext<Integer> values) {
+        var arr = values.getData();
+        int size = arr.size();
         if (size == 0) {
             values.emit(new Message("BFS: empty grid", Message.MessageType.ERROR));
             return;
@@ -33,11 +36,7 @@ public class PlayerBFS implements IPlayerSort {
 
         int[] cells = new int[size];
         for (int i = 0; i < size; i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof Integer number)) {
-                values.emit(new Message("BFS: expected integer grid values", Message.MessageType.ERROR));
-                return;
-            }
+            var number = arr.get(i);
             cells[i] = number;
         }
 

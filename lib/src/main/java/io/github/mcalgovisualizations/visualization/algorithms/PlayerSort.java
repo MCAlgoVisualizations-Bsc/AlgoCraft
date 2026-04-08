@@ -1,5 +1,5 @@
 package io.github.mcalgovisualizations.visualization.algorithms;
 
-public interface IPlayerSort<C> {
+public interface PlayerSort<C> {
     void run(C context);
 }

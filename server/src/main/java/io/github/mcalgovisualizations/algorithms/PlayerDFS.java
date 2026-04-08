@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
@@ -9,7 +10,7 @@ import io.github.mcalgovisualizations.visualization.models.ISort;
 import java.util.Arrays;
 import java.util.Stack;
 
-public class PlayerDFS implements IPlayerSort {
+public class PlayerDFS implements IPlayerSort<SortingContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -23,20 +24,18 @@ public class PlayerDFS implements IPlayerSort {
     }
 
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
+    public void run(SortingContext<Integer> ctx) {
+        var values = ctx.values;
         int size = values.size();
         if (size == 0) {
-            values.emit(new Message("DFS: empty grid", Message.MessageType.ERROR));
+            ctx.emit(new Message("DFS: empty grid", Message.MessageType.ERROR));
             return;
         }
 
         int[] cells = new int[size];
         for (int i = 0; i < size; i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof Integer number)) {
-                values.emit(new Message("DFS: expected integer grid values", Message.MessageType.ERROR));
-                return;
-            }
+            var number = values.get(i);
+
             cells[i] = number;
         }
 
@@ -50,7 +49,7 @@ public class PlayerDFS implements IPlayerSort {
         }
 
         if (start < 0 || goal < 0) {
-            values.emit(new Message("DFS: start or goal missing", Message.MessageType.ERROR));
+            ctx.emit(new Message("DFS: start or goal missing", Message.MessageType.ERROR));
             return;
         }
 
@@ -74,7 +73,7 @@ public class PlayerDFS implements IPlayerSort {
             }
 
             if (current != start && current != goal) {
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
             int row = current / columns;
@@ -94,13 +93,13 @@ public class PlayerDFS implements IPlayerSort {
                 frontier.push(neighbor);
 
                 if (neighbor != start && neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
+                    ctx.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
                 }
             }
         }
 
         if (!found) {
-            values.emit(new Message("DFS: no path found", Message.MessageType.ERROR));
+            ctx.emit(new Message("DFS: no path found", Message.MessageType.ERROR));
             return;
         }
 
@@ -108,12 +107,12 @@ public class PlayerDFS implements IPlayerSort {
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
                 CellState previous = visited[pathCursor] ? CellState.CLOSED : CellState.OPEN;
-                values.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
+                ctx.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }
 
-        values.emit(new Message("DFS: path found", Message.MessageType.SUCCESS));
+        ctx.emit(new Message("DFS: path found", Message.MessageType.SUCCESS));
     }
 
     private static int index(int row, int col, int rows, int columns, int size) {

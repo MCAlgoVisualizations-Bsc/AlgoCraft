@@ -28,7 +28,7 @@ public final class AlgorithmTraceBuilder<T extends Comparable<T>> {
     public @NotNull AlgorithmTrace<T> build() {
         var workingCollection = new SortingCollection<>(initialData);
 
-        algorithm.sort(workingCollection);
+        algorithm.run(workingCollection);
 
         return new AlgorithmTrace<>(
                 List.copyOf(initialData),
