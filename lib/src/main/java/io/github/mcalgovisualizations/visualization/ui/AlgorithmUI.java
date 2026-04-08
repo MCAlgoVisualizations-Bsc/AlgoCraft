@@ -9,12 +9,14 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
@@ -41,26 +43,15 @@ public class AlgorithmUI implements IAlgorithmUI {
         for (String algorithm : sortedAlgorithms) {
             AlgorithmPresentation presentation = presentationResolver.apply(algorithm);
             if (presentation == null) {
-                presentation = AlgorithmPresentation.fallback(algorithm);
+                presentation = new AlgorithmPresentation(algorithm);
             }
 
             ItemStack item = ItemStack.builder(presentation.icon())
-                    .customName(Component.text(presentation.displayName(), NamedTextColor.GOLD)
-                            .decoration(TextDecoration.ITALIC, false))
-                    .lore(
-                            Component.text(presentation.description1(), NamedTextColor.GRAY)
-                                    .decoration(TextDecoration.ITALIC, false),
-                            Component.text(presentation.description2(), NamedTextColor.GRAY)
-                                    .decoration(TextDecoration.ITALIC, false),
-                            Component.empty(),
-                            Component.text(presentation.complexity(), NamedTextColor.YELLOW)
-                                    .decoration(TextDecoration.ITALIC, false),
-                            Component.empty(),
-                            Component.text("Click to select!", NamedTextColor.GREEN)
-                                    .decoration(TextDecoration.ITALIC, false)
-                    )
+                    .customName(presentation.getCustomName())
+                    .lore(presentation.getComponents())
                     .set(ALGO_ID_TAG, algorithm)
                     .build();
+
             inventory.setItemStack(slots.get(i), item);
             i++;
         }

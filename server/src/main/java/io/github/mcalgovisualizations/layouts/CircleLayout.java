@@ -1,5 +1,6 @@
-package io.github.mcalgovisualizations.visualization.layouts;
+package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.visualization.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;

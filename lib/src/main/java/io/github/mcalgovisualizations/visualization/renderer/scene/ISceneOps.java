@@ -1,17 +1,13 @@
-package io.github.mcalgovisualizations.visualization.renderer;
+package io.github.mcalgovisualizations.visualization.renderer.scene;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
+import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
+import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public interface ISceneOps {
 
-    Map<Integer, IDisplayValue> displaysBySlot = new HashMap<>();
-
-    void setLayout(LayoutResult[] model);
+    void setLayout(LayoutResult<?>[] model);
 
     Pos getOrigin();
 
@@ -22,11 +18,11 @@ public interface ISceneOps {
 
     void moveSlotTo(int slot, Pos position);
     void swapSlots(int a, int b);
+    void addDisplay(int slot, IDisplayValue display);
 
     void playSound(String key, float volume, float pitch);
     void sendMessage(Component message);
     void sendActionBar(Component message);
-    void toggleCellState(int slot, CellState first, CellState second);
 
     void cleanUp();
 }

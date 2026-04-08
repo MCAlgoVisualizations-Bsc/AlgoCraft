@@ -1,8 +1,8 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Compare;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
+import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
@@ -65,11 +65,6 @@ public final class PlayerBSTBuild implements IPlayerSort {
         }
 
         values.emit(new Message("BST build complete", Message.MessageType.SUCCESS));
-    }
-
-    @Override
-    public String getName() {
-        return "BST Build";
     }
 
     private static <T extends Comparable<T>> int[] readIntInput(ISort<T> values) {

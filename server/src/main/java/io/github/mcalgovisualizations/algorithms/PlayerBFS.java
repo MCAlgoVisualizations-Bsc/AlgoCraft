@@ -1,9 +1,9 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellState;
-import io.github.mcalgovisualizations.visualization.algorithms.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.events.Message;
+import io.github.mcalgovisualizations.events.CellState;
+import io.github.mcalgovisualizations.events.CellStateTransition;
+import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
@@ -114,11 +114,6 @@ public class PlayerBFS implements IPlayerSort {
         }
 
         values.emit(new Message("BFS: path found", Message.MessageType.SUCCESS));
-    }
-
-    @Override
-    public String getName() {
-        return "BFS (4-way grid)";
     }
 
     private static int index(int row, int col, int rows, int columns, int size) {

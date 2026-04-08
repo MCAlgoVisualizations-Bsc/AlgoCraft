@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
@@ -10,16 +11,16 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
-public final class Executor {
+public final class Executor<O extends ISceneOps> {
 
     private static final int MAX_OPS_PER_TICK = 256;
 
-    private final ISceneOps scene;
+    private final O scene;
     private Task runningTask = null;
 
-    private final Queue<AnimationPlan> queue = new LinkedList<>();
+    private final Queue<AnimationPlan<O>> queue = new LinkedList<>();
 
-    private AnimationPlan currentPlan = null;
+    private AnimationPlan<O> currentPlan = null;
     private int stepIndex = 0;
     private int ticksRemaining = 0;
     private boolean stepJustEntered = false;
@@ -28,11 +29,11 @@ public final class Executor {
 
     private int SPEED = 1;
 
-    public Executor(ISceneOps scene) {
+    public Executor(O scene) {
         this.scene = Objects.requireNonNull(scene, "scene");
     }
 
-    public void add(@NotNull AnimationPlan plan) {
+    public void add(@NotNull AnimationPlan<O> plan) {
         if (plan.isEmpty()) return;
         queue.add(plan);
     }
@@ -102,7 +103,7 @@ public final class Executor {
             }
 
             if (stepJustEntered) {
-                var step = currentPlan.steps().get(stepIndex);
+                AnimationPlan.Step<O> step = currentPlan.steps().get(stepIndex);
                 step.op().accept(scene);
                 ticksRemaining = step.ticks();
 

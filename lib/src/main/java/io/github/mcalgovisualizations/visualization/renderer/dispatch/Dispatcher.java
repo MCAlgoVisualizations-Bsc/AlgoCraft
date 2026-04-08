@@ -1,13 +1,14 @@
 package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Objects;
 
-public final class Dispatcher {
+public final class Dispatcher<O extends ISceneOps> {
 
     private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers;
 
@@ -15,7 +16,7 @@ public final class Dispatcher {
         this.handlers = Map.copyOf(handlers);
     }
 
-    public AnimationPlan dispatch(@NotNull IAlgorithmEvent event) {
+    public AnimationPlan<O> dispatch(@NotNull IAlgorithmEvent event) {
         Objects.requireNonNull(event, "event");
         final var handler = handlers.get(event.getClass());
         if (handler == null) {
@@ -26,7 +27,7 @@ public final class Dispatcher {
     }
 
     @SuppressWarnings("unchecked")
-    private <E extends IAlgorithmEvent> AnimationPlan invokeUnchecked(
+    private <E extends IAlgorithmEvent> AnimationPlan<O> invokeUnchecked(
             @NotNull IAnimationHandler<?> raw,
             @NotNull IAlgorithmEvent event
     ) {

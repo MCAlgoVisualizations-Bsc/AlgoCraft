@@ -1,6 +1,7 @@
-package io.github.mcalgovisualizations.visualization.layouts;
+package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.renderer.Displays.BlockDisplay;
+import io.github.mcalgovisualizations.visualization.IStylingProfile;
+import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.block.Block;

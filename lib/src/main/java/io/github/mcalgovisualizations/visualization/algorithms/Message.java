@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.algorithms.events;
+package io.github.mcalgovisualizations.visualization.algorithms;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 

@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
-import io.github.mcalgovisualizations.visualization.renderer.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,26 +8,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public final class AnimationPlan {
+public final class AnimationPlan<O extends ISceneOps> {
 
     /**
      * @param ticks how long to wait AFTER running the op (can be 0)
      */
-    public record Step(int ticks, Consumer<ISceneOps> op) {
-            public Step(int ticks, Consumer<ISceneOps> op) {
+    public record Step<O extends ISceneOps>(int ticks, Consumer<O> op) {
+            public Step(int ticks, Consumer<O> op) {
                 if (ticks < 0) throw new IllegalArgumentException("ticks must be >= 0");
                 this.ticks = ticks;
                 this.op = Objects.requireNonNull(op, "op");
             }
         }
 
-    private final List<Step> steps;
+    private final List<Step<O>> steps;
 
-    private AnimationPlan(List<Step> steps) {
+    private AnimationPlan(List<Step<O>> steps) {
         this.steps = List.copyOf(steps);
     }
 
-    public List<Step> steps() {
+    public List<Step<O>> steps() {
         return steps;
     }
 
@@ -35,36 +35,37 @@ public final class AnimationPlan {
         return steps.isEmpty();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static <O extends ISceneOps>  Builder<O> builder() {
+        return new Builder<>();
     }
 
-    public static AnimationPlan instant(Consumer<ISceneOps> op) {
-        return builder().step(0, op).build();
+    public static <O extends ISceneOps> AnimationPlan<O> instant(Consumer<O> op) {
+        Builder<O> builder = builder();
+        return builder.step(op).build();
     }
 
-    public static AnimationPlan empty() {
-        return new AnimationPlan(Collections.emptyList());
+    public static <O extends ISceneOps> AnimationPlan<O> empty() {
+        return new AnimationPlan<>(Collections.emptyList());
     }
 
-    public static final class Builder {
-        private final List<Step> steps = new ArrayList<>();
+    public static final class Builder<O extends ISceneOps> {
+        private final List<Step<O>> steps = new ArrayList<>();
 
-        public Builder step(int ticks) {
+        public Builder<O> step(int ticks) {
             return step(ticks, _ -> {});
         }
 
-        public Builder step(Consumer<ISceneOps> op) {
+        public Builder<O> step(Consumer<O> op) {
             return step(1, op);
         }
 
-        public Builder step(int ticks, Consumer<ISceneOps> op) {
-            steps.add(new Step(ticks, op));
+        public Builder<O> step(int ticks, Consumer<O> op) {
+            steps.add(new Step<>(ticks, op));
             return this;
         }
 
-        public AnimationPlan build() {
-            return new AnimationPlan(steps);
+        public AnimationPlan<O> build() {
+            return new AnimationPlan<>(steps);
         }
     }
 }

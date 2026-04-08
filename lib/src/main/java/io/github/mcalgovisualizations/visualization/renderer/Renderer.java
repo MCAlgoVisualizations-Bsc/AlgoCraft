@@ -1,26 +1,28 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
-import io.github.mcalgovisualizations.visualization.algorithms.events.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.layouts.ILayout;
+import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.ILayout;
 import io.github.mcalgovisualizations.visualization.models.Data;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public final class Renderer {
-    private final Scene scene;
+public final class Renderer<O extends ISceneOps> {
+    private final ISceneOps scene;
     private final Instance instance;
-    private final Dispatcher dispatcher;
-    private final Executor executor;
+    private final Dispatcher<O> dispatcher;
+    private final Executor<O> executor;
+    private final AnimationPlan<O> complete;
     private final Pos origin;
     private final ILayout layout;
-    private final AnimationPlan complete;
     private boolean collapseAnimationDelays = false;
 
     public Renderer(
@@ -29,11 +31,12 @@ public final class Renderer {
             @NotNull ILayout layout,
             @NotNull AudienceChannel audience,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
-            @NotNull AnimationPlan complete
+            @NotNull AnimationPlan<O> complete,
+            @NotNull O scene
     ) {
-        this.scene = new Scene(instance, origin, audience);
-        this.executor = new Executor(scene);
-        this.dispatcher = new Dispatcher(handlers);
+        this.scene = scene;
+        this.executor = new Executor<>(scene);
+        this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
 
         // make these into context?
@@ -95,15 +98,25 @@ public final class Renderer {
 
     public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
+        requireChunksLoaded(layoutResult);
         scene.setLayout(layoutResult);
     }
 
-    private AnimationPlan normalizePlan(AnimationPlan plan) {
+    private <T extends Comparable<T>> void requireChunksLoaded(LayoutResult<T>[] layoutResult) {
+        final var allLoaded = Arrays.stream(layoutResult)
+                .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
+
+        if (!allLoaded) {
+            throw new IllegalStateException("Visualization area is not loaded yet.");
+        }
+    }
+
+    private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
         if (!collapseAnimationDelays || plan.isEmpty()) {
             return plan;
         }
 
-        var builder = AnimationPlan.builder();
+        AnimationPlan.Builder<O> builder = AnimationPlan.builder();
         for (var step : plan.steps()) {
             builder.step(0, step.op());
         }

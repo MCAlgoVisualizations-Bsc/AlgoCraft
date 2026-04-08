@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.algorithms.events;
+package io.github.mcalgovisualizations.events;
 
 public enum CellState {
     DEFAULT,

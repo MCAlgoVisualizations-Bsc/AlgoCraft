@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.renderer.Displays;
+package io.github.mcalgovisualizations.Displays;
 
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.minestom.server.MinecraftServer;
