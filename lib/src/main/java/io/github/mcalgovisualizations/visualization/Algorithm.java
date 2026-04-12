@@ -1,10 +1,11 @@
 package io.github.mcalgovisualizations.visualization;
 
+import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
-import io.github.mcalgovisualizations.visualization.renderer.*;
+import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
@@ -14,44 +15,90 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
-public record Algorithm<I, C extends AlgorithmContext<I>, O extends ISceneOps>(
+public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull String id,
         @NotNull Supplier<? extends IPlayerSort<C>> ctor,
-        @NotNull C context,
-        @NotNull ILayout<I> layout,
+        @NotNull C model,
+        @NotNull ILayout<T> layout,
         @NotNull AlgorithmPlacement placement,
         @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
         @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
         @Nullable AlgorithmPresentation presentation,
-        @NotNull Function<SceneContext, O> scene
+        @NotNull Function<SceneContext, O> scene,
+        @NotNull ContextFactory<T, C> contextFactory
 ) {
-    public static @NotNull <I, C extends AlgorithmContext<I>, O extends ISceneOps> Algorithm<I, C, O> build(
-            @NotNull Consumer<Builder<I, C, O>> configurer
-    ) {
-        var builder = new Builder<I, C, O>();
-        configurer.accept(builder);
-        return builder.create();
+    public Algorithm {
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(ctor, "ctor");
+        Objects.requireNonNull(model, "model");
+        Objects.requireNonNull(layout, "layout");
+        Objects.requireNonNull(placement, "placement");
+        Objects.requireNonNull(handlerRegistry, "handlerRegistry");
+        Objects.requireNonNull(onComplete, "onComplete");
+        Objects.requireNonNull(scene, "scene");
+        Objects.requireNonNull(contextFactory, "contextFactory");
+        handlerRegistry = Map.copyOf(handlerRegistry);
     }
 
-    public static final class Builder<I, C extends AlgorithmContext<I>, O extends ISceneOps> {
+    public static <T, C extends AlgorithmContext<T>>
+    @NotNull BuilderBase<T, C> builder(@NotNull C model) {
+        return new Builder<>(model);
+    }
+
+    public interface BuilderBase<T, C extends AlgorithmContext<T>> {
+        @NotNull BuilderBase<T, C> withIdentity(
+                @NotNull String id,
+                @NotNull Supplier<? extends IPlayerSort<C>> ctor
+        );
+
+        @NotNull BuilderBase<T, C> positioning(
+                @NotNull ILayout<T> layout,
+                @NotNull AlgorithmPlacement placement
+        );
+
+        @NotNull BuilderBase<T, C> withContextFactory(
+                @NotNull ContextFactory<T, C> contextFactory
+        );
+
+        @NotNull BuilderBase<T, C> withContextFactory(
+                @NotNull Function<T, C> contextCreator,
+                @NotNull UnaryOperator<T> copier,
+                @NotNull UnaryOperator<T> randomizer
+        );
+
+        <O extends ISceneOps> @NotNull Builder<T, C, O> withScene(
+                @NotNull Function<SceneContext, O> scene
+        );
+    }
+
+    public static final class Builder<T, C extends AlgorithmContext<T>, O extends ISceneOps>
+            implements BuilderBase<T, C> {
+
+        private final C model;
         private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
-        private Function<C, ? extends AnimationPlan<O>> onComplete;
-        private Function<SceneContext, O> scene;
 
         private String id;
         private Supplier<? extends IPlayerSort<C>> ctor;
-        private C model;
-        private ILayout<I> layout;
+        private ILayout<T> layout;
         private AlgorithmPlacement placement;
+        private Function<C, ? extends AnimationPlan<O>> onComplete;
         private @Nullable AlgorithmPresentation presentation;
+        private Function<SceneContext, O> scene;
+        private ContextFactory<T, C> contextFactory;
 
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> withIdentity(
+        private Builder(@NotNull C model) {
+            this.model = Objects.requireNonNull(model, "model");
+        }
+
+        @Override
+        public @NotNull Builder<T, C, O> withIdentity(
                 @NotNull String id,
                 @NotNull Supplier<? extends IPlayerSort<C>> ctor
         ) {
@@ -60,21 +107,9 @@ public record Algorithm<I, C extends AlgorithmContext<I>, O extends ISceneOps>(
             return this;
         }
 
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> withScene(@NotNull Function<SceneContext, O> scene) {
-            this.scene = Objects.requireNonNull(scene, "scene");
-            return this;
-        }
-
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> withContext(@NotNull C model) {
-            this.model = Objects.requireNonNull(model, "model");
-            return this;
-        }
-
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> positioning(
-                @NotNull ILayout<I> layout,
+        @Override
+        public @NotNull Builder<T, C, O> positioning(
+                @NotNull ILayout<T> layout,
                 @NotNull AlgorithmPlacement placement
         ) {
             this.layout = Objects.requireNonNull(layout, "layout");
@@ -82,37 +117,63 @@ public record Algorithm<I, C extends AlgorithmContext<I>, O extends ISceneOps>(
             return this;
         }
 
-        @SuppressWarnings("UnusedReturnValue")
-        public <E extends IAlgorithmEvent> @NotNull Builder<I, C, O> onEvent(
+        @Override
+        public @NotNull Builder<T, C, O> withContextFactory(
+                @NotNull ContextFactory<T, C> contextFactory
+        ) {
+            this.contextFactory = Objects.requireNonNull(contextFactory, "contextFactory");
+            return this;
+        }
+
+        @Override
+        public @NotNull Builder<T, C, O> withContextFactory(
+                @NotNull Function<T, C> contextCreator,
+                @NotNull UnaryOperator<T> copier,
+                @NotNull UnaryOperator<T> randomizer
+        ) {
+            this.contextFactory = new ContextFactory<>(
+                    Objects.requireNonNull(contextCreator, "contextCreator"),
+                    Objects.requireNonNull(copier, "copier"),
+                    Objects.requireNonNull(randomizer, "randomizer")
+            );
+            return this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <NO extends ISceneOps> @NotNull Builder<T, C, NO> withScene(
+                @NotNull Function<SceneContext, NO> scene
+        ) {
+            this.scene = (Function<SceneContext, O>) Objects.requireNonNull(scene, "scene");
+            return (Builder<T, C, NO>) this;
+        }
+
+        public <E extends IAlgorithmEvent> @NotNull Builder<T, C, O> onEvent(
                 @NotNull Class<E> event,
                 @NotNull IAnimationHandler<E> handler
         ) {
-            this.handlers.put(
+            handlers.put(
                     Objects.requireNonNull(event, "event"),
                     Objects.requireNonNull(handler, "handler")
             );
             return this;
         }
 
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> onCompletion(
+        public @NotNull Builder<T, C, O> onCompletion(
                 @NotNull Function<C, ? extends AnimationPlan<O>> handler
         ) {
             this.onComplete = Objects.requireNonNull(handler, "handler");
             return this;
         }
 
-
-
-        @SuppressWarnings("UnusedReturnValue")
-        public @NotNull Builder<I, C, O> withPresentation(
+        public @NotNull Builder<T, C, O> withPresentation(
                 @Nullable AlgorithmPresentation presentation
         ) {
             this.presentation = presentation;
             return this;
         }
 
-        private @NotNull Algorithm<I, C, O> create() {
+        public @NotNull Algorithm<T, C, O> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing at least 1 event handler");
             }
@@ -120,40 +181,25 @@ public record Algorithm<I, C extends AlgorithmContext<I>, O extends ISceneOps>(
             return new Algorithm<>(
                     Objects.requireNonNull(id, "id"),
                     Objects.requireNonNull(ctor, "ctor"),
-                    Objects.requireNonNull(model, "model"),
+                    model,
                     Objects.requireNonNull(layout, "layout"),
                     Objects.requireNonNull(placement, "placement"),
-                    Map.copyOf(handlers),
+                    handlers,
                     onComplete == null ? defaultOnComplete() : onComplete,
                     presentation,
-                    Objects.requireNonNull(scene, "scene")
+                    Objects.requireNonNull(scene, "scene"),
+                    Objects.requireNonNull(contextFactory, "contextFactory")
             );
         }
 
         private static <C extends AlgorithmContext<?>, O extends ISceneOps>
-        Function<C, AnimationPlan<O>> defaultOnComplete() {
-            return _ -> {
-                var plan = AnimationPlan.<O>builder()
-                        .step(sceneOps -> {
-                            var component = Component.text(
-                                    "Algorithm is complete, click on randomize or step through the steps!",
-                                    NamedTextColor.GREEN
-                            );
-                            sceneOps.sendMessage(component);
-                        });
-
-//                for (int i = 0; i < size; i++) {
-//                    final int idx = i;
-//                    plan.step(sceneOps -> sceneOps.hoverDisplay(idx, true));
-//                }
-//
-//                for (int i = 0; i < size; i++) {
-//                    final int idx = i;
-//                    plan.step(sceneOps -> sceneOps.hoverDisplay(idx, false));
-//                }
-
-                return plan.build();
-            };
+        @NotNull Function<C, AnimationPlan<O>> defaultOnComplete() {
+            return ignored -> AnimationPlan.<O>builder()
+                    .step(sceneOps -> sceneOps.sendMessage(Component.text(
+                            "Algorithm is complete, click on randomize or step through the steps!",
+                            NamedTextColor.GREEN
+                    )))
+                    .build();
         }
     }
 }

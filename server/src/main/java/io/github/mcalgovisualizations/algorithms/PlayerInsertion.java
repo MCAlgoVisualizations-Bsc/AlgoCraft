@@ -5,10 +5,10 @@ import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Swap;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
-public class PlayerInsertion<I extends Comparable<I>> implements IPlayerSort<SortingContext<I>> {
+public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<SortingContext<T>> {
 
     @Override
-    public void run(SortingContext<I> ctx) {
+    public void run(SortingContext<T> ctx) {
         var values = ctx.getData();
         int n = values.size();
         for (int i = 1; i < n; i++) {

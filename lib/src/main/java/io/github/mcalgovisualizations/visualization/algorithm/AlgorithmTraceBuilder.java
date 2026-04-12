@@ -5,15 +5,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public final class AlgorithmTraceBuilder<I, C extends AlgorithmContext<I>> {
+public final class AlgorithmTraceBuilder<T, C extends AlgorithmContext<T>> {
     private final IPlayerSort<C> algorithm;
-    private I initialData;
-    private final ContextFactory<I, C> factory;
+    private T initialData;
+    private final ContextFactory<T, C> factory;
 
     public AlgorithmTraceBuilder(
             @NotNull IPlayerSort<C> algorithm,
-            @NotNull I initialData,
-            @NotNull ContextFactory<I, C> contextFactory
+            @NotNull T initialData,
+            @NotNull ContextFactory<T, C> contextFactory
     ) {
         this.algorithm = algorithm;
         this.initialData = contextFactory.copy(initialData);
@@ -23,7 +23,7 @@ public final class AlgorithmTraceBuilder<I, C extends AlgorithmContext<I>> {
     /**
      * Builds a fresh immutable trace from the current initial data.
      */
-    public AlgorithmTrace<I> build() {
+    public AlgorithmTrace<T> build() {
         var initialSnapshot = factory.copy(initialData);
         var context = factory.create(initialData);
 
@@ -39,7 +39,7 @@ public final class AlgorithmTraceBuilder<I, C extends AlgorithmContext<I>> {
     /**
      * Replaces the initial data with a shuffled version, then builds a new trace.
      */
-    public @NotNull AlgorithmTrace<I> randomizeAndBuild() {
+    public @NotNull AlgorithmTrace<T> randomizeAndBuild() {
         this.initialData = factory.randomize(initialData);
         return build();
     }
@@ -47,20 +47,20 @@ public final class AlgorithmTraceBuilder<I, C extends AlgorithmContext<I>> {
     /**
      * Replaces the source data entirely.
      */
-    public void setInitialData(@NotNull I data) {
+    public void setInitialData(@NotNull T data) {
         this.initialData = factory.copy(data);
     }
 
     /**
      * Returns the current initial data snapshot.
      */
-    public @NotNull I getInitialData() {
+    public @NotNull T getInitialData() {
         return factory.copy(initialData);
     }
 
-    public record AlgorithmTrace<I>(
-            I initialData,
-            I finalData,
+    public record AlgorithmTrace<T>(
+            T initialData,
+            T finalData,
             List<IAlgorithmEvent> history
     ) {}
 }

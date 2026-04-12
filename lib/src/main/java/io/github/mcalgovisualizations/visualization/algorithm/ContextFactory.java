@@ -5,21 +5,21 @@ import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public record ContextFactory<I, C extends AlgorithmContext<I>>(
-        Function<I, C> contextCreator,
-        UnaryOperator<I> copier,
-        UnaryOperator<I> randomizer) {
+public record ContextFactory<T, C extends AlgorithmContext<T>>(
+        Function<T, C> contextCreator,
+        UnaryOperator<T> copier,
+        UnaryOperator<T> randomizer) {
 
-    public C create(I sourceData) {
-        I copy = copier.apply(sourceData);
+    public C create(T sourceData) {
+        T copy = copier.apply(sourceData);
         return contextCreator.apply(copy);
     }
 
-    public I copy(I data) {
+    public T copy(T data) {
         return copier.apply(data);
     }
 
-    public I randomize(I data) {
+    public T randomize(T data) {
         return randomizer.apply(copier.apply(data));
     }
 }

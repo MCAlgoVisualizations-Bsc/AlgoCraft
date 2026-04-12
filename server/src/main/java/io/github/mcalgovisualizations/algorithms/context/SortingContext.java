@@ -5,9 +5,9 @@ import io.github.mcalgovisualizations.visualization.models.AbstractContext;
 
 import java.util.List;
 
-public class SortingContext<I extends Comparable<I>> extends AbstractContext<List<I>> {
-    public SortingContext(List<I> values, List<IAlgorithmEvent> events) {
-        super(values, events);
+public class SortingContext<T extends Comparable<T>> extends AbstractContext<List<T>> {
+    public SortingContext(List<T> values) {
+        super(values);
     }
 
     public void swap(int idx1, int idx2) {

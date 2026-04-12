@@ -2,19 +2,19 @@ package io.github.mcalgovisualizations.visualization.models;
 
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractContext<I> implements AlgorithmContext<I> {
-    public final I values;
-    public final List<IAlgorithmEvent> events;
+public abstract class AbstractContext<T> implements AlgorithmContext<T> {
+    public final T values;
+    public final List<IAlgorithmEvent> events = new ArrayList<>();
 
-    public AbstractContext(I values, List<IAlgorithmEvent> events) {
+    public AbstractContext(T values) {
         this.values = values;
-        this.events = events;
     }
 
     @Override
-    public I getData() {
+    public T getData() {
         return values;
     }
 

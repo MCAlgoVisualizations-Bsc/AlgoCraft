@@ -37,7 +37,6 @@ public final class Renderer<I, O extends ISceneOps> {
         this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
 
-        // make these into context?
         this.instance = instance;
         this.layout = layout;
         this.origin = origin;
