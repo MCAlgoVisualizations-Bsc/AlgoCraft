@@ -120,26 +120,26 @@ public final class AlgoCraft {
         handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
-    public <T, C extends AlgorithmContext<T>, O extends ISceneOps>
-    void registerAlgorithm(Algorithm<T, C, O> algo) {
-        algorithms.put(
-                algo.id(),
-                new AlgorithmEntry<>(
-                        algo.ctor(),
-                        algo.model(),
-                        algo.layout(),
-                        algo.placement(),
-                        algo.handlerRegistry(),
-                        algo.onComplete(),
-                        algo.scene(),
-                        algo.contextFactory()
-                )
-        );
 
-        var presentation = Objects.isNull(algo.presentation())
-                ? new AlgorithmPresentation(algo.id())
-                : algo.presentation();
-        algorithmPresentations.put(algo.id(), presentation);
+
+    @SafeVarargs
+    public final <T, C extends AlgorithmContext<T>, O extends ISceneOps>
+    void registerAlgorithm(Algorithm<T, C, O>... algorithm) {
+        for (Algorithm<T, C, O> a : algorithm) {
+            algorithms.put(
+                    a.id(),
+                    new AlgorithmEntry<>(
+                            a.ctor(),
+                            a.model(),
+                            a.layout(),
+                            a.placement(),
+                            a.handlerRegistry(),
+                            a.onComplete(),
+                            a.scene(),
+                            a.contextFactory()
+                    )
+            );
+        }
     }
 
     public void selectAlgorithm(Player player) {
