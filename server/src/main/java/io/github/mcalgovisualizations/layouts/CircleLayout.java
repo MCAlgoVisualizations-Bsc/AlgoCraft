@@ -1,14 +1,13 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
 import java.util.List;
 
-public record CircleLayout(double radius, double yOffset) implements ILayout {
+public record CircleLayout(double radius, double yOffset) implements ILayout<List<Integer>> {
 
     public CircleLayout() {
         this(2.0, 2.0);
@@ -18,8 +17,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
         var size = model.size();
         var out = new LayoutResult[size];
 
@@ -28,7 +26,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
         if (size == 0) return new LayoutResult[0];
 
         if (size == 1) {
-            out[0] = new LayoutResult<>(model.getFirst(), origin, new StylingProfile());
+            out[0] = new LayoutResult(model.getFirst(), origin, new StylingProfile());
             return out;
         }
  
@@ -37,7 +35,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout {
             double x = origin.x() + (Math.cos(angle) * radius);
             double z = origin.z() + (Math.sin(angle) * radius);
             final var pos = new Pos(x, y, z);
-            out[i] = new LayoutResult<>(model.get(i), pos, new StylingProfile());
+            out[i] = new LayoutResult(model.get(i), pos, new StylingProfile());
         }
 
         return out;

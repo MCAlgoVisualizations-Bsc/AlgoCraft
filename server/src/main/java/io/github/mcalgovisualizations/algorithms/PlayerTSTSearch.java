@@ -1,9 +1,8 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,17 +79,6 @@ public final class PlayerTSTSearch implements IPlayerSort<SortingContext<String>
         }
     }
 
-    private static <T extends Comparable<T>> String[] readStringInput(ISort<T> values) {
-        String[] out = new String[values.size()];
-        for (int i = 0; i < values.size(); i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof String value)) {
-                return new String[0];
-            }
-            out[i] = value;
-        }
-        return out;
-    }
 }
 
 

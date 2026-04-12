@@ -7,7 +7,7 @@ import net.minestom.server.coordinate.Pos;
 
 public interface ISceneOps {
 
-    void setLayout(LayoutResult<?>[] model);
+    void setLayout(LayoutResult[] model);
 
     Pos getOrigin();
 

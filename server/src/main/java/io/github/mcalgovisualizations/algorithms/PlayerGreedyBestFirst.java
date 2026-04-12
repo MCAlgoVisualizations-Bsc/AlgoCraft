@@ -1,11 +1,10 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.Message;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.events.Message;
 
 import java.util.Arrays;
 import java.util.Comparator;

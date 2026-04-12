@@ -1,8 +1,10 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
 import io.github.mcalgovisualizations.visualization.PlayerControls;
-import io.github.mcalgovisualizations.visualization.algorithms.*;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmStepper;
+import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
 import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import net.kyori.adventure.text.Component;
@@ -15,19 +17,12 @@ import java.time.Duration;
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.
  */
-public class VisualizationController implements PlayerControls {
-    private enum State {
-        NEW,
-        INITIALIZED,
-        RUNNING,
-        PAUSED,
-        COMPLETED,
-        CLEARED
-    }
+public class VisualizationController<I, C extends AlgorithmContext<I>> implements PlayerControls {
+    private enum State { NEW, INITIALIZED, RUNNING, PAUSED, COMPLETED, CLEARED }
 
-    private final AlgorithmTraceBuilder<?> traceBuilder;
+    private final AlgorithmTraceBuilder<I, C> traceBuilder;
     private AlgorithmStepper algorithmStepper;
-    private final Renderer<?> renderer;
+    private final Renderer<I, ?> renderer;
     private final PlayerFeedback audience;
 
     private static final int MIN_TICKS_PER_STEP = 1;
@@ -39,12 +34,11 @@ public class VisualizationController implements PlayerControls {
     private State state = State.NEW;
 
     public VisualizationController(
-            @NotNull IPlayerSort algorithm,
-            @NotNull Renderer<?> renderer,
-            @NotNull ISort<?> collection,
+            @NotNull Renderer<I, ?> renderer,
+            @NotNull AlgorithmTraceBuilder<I, C> traceBuilder,
             @NotNull PlayerFeedback audience
     ) {
-        this.traceBuilder = new AlgorithmTraceBuilder<>(algorithm, collection);
+        this.traceBuilder = traceBuilder;
         this.algorithmStepper = new AlgorithmStepper(traceBuilder.build().history());
         this.renderer = renderer;
         this.audience = audience;
@@ -146,7 +140,7 @@ public class VisualizationController implements PlayerControls {
 
     private void scheduleSteppingTask() {
         cancelRunningTask();
-        int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
+        final int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::autoStep)
                 .repeat(Duration.ofMillis(schedulerTicks * 50L))
@@ -209,7 +203,7 @@ public class VisualizationController implements PlayerControls {
         cancelRunningTask();
         renderer.onCleanup();
 
-        var trace = traceBuilder.randomizeAndBuild(24);
+        final var trace = traceBuilder.randomizeAndBuild();
         this.algorithmStepper = new AlgorithmStepper(trace.history());
         renderer.initialize(trace.initialData());
         audience.randomize();

@@ -1,12 +1,8 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.visualization.models.ISort;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public final class PlayerUnorderedTree<I extends Comparable<I>> implements IPlayerSort<SortingContext<I>> {

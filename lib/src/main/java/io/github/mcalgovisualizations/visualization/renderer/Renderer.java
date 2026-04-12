@@ -3,32 +3,30 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-public final class Renderer<O extends ISceneOps> {
+public final class Renderer<I, O extends ISceneOps> {
     private final ISceneOps scene;
     private final Instance instance;
     private final Dispatcher<O> dispatcher;
     private final Executor<O> executor;
     private final AnimationPlan<O> complete;
     private final Pos origin;
-    private final ILayout layout;
+    private final ILayout<I> layout;
     private boolean collapseAnimationDelays = false;
 
     public Renderer(
             @NotNull Instance instance,
             @NotNull Pos origin,
-            @NotNull ILayout layout,
+            @NotNull ILayout<I> layout,
             @NotNull AudienceChannel audience,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
             @NotNull AnimationPlan<O> complete,
@@ -96,13 +94,13 @@ public final class Renderer<O extends ISceneOps> {
         scene.cleanUp();   // despawn entities
     }
 
-    public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
+    public void initialize(I initialModel) {
         final var layoutResult = this.layout.compute(initialModel, origin, instance);
         requireChunksLoaded(layoutResult);
         scene.setLayout(layoutResult);
     }
 
-    private <T extends Comparable<T>> void requireChunksLoaded(LayoutResult<T>[] layoutResult) {
+    private void requireChunksLoaded(LayoutResult[] layoutResult) {
         final var allLoaded = Arrays.stream(layoutResult)
                 .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
 

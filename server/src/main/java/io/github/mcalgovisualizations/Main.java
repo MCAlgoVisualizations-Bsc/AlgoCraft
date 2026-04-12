@@ -9,18 +9,16 @@ import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
-import io.github.mcalgovisualizations.visualization.SystemMessages;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.algorithms.Message;
+import io.github.mcalgovisualizations.events.Message;
 import io.github.mcalgovisualizations.events.Swap;
-import io.github.mcalgovisualizations.visualization.models.AbstractContext;
-import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -37,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static io.github.mcalgovisualizations.config.MapConstants.*;
@@ -99,8 +96,11 @@ public final class Main {
             algo.applyDefaultLayout(player);
 
             // Send welcome message
-            SystemMessages.sendTo(player, SystemMessages.WELCOME);
-            SystemMessages.sendTo(player, SystemMessages.SELECT_ALGORITHM_HINT);
+            player.sendMessage(Component.text(
+                    "Right-click the Nether Star to select an algorithm to visualize!", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text(
+                    "Welcome to Algorithm Visualizations!", Message.MessageType.SUCCESS.color()));
+
         });
 
         // Cleanup visualization when player disconnects
@@ -245,7 +245,7 @@ public final class Main {
         );
 
         algo.registerAlgorithm(
-                Algorithm.<GridContext, ISceneOps>build(ctx -> ctx
+                Algorithm.build(ctx -> ctx
                         .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
@@ -298,10 +298,12 @@ public final class Main {
     }
 
     private static void registerTreeSearchAlgo() {
+
+
         algo.registerAlgorithm(
                 Algorithm.build(ctx -> ctx
                         .withIdentity("bst search", PlayerBSTSearch::new)
-                        .withData(bstCollection)
+                        //.withData(bstCollection)
                         .positioning(new BSTNodeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
@@ -313,13 +315,14 @@ public final class Main {
                 )
         );
 
-        var unordered_tree_search_data = new ArrayList<>(bstCollection);
-        Collections.shuffle(unordered_tree_search_data);
+        //var unordered_tree_search_data = new ArrayList<>(bstCollection);
+        //Collections.shuffle(unordered_tree_search_data);
+
 
         algo.registerAlgorithm(
                 Algorithm.build(ctx -> ctx
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
-                        .withData(unordered_tree_search_data)
+                        //.withData(unordered_tree_search_data)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
                         .positioning(new UnorderedTreeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
@@ -335,7 +338,7 @@ public final class Main {
         algo.registerAlgorithm(
                 Algorithm.build(ctx -> ctx
                         .withIdentity("tst search", PlayerTSTSearch::new)
-                        .withData(stringCollection1)
+                        //.withData(stringCollection1)
                         .positioning(new TSTNodeLayout(), BST_SEARCH_PLACEMENT)
                         .onEvent(Compare.class, new BstCompareHandler())
                         .onEvent(Message.class, new MessageHandler())

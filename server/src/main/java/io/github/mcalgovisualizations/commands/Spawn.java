@@ -8,9 +8,9 @@ public class Spawn extends Command {
     public Spawn() {
         super("spawn");
         addSyntax((sender, context) -> {
-            if (!(sender instanceof Player)) return;
-            sender.sendMessage("Returning to spawn!");
-            ((Player) sender).teleport(new Pos(194, 137, -38));
+            if (!(sender instanceof Player p)) return;
+            p.sendMessage("Returning to spawn!");
+            p.teleport(new Pos(194, 137, -38));
         });
     }
 }

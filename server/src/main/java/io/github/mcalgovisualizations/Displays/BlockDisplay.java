@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.Displays;
 
 import io.github.mcalgovisualizations.visualization.renderer.IBlockStateDisplay;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -13,6 +14,8 @@ import net.minestom.server.entity.metadata.display.BlockDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockDisplay implements IBlockStateDisplay {
     private static final double TEXT_Y_OFFSET = 2.0;
@@ -37,10 +40,25 @@ public class BlockDisplay implements IBlockStateDisplay {
         this.textEntity = showLabel ? new Entity(EntityType.TEXT_DISPLAY) : null;
         this.pos = pos;
 
-        setupBlock(block);
+        Block b = block.withHandler(new BlockHandler() {
+            @Override
+            public boolean onInteract(@NotNull Interaction interaction) {
+                System.out.println("hello");
+                return BlockHandler.super.onInteract(interaction);
+            }
+
+            @Override
+            public Key getKey() {
+                return null;
+            }
+        });
+
+        setupBlock(b);
         if (textEntity != null) {
             setupText(text);
         }
+
+
     }
 
     public BlockDisplay(Pos pos, Block block, String text) {

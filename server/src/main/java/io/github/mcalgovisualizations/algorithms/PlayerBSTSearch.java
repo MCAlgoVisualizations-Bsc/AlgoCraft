@@ -1,11 +1,10 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
-import java.util.ArrayList;
+
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<SortingContext<I>> {

@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.models;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 
 import java.util.List;
 

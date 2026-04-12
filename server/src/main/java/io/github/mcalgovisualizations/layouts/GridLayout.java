@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -16,7 +15,7 @@ public record GridLayout(
         double spacing,
         double yOffset,
         double zOffset
-) implements ILayout {
+) implements ILayout<List<Integer>> {
 
     public GridLayout(int columns) {
         this(columns, 1.5, 0.0, 0.0);
@@ -29,7 +28,7 @@ public record GridLayout(
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
@@ -44,7 +43,7 @@ public record GridLayout(
 
             double x = origin.x() + (col * spacing);
             double z = zBase + (row * spacing);
-            out[idx] = new LayoutResult<>(model.get(idx), new Pos(x, y, z), new StylingProfile());
+            out[idx] = new LayoutResult(model.get(idx), new Pos(x, y, z), new StylingProfile());
         }
 
         return out;

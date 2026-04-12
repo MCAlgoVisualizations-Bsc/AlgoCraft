@@ -40,7 +40,7 @@ public class GridScene extends AbstractScene {
 
             IDisplayValue dv;
             if (useBlockGridDisplay) {
-                CellState initialState = initialCellState(value.value());
+                CellState initialState = initialCellState(value);
                 Block initialBlock = blockForState(initialState);
                 // Maze cells are pure block visuals; hide numeric labels.
                 dv = new BlockDisplay(instance, pos, initialBlock, "maze", false);
@@ -103,7 +103,7 @@ public class GridScene extends AbstractScene {
     private boolean isAStarGrid(LayoutResult[] layoutResults) {
         if (layoutResults.length == 0) return false;
         for (var layoutResult : layoutResults) {
-            Object raw = layoutResult.value().value();
+            Object raw = layoutResult.value();
             if (!(raw instanceof Integer number)) return false;
             if (number < 0 || number > 3) return false;
         }

@@ -3,8 +3,7 @@ package io.github.mcalgovisualizations.algorithms;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Swap;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.models.AbstractContext;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 public class PlayerInsertion<I extends Comparable<I>> implements IPlayerSort<SortingContext<I>> {
 

@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -25,7 +24,7 @@ public record FloatingLinearLayout(
         double spacing,
         double yOffset,
         double zOffset
-) implements ILayout {
+) implements ILayout<List<Integer>> {
 
     /**
      * Creates a floating linear layout with default configuration:
@@ -57,7 +56,7 @@ public record FloatingLinearLayout(
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
         if(model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
