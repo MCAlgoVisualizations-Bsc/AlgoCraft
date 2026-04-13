@@ -117,10 +117,6 @@ public final class Main {
                 new Data<>(0), new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0),  new Data<>(0)
         ));
 
-
-
-
-
         algo.registerAlgorithm(
                 Algorithm.<Integer, ISceneOps>build(ctx -> ctx
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
