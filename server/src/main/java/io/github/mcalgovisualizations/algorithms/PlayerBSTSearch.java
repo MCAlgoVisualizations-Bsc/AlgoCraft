@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
@@ -7,10 +8,10 @@ import io.github.mcalgovisualizations.events.Compare;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<SortingContext<I>> {
+public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<GridContext<I>> {
 
     @Override
-    public void run(SortingContext<I> ctx) {
+    public void run(GridContext<I> ctx) {
         var values = ctx.values;
         int size = values.size();
         if (size == 0) {

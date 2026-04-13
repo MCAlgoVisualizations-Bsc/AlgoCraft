@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Swap;

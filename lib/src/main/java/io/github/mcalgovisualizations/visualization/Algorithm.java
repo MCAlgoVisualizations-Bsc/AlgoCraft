@@ -47,39 +47,12 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         handlerRegistry = Map.copyOf(handlerRegistry);
     }
 
-    public static <T, C extends AlgorithmContext<T>>
-    @NotNull BuilderBase<T, C> builder(@NotNull C model) {
+    public static <T, C extends AlgorithmContext<T>, O extends ISceneOps>
+    @NotNull Builder<T, C, O> builder(@NotNull C model) {
         return new Builder<>(model);
     }
 
-    public interface BuilderBase<T, C extends AlgorithmContext<T>> {
-        @NotNull BuilderBase<T, C> withIdentity(
-                @NotNull String id,
-                @NotNull Supplier<? extends IPlayerSort<C>> ctor
-        );
-
-        @NotNull BuilderBase<T, C> positioning(
-                @NotNull ILayout<T> layout,
-                @NotNull AlgorithmPlacement placement
-        );
-
-        @NotNull BuilderBase<T, C> withContextFactory(
-                @NotNull ContextFactory<T, C> contextFactory
-        );
-
-        @NotNull BuilderBase<T, C> withContextFactory(
-                @NotNull Function<T, C> contextCreator,
-                @NotNull UnaryOperator<T> copier,
-                @NotNull UnaryOperator<T> randomizer
-        );
-
-        <O extends ISceneOps> @NotNull Builder<T, C, O> withScene(
-                @NotNull Function<SceneContext, O> scene
-        );
-    }
-
-    public static final class Builder<T, C extends AlgorithmContext<T>, O extends ISceneOps>
-            implements BuilderBase<T, C> {
+    public static final class Builder<T, C extends AlgorithmContext<T>, O extends ISceneOps> {
 
         private final C model;
         private final Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
@@ -97,7 +70,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             this.model = Objects.requireNonNull(model, "model");
         }
 
-        @Override
         public @NotNull Builder<T, C, O> withIdentity(
                 @NotNull String id,
                 @NotNull Supplier<? extends IPlayerSort<C>> ctor
@@ -107,7 +79,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
-        @Override
         public @NotNull Builder<T, C, O> positioning(
                 @NotNull ILayout<T> layout,
                 @NotNull AlgorithmPlacement placement
@@ -117,7 +88,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
-        @Override
         public @NotNull Builder<T, C, O> withContextFactory(
                 @NotNull ContextFactory<T, C> contextFactory
         ) {
@@ -125,7 +95,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
-        @Override
         public @NotNull Builder<T, C, O> withContextFactory(
                 @NotNull Function<T, C> contextCreator,
                 @NotNull UnaryOperator<T> copier,
@@ -139,7 +108,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
-        @Override
         @SuppressWarnings("unchecked")
         public <NO extends ISceneOps> @NotNull Builder<T, C, NO> withScene(
                 @NotNull Function<SceneContext, NO> scene

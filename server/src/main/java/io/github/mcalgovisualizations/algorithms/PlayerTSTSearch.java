@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
@@ -7,10 +8,10 @@ import io.github.mcalgovisualizations.events.Compare;
 import java.util.Arrays;
 import java.util.List;
 
-public final class PlayerTSTSearch implements IPlayerSort<SortingContext<String>> {
+public final class PlayerTSTSearch<T extends Comparable<T>> implements IPlayerSort<GridContext<T>> {
 
     @Override
-    public void run(SortingContext<String> ctx) {
+    public void run(GridContext<T> ctx) {
         var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
@@ -30,11 +31,11 @@ public final class PlayerTSTSearch implements IPlayerSort<SortingContext<String>
         }
 
         int targetIndex = size / 2;
-        String target = values.get(targetIndex);
+        T target = values.get(targetIndex);
 
         int cursor = root;
         while (cursor != -1) {
-            String current = values.get(cursor);
+            T current = values.get(cursor);
             ctx.emit(new Compare(cursor, targetIndex, current, target));
 
             int cmp = target.compareTo(current);
@@ -49,12 +50,12 @@ public final class PlayerTSTSearch implements IPlayerSort<SortingContext<String>
         }
     }
 
-    private static void insert(int root, int insert, List<String> data, int[] left, int[] middle, int[] right) {
+    private void insert(int root, int insert, List<T> data, int[] left, int[] middle, int[] right) {
         int cursor = root;
-        String candidate = data.get(insert);
+        T candidate = data.get(insert);
 
         while (true) {
-            String current = data.get(cursor);
+            T current = data.get(cursor);
             int cmp = candidate.compareTo(current);
 
             if (cmp < 0) {
@@ -78,7 +79,6 @@ public final class PlayerTSTSearch implements IPlayerSort<SortingContext<String>
             }
         }
     }
-
 }
 
 

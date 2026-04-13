@@ -7,18 +7,18 @@ import net.minestom.server.instance.Instance;
 
 import java.util.List;
 
-public record UnorderedTreeLayout(
+public record UnorderedTreeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing
-) implements ILayout<List<Integer>> {
+) implements ILayout<List<T>> {
 
     public UnorderedTreeLayout() {
         this(10.0, 3.0, 2.0);
     }
 
     @Override
-    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         int size = model.size();
         LayoutResult[] out = new LayoutResult[size];
         Pos[] positions = new Pos[size];
