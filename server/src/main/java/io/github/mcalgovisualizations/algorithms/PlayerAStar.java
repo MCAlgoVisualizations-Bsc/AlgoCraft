@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PlayerAStar implements IPlayerSort<GridContext> {
+public class PlayerAStar implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -24,7 +24,7 @@ public class PlayerAStar implements IPlayerSort<GridContext> {
     }
 
     @Override
-    public void run(GridContext ctx) {
+    public void run(GridContext<Integer> ctx) {
         var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
