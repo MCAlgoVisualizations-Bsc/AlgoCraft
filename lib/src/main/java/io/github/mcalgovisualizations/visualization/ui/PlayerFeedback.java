@@ -7,30 +7,31 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * Provides feedback to one or more {@link Audience} instances through sound and messages.
  * <p>
  * This class acts as a bridge between visualization controls and player-facing feedback,
  * implementing both {@link AudienceChannel} and {@link PlayerControls}.
- * It aggregates multiple audiences into a single composite audience.
  */
 public final class PlayerFeedback implements AudienceChannel, PlayerControls {
 
     /**
      * The aggregated audience receiving feedback.
      */
-    private Audience audience = Audience.empty();
+    private final Set<Audience> audiences = new HashSet<>();
 
     /**
      * Constructs a {@code PlayerFeedback} instance with an initial set of audiences.
      *
-     * @param audience the initial audiences to include
+     * @param audiences the initial audiences to include
      */
-    public PlayerFeedback(@NotNull final Audience... audience) {
-        addAudience(audience);
+    public PlayerFeedback(@NotNull final Audience... audiences) {
+        addAudience(audiences);
     }
 
     /**
@@ -38,15 +39,17 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      *
      * @param audience the audiences to add
      */
-    public void addAudience(@NotNull final Audience... audience) {
-        final var newAudience = new ArrayList<>(List.of(audience));
-        final var _ = newAudience.add(this.audience);
-        this.audience = Audience.audience(newAudience);
+    public void addAudience(@NotNull final Audience... audiences) {
+        this.audiences.addAll(Arrays.asList(audiences));
+    }
+
+    public void removeAudience(@NotNull final Audience... audiences) {
+        Arrays.asList(audiences).forEach(this.audiences::remove);
     }
 
     @Override
     public void sendActionBar(@NotNull final Component message) {
-        this.audience.sendActionBar(message);
+        Audience.audience(this.audiences).sendActionBar(message);
     }
 
     /**
@@ -58,7 +61,7 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      */
     @Override
     public void playSound(@NotNull final String key, final float volume, final float pitch) {
-        this.audience.playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
+        Audience.audience(this.audiences).playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
     }
 
     /**
@@ -68,7 +71,7 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      */
     @Override
     public void sendMessage(@NotNull final Component message) {
-        audience.sendMessage(message);
+        Audience.audience(this.audiences).sendMessage(message);
     }
 
     /**

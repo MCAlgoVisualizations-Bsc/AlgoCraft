@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 public final class Renderer<I, O extends ISceneOps> {
-    private final ISceneOps scene;
-    private final Instance instance;
+    private final O scene;
+    private Instance instance;
     private final Dispatcher<O> dispatcher;
     private final Executor<O> executor;
     private final AnimationPlan<O> complete;
@@ -91,6 +91,7 @@ public final class Renderer<I, O extends ISceneOps> {
     public void onCleanup() {
         executor.onCleanup();   // kill tick loop + clear queue
         scene.cleanUp();   // despawn entities
+        instance = null;
     }
 
     public void initialize(I initialModel) {
