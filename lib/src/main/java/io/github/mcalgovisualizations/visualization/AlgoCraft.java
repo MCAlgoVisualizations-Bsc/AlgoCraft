@@ -35,9 +35,9 @@ public final class AlgoCraft {
         private final VisualizationController controls;
         private final PlayerFeedback audience;
 
-        VisualizationSession(VisualizationController controls, Audience... audience) {
+        VisualizationSession(VisualizationController controls, Player... players) {
             this.controls = controls;
-            this.audience = new PlayerFeedback(audience);
+            this.audience = new PlayerFeedback(players);
         }
 
         PlayerControls controls() {

@@ -9,7 +9,6 @@ import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -27,10 +26,10 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     private final PlayerFeedback audience;
     private final VisualizationController<T, C> controller;
 
-    public AlgorithmInstance(Algorithm<T,C,O> algorithm, Audience... audiences) {
+    public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
         this.instance = MinecraftServer.getInstanceManager().createInstanceContainer();
         this.presentation = algorithm.presentation();
-        this.audience = new PlayerFeedback(audiences);
+        this.audience = new PlayerFeedback(players);
 
         final var algorithmCtx = algorithm.contextFactory().create(algorithm.model().getData());
         final var a = algorithm.ctor().get();
@@ -61,6 +60,9 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
                 traceBuilder,
                 audience
         );
+
+        // teleport all players to the instance
+        Arrays.stream(players).forEach(player -> player.setInstance(instance));
     }
 
     public Instance getInstance() {
@@ -73,36 +75,44 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
     public void addPlayer(Player... players) {
         Arrays.stream(players).forEach( player -> {
+            // add the player to the audience so they get notified when they join
+            this.audience.addAudience(player);
             final var message = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
-            this.instance.sendMessage(message); // broadcast to all players
+            this.audience.sendMessage(message);
             player.setInstance(this.instance);
         });
     }
 
+    public boolean isEmpty() {
+        return audience.isEmpty();
+    }
+
     public void removePlayer(@NotNull Instance returnInstance, Player... players) {
-        final var instance = Objects.requireNonNull(returnInstance, "Tried to send player to null instance");
-        if (instance == this.instance)
+        final var instance = Objects.requireNonNull(returnInstance, "Tried to send player to null returnInstance");
+        if (instance == this.instance) {
             System.err.println("Tried to remove player from the instance they are already in");
-        Arrays.stream(players).forEach( player -> {
-            final var message = Component.text(player.getUsername() + " left the session", NamedTextColor.RED);
-            this.instance.sendMessage(message); // broadcast to all players
+            this.audience.sendMessage(Component.text("An error occurred", NamedTextColor.RED));
+            return;
+        }
+        for (var player : players) {
+            if (player == null) continue;
+
+            this.audience.removeAudience(player);
+            this.audience.sendMessage(Component.text(player.getUsername() + " left the session", NamedTextColor.RED));
             player.setInstance(instance);
-        });
-        if (this.instance.getPlayers().isEmpty()) {
-            clear();
         }
     }
 
-    private void clear() {
-        this.instance = null;
+    public void clear() {
         this.controller.clear();
+        this.instance = null;
     }
 
     public AlgorithmPresentation getPresentation() {
         return this.presentation;
     }
 
-    public VisualizationController<T, C> getController() {
+    public PlayerControls getController() {
         return this.controller;
     }
 }

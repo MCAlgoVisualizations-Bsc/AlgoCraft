@@ -5,6 +5,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -23,33 +24,39 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
     /**
      * The aggregated audience receiving feedback.
      */
-    private final Set<Audience> audiences = new HashSet<>();
+    private final Set<Player> audiences = new HashSet<>();
 
     /**
      * Constructs a {@code PlayerFeedback} instance with an initial set of audiences.
      *
-     * @param audiences the initial audiences to include
+     * @param players the initial audiences to include
      */
-    public PlayerFeedback(@NotNull final Audience... audiences) {
-        addAudience(audiences);
+    public PlayerFeedback(@NotNull final Player... players) {
+        addAudience(players);
     }
 
     /**
      * Adds one or more audiences to the existing aggregated audience.
      *
-     * @param audience the audiences to add
+     * @param players the audiences to add
      */
-    public void addAudience(@NotNull final Audience... audiences) {
-        this.audiences.addAll(Arrays.asList(audiences));
+    public void addAudience(@NotNull final Player... players) {
+        this.audiences.addAll(Arrays.asList(players));
     }
 
-    public void removeAudience(@NotNull final Audience... audiences) {
-        Arrays.asList(audiences).forEach(this.audiences::remove);
+    public void removeAudience(@NotNull final Player... players) {
+        for (var player : players) {
+            this.audiences.remove(player);
+        }
     }
 
     @Override
     public void sendActionBar(@NotNull final Component message) {
         Audience.audience(this.audiences).sendActionBar(message);
+    }
+
+    public boolean isEmpty() {
+        return this.audiences.isEmpty();
     }
 
     /**
