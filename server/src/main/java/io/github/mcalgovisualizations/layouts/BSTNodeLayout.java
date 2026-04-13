@@ -11,12 +11,12 @@ import java.util.List;
  * Places items by simulating a Binary Search Tree insertion to determine logical
  * parent/child relationships, then assigns coordinates based on tree depth.
  */
-public record BSTNodeLayout(
+public record BSTNodeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing,
         double zOffset
-) implements ILayout<List<Integer>> {
+) implements ILayout<List<T>> {
 
     public BSTNodeLayout() {
         this(4.0, 2.0, 0.5, 0.0);
@@ -28,7 +28,7 @@ public record BSTNodeLayout(
     }
 
     @Override
-    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
@@ -53,21 +53,20 @@ public record BSTNodeLayout(
 
     // --- Tree Logic ---
 
-    private void insert(Node root, Integer data, int index) {
-        Node current = root;
-        var candidate = data;
+    private void insert(Node<T> root, T data, int index) {
+        Node<T> current = root;
 
         while (true) {
             var currentValue = current;
-            if (candidate.compareTo(currentValue.data) < 0) {
+            if (data.compareTo(currentValue.data) < 0) {
                 if (current.left == null) {
-                    current.left = new Node(data, index);
+                    current.left = new Node<>(data, index);
                     break;
                 }
                 current = current.left;
             } else {
                 if (current.right == null) {
-                    current.right = new Node(data, index);
+                    current.right = new Node<T>(data, index);
                     break;
                 }
                 current = current.right;
@@ -75,12 +74,12 @@ public record BSTNodeLayout(
         }
     }
 
-    private int getMaxDepth(Node node) {
+    private int getMaxDepth(Node<T> node) {
         if (node == null) return 0;
         return 1 + Math.max(getMaxDepth(node.left), getMaxDepth(node.right));
     }
 
-    private void assignPositions(Node node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult[] out) {
+    private void assignPositions(Node<T> node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult[] out) {
         if (node == null) return;
 
         double x = origin.x() + xOffset;
@@ -119,13 +118,13 @@ public record BSTNodeLayout(
 
     // --- Inner Helper Class ---
 
-    private static class Node {
-        final int data;
+    private static class Node<T>{
+        final T data;
         final int originalIndex; // Remembers where it goes in the output array!
-        Node left;
-        Node right;
+        Node<T> left;
+        Node<T> right;
 
-        Node(int data, int originalIndex) {
+        Node(T data, int originalIndex) {
             this.data = data;
             this.originalIndex = originalIndex;
         }

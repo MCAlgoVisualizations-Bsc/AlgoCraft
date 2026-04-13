@@ -11,12 +11,12 @@ import java.util.List;
  * Places values by simulating a ternary search tree insertion to determine logical
  * parent/left/middle/right relationships, then assigns coordinates based on tree depth.
  */
-public record TSTNodeLayout(
+public record TSTNodeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing,
         double zOffset
-) implements ILayout<List<Integer>> {
+) implements ILayout<List<T>> {
 
     public TSTNodeLayout() {
         this(4.0, 2.0, 0.5, 0.0);
@@ -28,7 +28,7 @@ public record TSTNodeLayout(
     }
 
     @Override
-    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
@@ -36,7 +36,7 @@ public record TSTNodeLayout(
         int size = model.size();
         LayoutResult[] out = new LayoutResult[size];
 
-        Node root = new Node(model.getFirst(), 0);
+        Node<T> root = new Node<>(model.getFirst(), 0);
         for (int i = 1; i < size; i++) {
             insert(root, model.get(i), i);
         }
@@ -46,28 +46,27 @@ public record TSTNodeLayout(
         return out;
     }
 
-    private void insert(Node root, Integer data, int index) {
-        Node current = root;
-        var candidate = data;
+    private void insert(Node<T> root, T data, int index) {
+        Node<T> current = root;
 
         while (true) {
             var currentValue = current.data;
-            int cmp = candidate.compareTo(currentValue);
+            int cmp = data.compareTo(currentValue);
             if (cmp < 0) {
                 if (current.left == null) {
-                    current.left = new Node(data, index);
+                    current.left = new Node<>(data, index);
                     break;
                 }
                 current = current.left;
             } else if (cmp > 0) {
                 if (current.right == null) {
-                    current.right = new Node(data, index);
+                    current.right = new Node<>(data, index);
                     break;
                 }
                 current = current.right;
             } else {
                 if (current.middle == null) {
-                    current.middle = new Node(data, index);
+                    current.middle = new Node<T>(data, index);
                     break;
                 }
                 current = current.middle;
@@ -75,14 +74,14 @@ public record TSTNodeLayout(
         }
     }
 
-    private int getMaxDepth(Node node) {
+    private int getMaxDepth(Node<T> node) {
         if (node == null) return 0;
         return 1 + Math.max(node.left == null ? 0 : getMaxDepth(node.left),
                 Math.max(node.middle == null ? 0 : getMaxDepth(node.middle),
                         node.right == null ? 0 : getMaxDepth(node.right)));
     }
 
-    private void assignPositions(Node node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult[] out) {
+    private void assignPositions(Node<T> node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult[] out) {
         if (node == null) return;
 
         double x = origin.x() + xOffset;
@@ -122,14 +121,14 @@ public record TSTNodeLayout(
         );
     }
 
-    private static class Node {
-        final int data;
+    private static class Node<T> {
+        final T data;
         final int originalIndex;
-        Node left;
-        Node middle;
-        Node right;
+        Node<T> left;
+        Node<T> middle;
+        Node<T> right;
 
-        Node(int data, int originalIndex) {
+        Node(T data, int originalIndex) {
             this.data = data;
             this.originalIndex = originalIndex;
         }
