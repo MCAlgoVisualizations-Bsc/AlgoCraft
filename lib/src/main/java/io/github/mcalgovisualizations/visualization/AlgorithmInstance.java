@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends ISceneOps> {
-    private Instance instance;
+    private final Instance instance;
     private final AlgorithmPresentation presentation;
     private final PlayerFeedback audience;
     private final VisualizationController<T, C> controller;
@@ -62,15 +62,19 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         );
 
         // teleport all players to the instance
-        Arrays.stream(players).forEach(player -> player.setInstance(instance));
+        // Arrays.stream(players).forEach(player -> player.setInstance(instance));
     }
 
     public Instance getInstance() {
         return this.instance;
     }
 
-    public UUID getUUID() {
+    public UUID getUuid() {
         return this.instance.getUuid();
+    }
+
+    public boolean containsPlayer(Player... players) {
+        return this.audience.containsPlayer(players);
     }
 
     public void addPlayer(Player... players) {
@@ -103,9 +107,10 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         }
     }
 
-    public void clear() {
-        this.controller.clear();
-        this.instance = null;
+    public void teleportPlayer(Player... players) {
+        for (var player : players) {
+            player.setInstance(this.instance);
+        }
     }
 
     public AlgorithmPresentation getPresentation() {

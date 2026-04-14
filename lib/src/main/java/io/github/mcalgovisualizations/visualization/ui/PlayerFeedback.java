@@ -59,6 +59,10 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         return this.audiences.isEmpty();
     }
 
+    public boolean containsPlayer(Player... players) {
+        return this.audiences.containsAll(Arrays.asList(players));
+    }
+
     /**
      * Plays a sound to the aggregated audience.
      *
