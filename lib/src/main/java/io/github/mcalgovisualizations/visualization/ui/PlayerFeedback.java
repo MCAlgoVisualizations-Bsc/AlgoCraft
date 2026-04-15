@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.ui;
 
-import io.github.mcalgovisualizations.visualization.PlayerControls;
+import io.github.mcalgovisualizations.visualization.engine.PlayerControls;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;

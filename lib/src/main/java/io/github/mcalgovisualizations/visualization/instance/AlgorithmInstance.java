@@ -1,5 +1,6 @@
-package io.github.mcalgovisualizations.visualization;
+package io.github.mcalgovisualizations.visualization.instance;
 
+import io.github.mcalgovisualizations.visualization.engine.PlayerControls;
 import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
@@ -16,6 +17,8 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.LightingChunk;
+import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +34,8 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     public static final Pos origin = new Pos(0, 40, 0);
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
-        this.instance = MinecraftServer.getInstanceManager().createInstanceContainer();
+        var container = MinecraftServer.getInstanceManager().createInstanceContainer();
+        this.instance = container;
         this.presentation = algorithm.presentation();
         this.audience = new PlayerFeedback(players);
 
@@ -46,6 +50,10 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
                 }
             }
         });
+
+        container.setChunkSupplier(LightingChunk::new);
+
+        //container.setChunkLoader(new AnvilLoader(worldPath));
 
         final var algorithmCtx = algorithm.model();
         final var a = algorithm.ctor().get();

@@ -1,5 +1,7 @@
-package io.github.mcalgovisualizations.visualization;
+package io.github.mcalgovisualizations.visualization.instance;
 
+import io.github.mcalgovisualizations.visualization.commands.Accept;
+import io.github.mcalgovisualizations.visualization.commands.Invite;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
@@ -77,7 +79,7 @@ public class AlgoCraft {
         algorithmRegistry.put(algorithm.id(), algorithm);
     }
 
-    private AlgorithmInstance<?,?,?> requireInstance(Player player) {
+    public AlgorithmInstance<?,?,?> requireInstance(Player player) {
         var instance = playerInstance.get(player.getUuid());
         if (instance == null) {
             throw new IllegalStateException("No instance for player " + player.getUsername());
@@ -92,6 +94,8 @@ public class AlgoCraft {
 
     public void addListener(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
+        MinecraftServer.getCommandManager().register(new Invite(this));
+        MinecraftServer.getCommandManager().register(new Accept(this));
 //        handler.addListener(InventoryPreClickEvent.class, this::onInventoryPreClick);
 //        handler.addListener(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
     }
@@ -164,12 +168,12 @@ public class AlgoCraft {
             ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
             player.setInstance(session.getInstance());
-            player.teleport(AlgorithmInstance.origin);
 
             MinecraftServer.getSchedulerManager()
                     .buildTask(() -> {
                         try {
-                            session.startVisualization();
+                            player.teleport(AlgorithmInstance.origin)
+                                    .thenRun(session::startVisualization);
                         } catch (IllegalStateException e) {
                             player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
                         } catch (NullPointerException e) {
@@ -184,4 +188,23 @@ public class AlgoCraft {
 
         player.openInventory(inventory);
     }
+
+    private final Map<UUID, PendingInvite> pendingInvites = new HashMap<>();
+
+    public static class PendingInvite {
+        public final UUID inviter;
+        public final AlgorithmInstance<?, ?, ?> instance;
+        public final long expiresAt;
+
+        public PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
+            this.inviter = inviter;
+            this.instance = instance;
+            this.expiresAt = expiresAt;
+        }
+    }
+
+    public Map<UUID, PendingInvite> getPendingInvites() {
+        return pendingInvites;
+    }
+
 }

@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
+import io.github.mcalgovisualizations.visualization.ui.IStylingProfile;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.NotNull;
 

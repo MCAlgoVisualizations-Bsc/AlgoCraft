@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
-import io.github.mcalgovisualizations.visualization.PlayerControls;
 import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmStepper;
 import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;

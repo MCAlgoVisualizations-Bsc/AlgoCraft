@@ -1,8 +1,7 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.commands.*;
-import io.github.mcalgovisualizations.visualization.AlgoCraft;
-import io.github.mcalgovisualizations.visualization.AlgoCraftOld;
+import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.events.Message;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

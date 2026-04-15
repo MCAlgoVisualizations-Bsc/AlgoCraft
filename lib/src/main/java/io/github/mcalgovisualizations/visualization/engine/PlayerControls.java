@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization;
+package io.github.mcalgovisualizations.visualization.engine;
 
 /**
  * Defines control actions for a visualization or playback system.
