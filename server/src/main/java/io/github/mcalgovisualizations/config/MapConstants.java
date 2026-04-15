@@ -4,7 +4,7 @@ import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
 import net.minestom.server.coordinate.Pos;
 
 public final class MapConstants {
-    public static final Pos HUB_SPAWN = new Pos(194, 137, -38);
+    public static final Pos HUB_SPAWN = new Pos(194.5, 137, -38.5);
 
     public static final AlgorithmPlacement INSERTION_INTS_PLACEMENT =
             new AlgorithmPlacement(new Pos(187, 138, 132), new Pos(194.5, 139, 136));

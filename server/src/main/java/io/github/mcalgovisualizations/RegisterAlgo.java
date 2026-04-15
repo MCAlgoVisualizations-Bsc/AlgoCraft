@@ -11,6 +11,7 @@ import io.github.mcalgovisualizations.events.Swap;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
+import io.github.mcalgovisualizations.visualization.AlgoCraftOld;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;

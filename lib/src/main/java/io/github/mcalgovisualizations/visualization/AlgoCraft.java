@@ -1,147 +1,149 @@
 package io.github.mcalgovisualizations.visualization;
 
-import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
-import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
-import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
-import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
-import io.github.mcalgovisualizations.visualization.renderer.*;
-import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
-import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-import io.github.mcalgovisualizations.visualization.ui.*;
-import net.kyori.adventure.audience.Audience;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
-import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_ID_TAG;
-import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_INTERACTION_TAG;
-import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR_TAG;
+import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 
-public final class AlgoCraft {
+public class AlgoCraft {
+    private final Map<String, Algorithm<?,?,?>> algorithmRegistry = new HashMap<>();
+    // player uuid for fast lookup
+    private final Map<UUID, AlgorithmInstance<?,?,?>> playerInstance = new HashMap<>();
+    private final Map<UUID, PlayerInventory> playerInventory = new HashMap<>();
+    private final Map<String, AlgorithmPresentation> presentations = new HashMap<>();
+    private final AlgorithmUI ui = new AlgorithmUI();
+    private final Instance defaultInstance;
 
-    private record AlgorithmEntry<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
-            @NotNull Supplier<? extends IPlayerSort<C>> ctor,
-            @NotNull C context,
-            @NotNull ILayout<T> layout,
-            @NotNull AlgorithmPlacement placement,
-            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
-            @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
-            @NotNull Function<SceneContext, O> scene
-    ) { }
+    public AlgoCraft(InstanceContainer defaultInstance) {
+        this.defaultInstance = defaultInstance;
+    }
 
-    private static final class VisualizationSession {
-        private final VisualizationController controls;
-        private final PlayerFeedback audience;
+    public AlgorithmInstance<?,?,?> createInstance(String id, Player... players){
+        if (algorithmRegistry.get(id) == null)
+            throw new IllegalArgumentException("No entry with id " + id);
+        var algorithm = algorithmRegistry.get(id);
+        var instance = new AlgorithmInstance<>(algorithm, players);
+        Arrays.stream(players).forEach(player -> playerInstance.put(player.getUuid(), instance));
+        return instance;
+    }
 
-        VisualizationSession(VisualizationController controls, Audience... audience) {
-            this.controls = controls;
-            this.audience = new PlayerFeedback(audience);
+    public void addPlayerToInstance(UUID instanceId, Player... players) {
+        final var instance = playerInstance.get(instanceId);
+        if (instance == null) {
+            //createInstance(instanceId, players);
+        }
+        instance.addPlayer(players);
+    }
+
+    public void removePlayerFromInstance(Player... players) {
+        for(var player : players) {
+            var instance = requireInstance(player);
+            instance.removePlayer(defaultInstance, player);
+            playerInstance.remove(player.getUuid());
         }
 
-        PlayerControls controls() { return controls; }
-
-        void start() { controls.startVisualization(); }
-
-        void clear() { controls.clear(); }
-
-        PlayerFeedback audience() { return audience; }
-    }
-
-    private IAlgorithmUI ui = new AlgorithmUI();
-    private final InstanceContainer instanceContainer;
-    private final Map<UUID, VisualizationSession> sessions = new HashMap<>();
-    private final Map<String, AlgorithmEntry<?, ?, ?>> algorithms = new HashMap<>();
-    private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
-    private Consumer<Player> spawnAction = player -> {};
-
-    public AlgoCraft(InstanceContainer instanceContainer) {
-        this.instanceContainer = instanceContainer;
-    }
-
-    public void addListeners(GlobalEventHandler handler) {
-        handler.addListener(PlayerUseItemEvent.class, event -> {
-            final var player = event.getPlayer();
-            final var session = getSession(player.getUuid());
-            final ItemStack itemStack = event.getItemStack();
-            event.setCancelled(true); // Prevent teleportation
-
-            if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
-                selectAlgorithm(player);
-                return;
+        // dereference and clear instance if members are empty
+        playerInstance.entrySet().removeIf(entry -> {
+            var algorithmInstance = entry.getValue();
+            if (algorithmInstance.isEmpty()) {
+                algorithmInstance.getController().clear();
+                return true;
             }
-
-            if(itemStack.hasTag(ALGO_INTERACTION_TAG) && itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
-                spawnAction.accept(player);
-                return;
-            }
-
-            if(session == null) {
-                System.err.println("No controls for player " + player.getUsername());
-                return;
-            }
-
-
-            if (itemStack.hasTag(ALGO_INTERACTION_TAG)) {
-                switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-                    case RANDOMIZE -> session.controls().randomize();
-                    case START -> session.controls().start();
-                    case STOP -> session.controls().pause();
-                    case FORWARD -> session.controls().step();
-                    case BACKWARD -> session.controls().back();
-                    case SET_SPEED -> session.controls().changeSpeed();
-                    default -> {
-                        ui.applyDefaultLayout(player);
-                        removeVisualization(player);
-                    }
-                }
-            }
+            return false;
         });
-        handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
+    public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
+        algorithmRegistry.put(algorithm.id(), algorithm);
+    }
+
+    private AlgorithmInstance<?,?,?> requireInstance(Player player) {
+        var instance = playerInstance.get(player.getUuid());
+        if (instance == null) {
+            throw new IllegalStateException("No instance for player " + player.getUsername());
+        }
+        playerInventory.put(player.getUuid(), player.getInventory());
+        return instance;
+    }
+
+    public void applyDefaultLayout(Player player) {
+        ui.applyDefaultLayout(player);
+    }
+
+    public void addListener(GlobalEventHandler handler) {
+        handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
+//        handler.addListener(InventoryPreClickEvent.class, this::onInventoryPreClick);
+//        handler.addListener(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
+    }
+
+    private void onPlayerUseItem(PlayerUseItemEvent event) {
+        final var player = event.getPlayer();
+        final ItemStack itemStack = event.getItemStack();
+        if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
+            selectAlgorithm(player);
+            return;
+        }
+
+        if (!itemStack.hasTag(ALGO_SELECTOR_TAG) && !itemStack.hasTag(ALGO_INTERACTION_TAG)) {
+            return;
+        }
+
+        final var instance = requireInstance(player);
+        event.setCancelled(true);
 
 
-    @SafeVarargs
-    public final <T, C extends AlgorithmContext<T>, O extends ISceneOps>
-    void registerAlgorithm(Algorithm<T, C, O>... algorithm) {
-        for (Algorithm<T, C, O> a : algorithm) {
-            algorithms.put(
-                    a.id(),
-                    new AlgorithmEntry<>(
-                            a.ctor(),
-                            a.model(),
-                            a.layout(),
-                            a.placement(),
-                            a.handlerRegistry(),
-                            a.onComplete(),
-                            a.scene()
-                    )
-            );
+
+        if (itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
+            if(player.getInstance() != defaultInstance)
+                player.setInstance(defaultInstance);
+            player.teleport(new Pos(194.5, 137, -38.5));
+            // should
+            return;
+        }
+
+//        if (session == null) {
+//            System.err.println("No controls for player " + player.getUsername());
+//            return;
+//        }
+
+        switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
+            case RANDOMIZE -> instance.getController().randomize();
+            case START -> instance.getController().start();
+            case STOP -> instance.getController().pause();
+            case FORWARD -> instance.getController().step();
+            case BACKWARD -> instance.getController().back();
+            case SET_SPEED -> instance.getController().changeSpeed();
+            default -> {
+                ui.applyDefaultLayout(player);
+            }
         }
     }
 
     public void selectAlgorithm(Player player) {
-        final var inventory = ui.openSelector(algorithms.keySet(), this::resolvePresentation);
+        final var inventory = ui.openSelector(algorithmRegistry.keySet(), presentation -> {
+            var entry = presentations.get(presentation);
+            return entry != null ? entry : new AlgorithmPresentation(presentation);
+        });
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
             if (event.getPlayer() != player) return;
@@ -155,25 +157,24 @@ public final class AlgoCraft {
             final var algorithmId = clickedItem.getTag(ALGO_ID_TAG);
             if (algorithmId == null) return;
 
-            final var entry = algorithms.get(algorithmId);
+            final var entry = algorithmRegistry.get(algorithmId);
             if (entry == null) return;
 
-            var originalpos = player.getPosition();
-
             player.closeInventory();
-            player.teleport(entry.placement().teleportPoint());
             ui.applyRunningLayout(player);
+            var session = createInstance(entry.id(), player);
+            player.setInstance(session.getInstance());
+            player.teleport(AlgorithmInstance.origin);
 
             MinecraftServer.getSchedulerManager()
                     .buildTask(() -> {
                         try {
-                            var session = assignVisualization(entry, instanceContainer, player);
-                            session.start();
+                            session.startVisualization();
                         } catch (IllegalStateException e) {
                             player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
                         } catch (NullPointerException e) {
                             player.sendMessage(Component.text("Failed to assign visualization : ", NamedTextColor.RED));
-                            player.teleport(originalpos);
+                            player.setInstance(defaultInstance);
                             ui.applyDefaultLayout(player);
                         }
                     })
@@ -182,88 +183,5 @@ public final class AlgoCraft {
         });
 
         player.openInventory(inventory);
-    }
-
-    public void setSelectorUI(IAlgorithmUI ui) {
-        this.ui = ui;
-    }
-
-    public void setSpawnAction(Consumer<Player> spawnAction) {
-        this.spawnAction = spawnAction == null ? _ -> {} : spawnAction;
-    }
-
-    public void applyDefaultLayout(Player player) {
-        ui.applyDefaultLayout(player);
-    }
-
-    private VisualizationSession getSession(UUID uuid) {
-        return sessions.get(uuid);
-    }
-
-    private AlgorithmPresentation resolvePresentation(String algorithmId) {
-        AlgorithmPresentation presentation = algorithmPresentations.get(algorithmId);
-        return presentation != null
-                ? presentation
-                : new AlgorithmPresentation(algorithmId);
-    }
-
-    private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualization(
-            AlgorithmEntry<T, C, O> entry, InstanceContainer instance, Player player
-    ) {
-        try {
-            return assignVisualizationCaptured(instance, entry, player);
-        } catch (IllegalStateException e) {
-            System.err.println("Failed to assign visualization: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualizationCaptured(
-            InstanceContainer instance,
-            AlgorithmEntry<T, C, O> algo,
-            Player player
-    ) {
-        removeVisualization(player);
-
-        final var audience = new PlayerFeedback(player);
-        final var algoCtx = algo.context();
-
-
-        final var algorithm = algo.ctor.get();
-        algorithm.run(algoCtx);
-        final AnimationPlan<O> onCompletePlan = algo.onComplete().apply(algoCtx);
-
-        final var sceneCtx = new SceneContext(instance, audience, algo.placement().renderOrigin());
-        final var scene = algo.scene().apply(sceneCtx);
-
-        final var renderer = new Renderer<>(
-                instance,
-                algo.placement().renderOrigin(),
-                algo.layout(),
-                audience,
-                algo.handlerRegistry(),
-                onCompletePlan,
-                scene
-        );
-
-        // TODO, remove the casting?
-        final var traceBuilder = new AlgorithmTraceBuilder<T, C>(algorithm, algo.context.copy());
-
-        final var controller = new VisualizationController<>(
-                renderer,
-                traceBuilder,
-                audience
-        );
-
-        var session = new VisualizationSession(controller);
-        sessions.put(player.getUuid(), session);
-        return session;
-    }
-
-    private void removeVisualization(Player player) {
-        final var session = sessions.remove(player.getUuid());
-        if (session != null) {
-            session.clear();
-        }
     }
 }

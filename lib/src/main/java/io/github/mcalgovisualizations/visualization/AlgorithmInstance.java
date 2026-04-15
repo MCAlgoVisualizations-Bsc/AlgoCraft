@@ -12,8 +12,11 @@ import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -25,13 +28,26 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     private final AlgorithmPresentation presentation;
     private final PlayerFeedback audience;
     private final VisualizationController<T, C> controller;
+    public static final Pos origin = new Pos(0, 40, 0);
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
         this.instance = MinecraftServer.getInstanceManager().createInstanceContainer();
         this.presentation = algorithm.presentation();
         this.audience = new PlayerFeedback(players);
 
-        final var algorithmCtx = algorithm.contextFactory().create(algorithm.model().getData());
+        instance.setGenerator(unit -> {
+            final Point start = unit.absoluteStart();
+            final Point size = unit.size();
+            for (int x = 0; x < size.blockX(); x++) {
+                for (int z = 0; z < size.blockZ(); z++) {
+                    for (int y = 0; y < Math.min(40 - start.blockY(), size.blockY()); y++) {
+                        unit.modifier().setBlock(start.add(x, y, z), Block.STONE);
+                    }
+                }
+            }
+        });
+
+        final var algorithmCtx = algorithm.model();
         final var a = algorithm.ctor().get();
         a.run(algorithmCtx);
         final AnimationPlan<O> onCompletePlan = algorithm.onComplete().apply(algorithmCtx);
@@ -51,8 +67,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
         final var traceBuilder = new AlgorithmTraceBuilder<>(
                 a,
-                algorithm.model().getData(),
-                algorithm.contextFactory()
+                algorithm.model()
         );
 
         this.controller = new VisualizationController<>(
@@ -113,6 +128,9 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         }
     }
 
+    public void startVisualization() {
+        controller.startVisualization();
+    }
     public AlgorithmPresentation getPresentation() {
         return this.presentation;
     }

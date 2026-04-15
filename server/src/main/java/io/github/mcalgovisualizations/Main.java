@@ -1,24 +1,9 @@
 package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.algorithms.*;
-import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.commands.*;
-import io.github.mcalgovisualizations.config.MapConstants;
-import io.github.mcalgovisualizations.handlers.*;
-import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
-import io.github.mcalgovisualizations.visualization.Algorithm;
-import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.visualization.AlgoCraftOld;
 import io.github.mcalgovisualizations.events.Message;
-import io.github.mcalgovisualizations.events.Swap;
-import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
-import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
-import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
-import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.Auth;
@@ -31,10 +16,6 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.item.Material;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 import static io.github.mcalgovisualizations.RegisterAlgo.*;
 import static io.github.mcalgovisualizations.config.MapConstants.*;
@@ -55,8 +36,8 @@ public final class Main {
 
         registerAlgo(algo);
 
-        algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
-        algo.addListeners(MinecraftServer.getGlobalEventHandler());
+        //algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
+        algo.addListener(MinecraftServer.getGlobalEventHandler());
 
         // Register visualization control listeners (item interactions)
         registerListeners(instance);
