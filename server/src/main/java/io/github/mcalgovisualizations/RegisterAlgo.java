@@ -4,16 +4,14 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.config.MapConstants;
-import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.events.Message;
-import io.github.mcalgovisualizations.events.Swap;
+import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.item.Material;
 
@@ -28,6 +26,35 @@ public class RegisterAlgo {
         registerSortingAlgo(algo);
         registerTreeSearchAlgo(algo);
         registerPathFindingAlgo(algo);
+        registerFlowAlgo(algo);
+    }
+
+    private static void registerFlowAlgo(AlgoCraft algo) {
+        var flowMatrix = new GridContext<Integer>(new ArrayList<>(Arrays.asList(
+                0,16, 13, 0,  0,  0,
+                0,0,  10, 12, 0,  0,
+                0,4,  0,  0,  14, 0,
+                0,0,  9,  0,  0,  20,
+                0,0,  0,  7,  0,  4,
+                0,0,  0,  0,  0,  0
+        )));
+            var e = Algorithm.builder(flowMatrix)
+                .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
+                .positioning(new GraphNetworkLayout<>(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
+                .withScene(DefaultScene::new)
+                .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
+                .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
+                .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
+                .onEvent(FlowStatus.class, new FlowStatusHandler())
+                .withPresentation(new AlgorithmPresentation(
+                        "Max Flow (Edmonds-Karp)",
+                        Material.WATER_BUCKET,
+                        "Graph max-flow from source (0) to sink (n-1)",
+                        "Fixed 6-node flow graph with edge current/max labels",
+                        "Selected augmenting path edges turn particle color"
+                ))
+                .create();
+        algo.registerAlgorithm(e);
     }
 
     private static void registerSortingAlgo(AlgoCraft algo) {

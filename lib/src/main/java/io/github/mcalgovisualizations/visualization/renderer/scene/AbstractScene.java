@@ -38,7 +38,8 @@ public abstract class AbstractScene implements ISceneOps {
 
     @Override
     public void setValue(int slot, int value) {
-        System.err.println("Not sure this should be in the API");
+        var display = requireDisplay(slot);
+        display.setValue(value);
     }
 
     @Override

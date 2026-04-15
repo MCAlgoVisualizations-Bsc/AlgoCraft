@@ -169,6 +169,7 @@ public final class AlgoCraft {
                         try {
                             var session = assignVisualization(entry, instanceContainer, player);
                             session.start();
+                            player.setFlying(true);
                         } catch (IllegalStateException e) {
                             player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
                         } catch (NullPointerException e) {
