@@ -14,6 +14,7 @@ import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {
     protected final BlockDisplay base;
@@ -30,6 +31,23 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
     }
 
     protected abstract List<Pos> targets();
+
+    protected Pos particleSource() {
+        return base.getPos();
+    }
+
+    protected List<Pos> particleSources() {
+        Pos source = particleSource();
+        return source == null ? List.of() : Collections.singletonList(source);
+    }
+
+    protected int particlesPerStep() {
+        return 1;
+    }
+
+    protected int stepsForDistance(double distance) {
+        return Math.max(5, (int) Math.ceil(distance * 6.0));
+    }
 
     protected final List<Pos> nonNullTargets(Pos... positions) {
         List<Pos> out = new ArrayList<>(positions.length);
@@ -92,8 +110,18 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
             return;
         }
 
-        Pos from = base.getPos();
-        for (Pos to : targets()) {
+        List<Pos> sources = particleSources();
+        List<Pos> targets = targets();
+
+        if (sources.size() == targets.size() && !sources.isEmpty()) {
+            for (int i = 0; i < targets.size(); i++) {
+                emitLine(sources.get(i), targets.get(i));
+            }
+            return;
+        }
+
+        Pos from = particleSource();
+        for (Pos to : targets) {
             emitLine(from, to);
         }
     }
@@ -132,7 +160,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
         double dy = to.y() - from.y();
         double dz = to.z() - from.z();
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        int steps = Math.max(5, (int) Math.ceil(distance * 6.0));
+        int steps = Math.max(2, stepsForDistance(distance));
 
         for (int i = 1; i < steps; i++) {
             double t = (double) i / steps;
@@ -148,7 +176,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
                     point,
                     new Vec(0, 0, 0),
                     0f,
-                    1
+                    Math.max(1, particlesPerStep())
             );
             for (var viewer : instance.getPlayers()) {
                 viewer.sendPacket(packet);

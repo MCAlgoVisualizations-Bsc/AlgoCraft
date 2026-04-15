@@ -62,16 +62,22 @@ public class BlockDisplay implements IBlockStateDisplay {
     }
 
     public BlockDisplay(Pos pos, Block block, String text) {
+        this(pos, block, text, true);
+    }
+
+    public BlockDisplay(Pos pos, Block block, String text, boolean showLabel) {
         if (block == null) throw new NullPointerException("block cannot be null");
-        if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
+        if (showLabel && (text == null || text.isBlank())) throw new IllegalArgumentException("text cannot be blank");
 
         this.instance = null;
         this.blockEntity = new Entity(EntityType.BLOCK_DISPLAY);
-        this.textEntity = new Entity(EntityType.TEXT_DISPLAY);
+        this.textEntity = showLabel ? new Entity(EntityType.TEXT_DISPLAY) : null;
         this.pos = pos;
 
         setupBlock(block);
-        setupText(text);
+        if (textEntity != null) {
+            setupText(text);
+        }
     }
 
     public Pos getPos() {
@@ -130,9 +136,13 @@ public class BlockDisplay implements IBlockStateDisplay {
     }
 
     public void setValue(int value) {
+        setText(Integer.toString(value));
+    }
+
+    public void setText(String text) {
         if (textEntity == null) return;
         var meta = (TextDisplayMeta) textEntity.getEntityMeta();
-        meta.setText(Component.text(Integer.toString(value), NamedTextColor.GOLD));
+        meta.setText(Component.text(text, NamedTextColor.GOLD));
     }
 
     public void setGlowing(boolean highlighted) {
