@@ -19,7 +19,6 @@ import net.minestom.server.item.Material;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static io.github.mcalgovisualizations.config.MapConstants.*;
@@ -32,8 +31,8 @@ public class RegisterAlgo {
     }
 
     private static void registerSortingAlgo(AlgoCraft algo) {
-        var integerCollection1 = new SortingContext<>(Arrays.asList(3, 7, 8, 1, 6, 4, 9, 5, 2));
-        var stringCollection1 = new SortingContext<>(Arrays.asList("a", "b", "k", "x", "d", "h", "a", "b", "e"));
+        var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
+        var stringCollection1 = new SortingContext<>(new ArrayList<>(List.of("a", "b", "k", "x", "d", "h", "a", "b", "e")));
 
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)
@@ -47,10 +46,6 @@ public class RegisterAlgo {
                                 Material.IRON_SWORD,
                                 "Time: O(n^2) | Space: O(1)", "the final sorted array one item at a time.", "A simple sorting algorithm that builds"
                         ))
-                        .withContextFactory(SortingContext::new, ArrayList::new, lst -> {
-                            Collections.shuffle(lst);
-                            return lst;
-                        })
                         .create()
         );
 
@@ -66,10 +61,6 @@ public class RegisterAlgo {
                         ))
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .withContextFactory(SortingContext::new, ArrayList::new, lst -> {
-                            Collections.shuffle(lst);
-                            return lst;
-                        })
                         .create()
         );
 
@@ -87,10 +78,6 @@ public class RegisterAlgo {
                         ))
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
-                        .withContextFactory(SortingContext::new, ArrayList::new, lst -> {
-                            Collections.shuffle(lst);
-                            return lst;
-                        })
                         .create()
 
         );

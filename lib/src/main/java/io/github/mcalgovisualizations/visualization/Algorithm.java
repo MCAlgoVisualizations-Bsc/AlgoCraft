@@ -31,8 +31,7 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
         @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
         @Nullable AlgorithmPresentation presentation,
-        @NotNull Function<SceneContext, O> scene,
-        @NotNull ContextFactory<T, C> contextFactory
+        @NotNull Function<SceneContext, O> scene
 ) {
     public Algorithm {
         Objects.requireNonNull(id, "id");
@@ -43,7 +42,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         Objects.requireNonNull(handlerRegistry, "handlerRegistry");
         Objects.requireNonNull(onComplete, "onComplete");
         Objects.requireNonNull(scene, "scene");
-        Objects.requireNonNull(contextFactory, "contextFactory");
         handlerRegistry = Map.copyOf(handlerRegistry);
     }
 
@@ -64,7 +62,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         private Function<C, ? extends AnimationPlan<O>> onComplete;
         private @Nullable AlgorithmPresentation presentation;
         private Function<SceneContext, O> scene;
-        private ContextFactory<T, C> contextFactory;
 
         private Builder(@NotNull C model) {
             this.model = Objects.requireNonNull(model, "model");
@@ -88,25 +85,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
-        public @NotNull Builder<T, C, O> withContextFactory(
-                @NotNull ContextFactory<T, C> contextFactory
-        ) {
-            this.contextFactory = Objects.requireNonNull(contextFactory, "contextFactory");
-            return this;
-        }
-
-        public @NotNull Builder<T, C, O> withContextFactory(
-                @NotNull Function<T, C> contextCreator,
-                @NotNull UnaryOperator<T> copier,
-                @NotNull UnaryOperator<T> randomizer
-        ) {
-            this.contextFactory = new ContextFactory<>(
-                    Objects.requireNonNull(contextCreator, "contextCreator"),
-                    Objects.requireNonNull(copier, "copier"),
-                    Objects.requireNonNull(randomizer, "randomizer")
-            );
-            return this;
-        }
 
         @SuppressWarnings("unchecked")
         public <NO extends ISceneOps> @NotNull Builder<T, C, NO> withScene(
@@ -155,8 +133,7 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
                     handlers,
                     onComplete == null ? defaultOnComplete() : onComplete,
                     presentation,
-                    Objects.requireNonNull(scene, "scene"),
-                    Objects.requireNonNull(contextFactory, "contextFactory")
+                    Objects.requireNonNull(scene, "scene")
             );
         }
 

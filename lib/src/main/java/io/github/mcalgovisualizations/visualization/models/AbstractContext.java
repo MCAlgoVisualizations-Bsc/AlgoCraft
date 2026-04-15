@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractContext<T> implements AlgorithmContext<T> {
-    public final T values;
+    public T values;
     public final List<IAlgorithmEvent> events = new ArrayList<>();
 
     public AbstractContext(T values) {

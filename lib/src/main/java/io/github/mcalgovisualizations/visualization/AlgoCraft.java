@@ -46,8 +46,7 @@ public final class AlgoCraft {
             @NotNull AlgorithmPlacement placement,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
             @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
-            @NotNull Function<SceneContext, O> scene,
-            @NotNull ContextFactory<T, C> contextFactory
+            @NotNull Function<SceneContext, O> scene
     ) { }
 
     private static final class VisualizationSession {
@@ -135,8 +134,7 @@ public final class AlgoCraft {
                             a.placement(),
                             a.handlerRegistry(),
                             a.onComplete(),
-                            a.scene(),
-                            a.contextFactory()
+                            a.scene()
                     )
             );
         }
@@ -248,7 +246,8 @@ public final class AlgoCraft {
                 scene
         );
 
-        final var traceBuilder = new AlgorithmTraceBuilder<>(algorithm, algo.context.getData(), algo.contextFactory());
+        // TODO, remove the casting?
+        final var traceBuilder = new AlgorithmTraceBuilder<T, C>(algorithm, algo.context.copy());
 
         final var controller = new VisualizationController<>(
                 renderer,
