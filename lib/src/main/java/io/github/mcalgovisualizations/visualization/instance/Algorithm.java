@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.visualization.instance;
 
-import io.github.mcalgovisualizations.visualization.AlgorithmPlacement;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
@@ -26,7 +25,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull Supplier<? extends IPlayerSort<C>> ctor,
         @NotNull C model,
         @NotNull ILayout<T> layout,
-        @NotNull AlgorithmPlacement placement,
         @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
         @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
         @Nullable AlgorithmPresentation presentation,
@@ -37,7 +35,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         Objects.requireNonNull(ctor, "ctor");
         Objects.requireNonNull(model, "model");
         Objects.requireNonNull(layout, "layout");
-        Objects.requireNonNull(placement, "placement");
         Objects.requireNonNull(handlerRegistry, "handlerRegistry");
         Objects.requireNonNull(onComplete, "onComplete");
         Objects.requireNonNull(scene, "scene");
@@ -57,7 +54,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         private String id;
         private Supplier<? extends IPlayerSort<C>> ctor;
         private ILayout<T> layout;
-        private AlgorithmPlacement placement;
         private Function<C, ? extends AnimationPlan<O>> onComplete;
         private @Nullable AlgorithmPresentation presentation;
         private Function<SceneContext, O> scene;
@@ -76,11 +72,9 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         }
 
         public @NotNull Builder<T, C, O> positioning(
-                @NotNull ILayout<T> layout,
-                @NotNull AlgorithmPlacement placement
+                @NotNull ILayout<T> layout
         ) {
             this.layout = Objects.requireNonNull(layout, "layout");
-            this.placement = Objects.requireNonNull(placement, "placement");
             return this;
         }
 
@@ -128,7 +122,6 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
                     Objects.requireNonNull(ctor, "ctor"),
                     model,
                     Objects.requireNonNull(layout, "layout"),
-                    Objects.requireNonNull(placement, "placement"),
                     handlers,
                     onComplete == null ? defaultOnComplete() : onComplete,
                     presentation,

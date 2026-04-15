@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerSkin;
@@ -17,7 +18,6 @@ import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
 
 import static io.github.mcalgovisualizations.RegisterAlgo.*;
-import static io.github.mcalgovisualizations.config.MapConstants.*;
 import static io.github.mcalgovisualizations.config.WorldConfig.createMainInstance;
 
 public final class Main {
@@ -57,7 +57,7 @@ public final class Main {
                 player.setSkin(skin);
             }
             event.setSpawningInstance(instance);
-            player.setRespawnPoint(HUB_SPAWN);
+            player.setRespawnPoint(new Pos(194.5, 137, -38.5));
         });
 
         // Player spawn - give items and assign visualization (player is now fully in the world)

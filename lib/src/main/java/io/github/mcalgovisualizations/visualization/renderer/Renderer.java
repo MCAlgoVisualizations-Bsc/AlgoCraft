@@ -8,6 +8,7 @@ import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -100,13 +101,17 @@ public final class Renderer<I, O extends ISceneOps> {
         scene.setLayout(layoutResult);
     }
 
-    private void requireChunksLoaded(LayoutResult[] layoutResult) {
+    private void requireChunksLoaded(LayoutResult... layoutResult) {
         final var allLoaded = Arrays.stream(layoutResult)
                 .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
 
         if (!allLoaded) {
             throw new IllegalStateException("Visualization area is not loaded yet.");
         }
+    }
+
+    private void requireBlocksNotObscured(LayoutResult... layoutResult) {
+        final var allLoaded = Arrays.stream(layoutResult).allMatch(r -> instance.getBlock(r.pos()) == Block.AIR);
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {

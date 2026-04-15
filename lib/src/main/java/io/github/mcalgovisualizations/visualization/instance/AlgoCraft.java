@@ -45,7 +45,10 @@ public class AlgoCraft {
             throw new IllegalArgumentException("No entry with id " + id);
         var algorithm = algorithmRegistry.get(id);
         var instance = new AlgorithmInstance<>(algorithm, players);
-        Arrays.stream(players).forEach(player -> playerInstance.put(player.getUuid(), instance));
+        Arrays.stream(players).forEach(player -> {
+            playerInventory.put(player.getUuid(), player.getInventory());
+            playerInstance.put(player.getUuid(), instance);
+        });
         return instance;
     }
 
@@ -84,7 +87,6 @@ public class AlgoCraft {
         if (instance == null) {
             throw new IllegalStateException("No instance for player " + player.getUsername());
         }
-        playerInventory.put(player.getUuid(), player.getInventory());
         return instance;
     }
 
@@ -101,7 +103,9 @@ public class AlgoCraft {
     }
 
     private void onPlayerUseItem(PlayerUseItemEvent event) {
+        event.setCancelled(true);
         final var player = event.getPlayer();
+        final var instance = playerInstance.get(player.getUuid());
         final ItemStack itemStack = event.getItemStack();
         if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
             selectAlgorithm(player);
@@ -112,18 +116,17 @@ public class AlgoCraft {
             return;
         }
 
-        final var instance = requireInstance(player);
-        event.setCancelled(true);
 
 
 
         if (itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
-            if(player.getInstance() != defaultInstance)
-                player.setInstance(defaultInstance);
-            player.teleport(new Pos(194.5, 137, -38.5));
-            // should
+            if(player.getInstance() == defaultInstance)
+                return;
+            if(instance != null)
+                instance.removePlayer(defaultInstance, player);
             return;
         }
+
 
 //        if (session == null) {
 //            System.err.println("No controls for player " + player.getUsername());
@@ -178,7 +181,8 @@ public class AlgoCraft {
                             player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
                         } catch (NullPointerException e) {
                             player.sendMessage(Component.text("Failed to assign visualization : ", NamedTextColor.RED));
-                            player.setInstance(defaultInstance);
+                            player.setInstance(defaultInstance)
+                                    .thenRun(() -> player.teleport(new Pos(194.5, 137, -38.5)));
                             ui.applyDefaultLayout(player);
                         }
                     })

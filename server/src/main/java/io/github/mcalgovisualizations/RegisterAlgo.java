@@ -3,7 +3,6 @@ package io.github.mcalgovisualizations;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.config.MapConstants;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Message;
@@ -21,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.mcalgovisualizations.config.MapConstants.*;
-
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
         registerSortingAlgo(algo);
@@ -37,7 +34,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
-                        .positioning(new FloatingLinearLayout<>(), INSERTION_INTS_PLACEMENT)
+                        .positioning(new FloatingLinearLayout<>())
                         .withScene(DefaultScene::new)
                         .onEvent(Compare.class, new CompareHandler())
                         .onEvent(Swap.class, new SwapHandler())
@@ -52,7 +49,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)
                         .withIdentity("insertion sort (ints)", PlayerInsertion::new)
-                        .positioning(new FloatingLinearLayout<>(), MapConstants.INSERTION_INTS_PLACEMENT)
+                        .positioning(new FloatingLinearLayout<>())
                         .withScene(DefaultScene::new)
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion Sort",
@@ -67,7 +64,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)
                         .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
-                        .positioning(new FloatingLinearLayout<>(), INSERTION_SMALL_PLACEMENT)
+                        .positioning(new FloatingLinearLayout<>())
                         .withScene(DefaultScene::new)
                         .withPresentation(new AlgorithmPresentation(
                                 "Small insertion sort (ints)",
@@ -86,7 +83,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(new SortingContext<>(Arrays.asList(8, 3, 1)))
                         .withIdentity("small insertion sort (ints)", PlayerInsertion::new)
-                        .positioning(new FloatingLinearLayout<>(), MapConstants.INSERTION_SMALL_PLACEMENT)
+                        .positioning(new FloatingLinearLayout<>())
                         .withPresentation(new AlgorithmPresentation(
                                 "Small Insertion Sort",
                                 Material.GOLDEN_SWORD,
@@ -102,7 +99,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
             Algorithm.builder(stringCollection1)
                 .withIdentity("insertion sort (string)", PlayerInsertion::new)
-                .positioning(new FloatingLinearLayout<>(), MapConstants.INSERTION_STRINGS_PLACEMENT)
+                .positioning(new FloatingLinearLayout<>())
                 .onEvent(Compare.class, new CompareHandler())
                 .onEvent(Swap.class, new SwapHandler())
                 .onCompletion(_ -> AnimationPlan.empty())
@@ -123,7 +120,7 @@ public class RegisterAlgo {
                 Algorithm.builder(bstCollection)
                         .withIdentity("bst search", PlayerBSTSearch::new)
                         //.withData(bstCollection)
-                        .positioning(new BSTNodeLayout<>(), BST_SEARCH_PLACEMENT)
+                        .positioning(new BSTNodeLayout<>())
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Binary Search Tree (Search)",
@@ -138,7 +135,7 @@ public class RegisterAlgo {
                 Algorithm.builder(bstCollection)
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
-                        .positioning(new UnorderedTreeLayout<>(), BST_SEARCH_PLACEMENT)
+                        .positioning(new UnorderedTreeLayout<>())
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Unordered Binary Tree (Linear Search)",
@@ -153,7 +150,7 @@ public class RegisterAlgo {
                 Algorithm.builder(bstCollection)
                         .withIdentity("tst search", PlayerTSTSearch::new)
                         //.withData(stringCollection1)
-                        .positioning(new TSTNodeLayout<>(), BST_SEARCH_PLACEMENT)
+                        .positioning(new TSTNodeLayout<>())
                         .onEvent(Compare.class, new BstCompareHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
@@ -174,7 +171,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
-                        .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
+                        .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
@@ -191,7 +188,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
-                        .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
+                        .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
@@ -208,7 +205,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
-                        .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
+                        .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
@@ -225,7 +222,7 @@ public class RegisterAlgo {
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
-                        .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
+                        .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(

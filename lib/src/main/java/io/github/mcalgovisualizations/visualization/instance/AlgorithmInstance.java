@@ -60,12 +60,12 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         a.run(algorithmCtx);
         final AnimationPlan<O> onCompletePlan = algorithm.onComplete().apply(algorithmCtx);
 
-        final var sceneCtx = new SceneContext(instance, audience, algorithm.placement().renderOrigin());
+        final var sceneCtx = new SceneContext(instance, audience, new Pos(0, 40, 0));
         final var scene = algorithm.scene().apply(sceneCtx);
 
         final var renderer = new Renderer<>(
                 instance,
-                algorithm.placement().renderOrigin(),
+                new Pos(0, 40, 0),
                 algorithm.layout(),
                 audience,
                 algorithm.handlerRegistry(),
@@ -126,7 +126,8 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
             this.audience.removeAudience(player);
             this.audience.sendMessage(Component.text(player.getUsername() + " left the session", NamedTextColor.RED));
-            player.setInstance(instance);
+            player.setInstance(instance).thenRun(() -> player.teleport(new Pos(194.5, 137, -38.5)));
+
         }
     }
 
