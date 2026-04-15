@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.events;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import org.jetbrains.annotations.NotNull;
 
 public record FlowEdgeFlowUpdate(int slot, int currentFlow) implements IAlgorithmEvent {

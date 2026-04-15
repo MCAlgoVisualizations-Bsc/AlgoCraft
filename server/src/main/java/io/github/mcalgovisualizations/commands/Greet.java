@@ -8,7 +8,7 @@ public class Greet extends Command {
     public Greet() {
         super("greet");
         addSyntax((sender, _) -> {
-            if (sender instanceof Player) sender.sendMessage("Hello " + ((Player) sender).getUsername());
+            if (sender instanceof Player p) sender.sendMessage("Hello " + p.getUsername());
         });
     }
 }

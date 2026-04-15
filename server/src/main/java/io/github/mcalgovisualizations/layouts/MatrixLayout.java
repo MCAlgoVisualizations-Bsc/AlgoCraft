@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -21,7 +20,7 @@ public record MatrixLayout (
     int     rows,
     double  spacing,
     long    seed
-) implements ILayout {
+) implements ILayout<List<Integer>> {
 
     // setting the default configs here
     public MatrixLayout() {
@@ -39,14 +38,14 @@ public record MatrixLayout (
      * Throws if size exceeds capacity.
      */
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
         return random(model, origin);
     }
 
     /**
      * Randomized (but deterministic per seed) grid positions.
      */
-    public <T extends Comparable<T>> LayoutResult<T>[] random(List<Data<T>> model, Pos origin) {
+    public LayoutResult[] random(List<Integer> model, Pos origin) {
         final var size = model.size();
         final var random = new Random(seed);
         int capacity = cols * rows;
@@ -85,7 +84,7 @@ public record MatrixLayout (
             Cell cell = cells.get(id);
             final double x = startX + cell.col * spacing;
             final double z = startZ + cell.row * spacing;
-            out[id] = new LayoutResult<>(new Data<>(id), new Pos(x, y, z), new StylingProfile());
+            out[id] = new LayoutResult(id, new Pos(x, y, z), new StylingProfile());
         }
 
         return out;

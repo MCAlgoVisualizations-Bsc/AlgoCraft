@@ -1,27 +1,26 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
 import java.util.List;
 
-public record UnorderedTreeLayout(
+public record UnorderedTreeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing
-) implements ILayout {
+) implements ILayout<List<T>> {
 
     public UnorderedTreeLayout() {
         this(10.0, 3.0, 2.0);
     }
 
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         int size = model.size();
-        LayoutResult<T>[] out = new LayoutResult[size];
+        LayoutResult[] out = new LayoutResult[size];
         Pos[] positions = new Pos[size];
 
         for (int i = 0; i < size; i++) {
@@ -51,7 +50,7 @@ public record UnorderedTreeLayout(
                     ? BstNodeStylingProfile.NodeRole.LEAF
                     : BstNodeStylingProfile.NodeRole.INTERNAL);
 
-            out[i] = new LayoutResult<>(
+            out[i] = new LayoutResult(
                     model.get(i),
                     positions[i],
                     new ParticleTreeNodeStylingProfile(role, leftPos, rightPos)

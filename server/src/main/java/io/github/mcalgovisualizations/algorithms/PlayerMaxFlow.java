@@ -1,22 +1,23 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
 import io.github.mcalgovisualizations.events.FlowEdgeVisit;
 import io.github.mcalgovisualizations.events.FlowPathEdge;
 import io.github.mcalgovisualizations.events.FlowStatus;
 import io.github.mcalgovisualizations.layouts.FlowNetworkRules;
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
-public final class PlayerMaxFlow implements IPlayerSort {
+public final class PlayerMaxFlow implements IPlayerSort<GridContext<Integer>> {
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
+    public void run(GridContext<Integer> ctx) {
+        var values = ctx.getData();
         int size = values.size();
         if (size != FlowNetworkRules.MATRIX_SIZE) {
-            values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
+            ctx.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
             return;
         }
 
@@ -27,11 +28,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
         int[][] flow = new int[nodeCount][nodeCount];
 
         for (int i = 0; i < size; i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof Integer number) || number < 0) {
-                values.emit(new FlowStatus(FlowStatus.Type.INVALID_INPUT, 0, 0));
-                return;
-            }
+            var number = values.get(i);
             int row = i / nodeCount;
             int col = i % nodeCount;
             int effective = FlowNetworkRules.effectiveCapacity(row, col, number);
@@ -44,10 +41,10 @@ public final class PlayerMaxFlow implements IPlayerSort {
         int maxFlow = 0;
 
         // Initialize node fills and sink total text.
-        emitNodeLoads(values, capacity, flow, nodeCount, maxFlow);
+        emitNodeLoads(ctx, capacity, flow, nodeCount, maxFlow);
 
         int[] parent = new int[nodeCount];
-        while (bfs(residual, source, sink, parent, values, nodeCount)) {
+        while (bfs(ctx, residual, source, sink, parent, nodeCount)) {
             int pathFlow = Integer.MAX_VALUE;
             for (int v = sink; v != source; v = parent[v]) {
                 int u = parent[v];
@@ -57,35 +54,35 @@ public final class PlayerMaxFlow implements IPlayerSort {
             for (int v = sink; v != source; v = parent[v]) {
                 int u = parent[v];
                 int slot = (u * nodeCount) + v;
-                values.emit(new FlowPathEdge(nodeName(u), nodeName(v), slot, pathFlow));
+                ctx.emit(new FlowPathEdge(nodeName(u), nodeName(v), slot, pathFlow));
 
                 residual[u][v] -= pathFlow;
                 residual[v][u] += pathFlow;
 
                 if (capacity[u][v] > 0) {
                     flow[u][v] += pathFlow;
-                    values.emit(new FlowEdgeFlowUpdate(slot, flow[u][v]));
+                    ctx.emit(new FlowEdgeFlowUpdate(slot, flow[u][v]));
                 } else if (capacity[v][u] > 0) {
                     flow[v][u] -= pathFlow;
                     int reverseSlot = (v * nodeCount) + u;
-                    values.emit(new FlowEdgeFlowUpdate(reverseSlot, flow[v][u]));
+                    ctx.emit(new FlowEdgeFlowUpdate(reverseSlot, flow[v][u]));
                 }
             }
 
             maxFlow += pathFlow;
-            emitNodeLoads(values, capacity, flow, nodeCount, maxFlow);
-            values.emit(new FlowStatus(FlowStatus.Type.AUGMENTED, pathFlow, maxFlow));
+            emitNodeLoads(ctx, capacity, flow, nodeCount, maxFlow);
+            ctx.emit(new FlowStatus(FlowStatus.Type.AUGMENTED, pathFlow, maxFlow));
         }
 
-        values.emit(new FlowStatus(FlowStatus.Type.COMPLETE, maxFlow, maxFlow));
+        ctx.emit(new FlowStatus(FlowStatus.Type.COMPLETE, maxFlow, maxFlow));
     }
 
-    private static <T extends Comparable<T>> boolean bfs(
+    private static boolean bfs(
+            GridContext<Integer> ctx,
             int[][] residual,
             int source,
             int sink,
             int[] parent,
-            ISort<T> values,
             int nodeCount
     ) {
         Arrays.fill(parent, -1);
@@ -104,7 +101,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
 
                 parent[v] = u;
                 int matrixIndex = (u * nodeCount) + v;
-                values.emit(new FlowEdgeVisit(nodeName(u), nodeName(v), matrixIndex, residual[u][v]));
+                ctx.emit(new FlowEdgeVisit(nodeName(u), nodeName(v), matrixIndex, residual[u][v]));
 
                 if (v == sink) {
                     return true;
@@ -116,8 +113,8 @@ public final class PlayerMaxFlow implements IPlayerSort {
         return false;
     }
 
-    private static <T extends Comparable<T>> void emitNodeLoads(
-            ISort<T> values,
+    private static void emitNodeLoads(
+            GridContext<Integer> ctx,
             int[][] capacity,
             int[][] flow,
             int nodeCount,
@@ -127,7 +124,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
             if (node == nodeCount - 1) {
                 // F always shows current total max flow value.
                 int sinkSlot = (node * nodeCount) + node;
-                values.emit(new FlowEdgeFlowUpdate(sinkSlot, maxFlow));
+                ctx.emit(new FlowEdgeFlowUpdate(sinkSlot, maxFlow));
                 continue;
             }
 
@@ -138,7 +135,7 @@ public final class PlayerMaxFlow implements IPlayerSort {
                 }
             }
             int slot = (node * nodeCount) + node;
-            values.emit(new FlowEdgeFlowUpdate(slot, load));
+            ctx.emit(new FlowEdgeFlowUpdate(slot, load));
         }
     }
 

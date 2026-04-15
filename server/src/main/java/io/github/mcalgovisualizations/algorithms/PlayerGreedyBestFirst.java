@@ -1,16 +1,17 @@
 package io.github.mcalgovisualizations.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
+import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.Message;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.events.Message;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PlayerGreedyBestFirst implements IPlayerSort {
+public class PlayerGreedyBestFirst implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -24,21 +25,12 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
     }
 
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
+    public void run(GridContext<Integer> ctx) {
+        var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
-            values.emit(new Message("Greedy Best-First: empty grid", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: empty grid", Message.MessageType.ERROR));
             return;
-        }
-
-        int[] cells = new int[size];
-        for (int i = 0; i < size; i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof Integer number)) {
-                values.emit(new Message("Greedy Best-First: expected integer grid values", Message.MessageType.ERROR));
-                return;
-            }
-            cells[i] = number;
         }
 
         int rows = (int) Math.ceil(size / (double) columns);
@@ -46,12 +38,12 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
         int goal = -1;
 
         for (int i = 0; i < size; i++) {
-            if (cells[i] == START) start = i;
-            if (cells[i] == GOAL) goal = i;
+            if (values.get(i) == START) start = i;
+            if (values.get(i) == GOAL) goal = i;
         }
 
         if (start < 0 || goal < 0) {
-            values.emit(new Message("Greedy Best-First: start or goal missing", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: start or goal missing", Message.MessageType.ERROR));
             return;
         }
 
@@ -75,7 +67,7 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
             }
 
             if (current != start) {
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
             int row = current / columns;
@@ -89,32 +81,32 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
             };
 
             for (int neighbor : neighbors) {
-                if (neighbor < 0 || cells[neighbor] == WALL || visited[neighbor]) continue;
+                if (neighbor < 0 || values.get(neighbor) == WALL || visited[neighbor]) continue;
 
                 parent[neighbor] = current;
                 frontier.add(new Node(neighbor, heuristic(neighbor, goal, columns)));
                 visited[neighbor] = true;
 
                 if (neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
+                    ctx.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
                 }
             }
         }
 
         if (!found) {
-            values.emit(new Message("Greedy Best-First: no path found", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: no path found", Message.MessageType.ERROR));
             return;
         }
 
         int pathCursor = goal;
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
-                values.emit(new CellStateTransition(pathCursor, CellState.CLOSED, CellState.PATH));
+                ctx.emit(new CellStateTransition(pathCursor, CellState.CLOSED, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }
 
-        values.emit(new Message("Greedy Best-First: path found", Message.MessageType.SUCCESS));
+        ctx.emit(new Message("Greedy Best-First: path found", Message.MessageType.SUCCESS));
     }
 
     private static int heuristic(int from, int to, int columns) {

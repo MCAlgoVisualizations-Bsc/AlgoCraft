@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -12,12 +11,12 @@ import java.util.List;
  * Places values by simulating a ternary search tree insertion to determine logical
  * parent/left/middle/right relationships, then assigns coordinates based on tree depth.
  */
-public record TSTNodeLayout(
+public record TSTNodeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,
         double horizontalSpacing,
         double zOffset
-) implements ILayout {
+) implements ILayout<List<T>> {
 
     public TSTNodeLayout() {
         this(4.0, 2.0, 0.5, 0.0);
@@ -28,15 +27,14 @@ public record TSTNodeLayout(
         if (horizontalSpacing <= 0) throw new IllegalArgumentException("horizontalSpacing must be > 0");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
 
         int size = model.size();
-        LayoutResult<T>[] out = new LayoutResult[size];
+        LayoutResult[] out = new LayoutResult[size];
 
         Node<T> root = new Node<>(model.getFirst(), 0);
         for (int i = 1; i < size; i++) {
@@ -48,13 +46,12 @@ public record TSTNodeLayout(
         return out;
     }
 
-    private <T extends Comparable<T>> void insert(Node<T> root, Data<T> data, int index) {
+    private void insert(Node<T> root, T data, int index) {
         Node<T> current = root;
-        T candidate = data.value();
 
         while (true) {
-            T currentValue = current.data.value();
-            int cmp = candidate.compareTo(currentValue);
+            var currentValue = current.data;
+            int cmp = data.compareTo(currentValue);
             if (cmp < 0) {
                 if (current.left == null) {
                     current.left = new Node<>(data, index);
@@ -69,7 +66,7 @@ public record TSTNodeLayout(
                 current = current.right;
             } else {
                 if (current.middle == null) {
-                    current.middle = new Node<>(data, index);
+                    current.middle = new Node<T>(data, index);
                     break;
                 }
                 current = current.middle;
@@ -77,14 +74,14 @@ public record TSTNodeLayout(
         }
     }
 
-    private <T extends Comparable<T>> int getMaxDepth(Node<T> node) {
+    private int getMaxDepth(Node<T> node) {
         if (node == null) return 0;
         return 1 + Math.max(node.left == null ? 0 : getMaxDepth(node.left),
                 Math.max(node.middle == null ? 0 : getMaxDepth(node.middle),
                         node.right == null ? 0 : getMaxDepth(node.right)));
     }
 
-    private <T extends Comparable<T>> void assignPositions(Node<T> node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult<T>[] out) {
+    private void assignPositions(Node<T> node, Pos origin, int depth, double xOffset, int maxDepth, LayoutResult[] out) {
         if (node == null) return;
 
         double x = origin.x() + xOffset;
@@ -105,7 +102,7 @@ public record TSTNodeLayout(
         Pos middlePos = node.middle != null ? buildPosition(origin, depth + 1, xOffset) : null;
         Pos rightPos = node.right != null ? buildPosition(origin, depth + 1, xOffset + step) : null;
 
-        out[node.originalIndex] = new LayoutResult<>(
+        out[node.originalIndex] = new LayoutResult(
                 node.data,
                 currentPos,
                 new ParticleTreeNodeStylingProfile(role, leftPos, middlePos, rightPos)
@@ -124,14 +121,14 @@ public record TSTNodeLayout(
         );
     }
 
-    private static class Node<T extends Comparable<T>> {
-        final Data<T> data;
+    private static class Node<T> {
+        final T data;
         final int originalIndex;
         Node<T> left;
         Node<T> middle;
         Node<T> right;
 
-        Node(Data<T> data, int originalIndex) {
+        Node(T data, int originalIndex) {
             this.data = data;
             this.originalIndex = originalIndex;
         }

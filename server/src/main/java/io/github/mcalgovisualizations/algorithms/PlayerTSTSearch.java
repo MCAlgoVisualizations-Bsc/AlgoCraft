@@ -1,22 +1,20 @@
 package io.github.mcalgovisualizations.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
+import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.visualization.models.ISort;
 
 import java.util.Arrays;
+import java.util.List;
 
-public final class PlayerTSTSearch implements IPlayerSort {
+public final class PlayerTSTSearch<T extends Comparable<T>> implements IPlayerSort<GridContext<T>> {
 
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
+    public void run(GridContext<T> ctx) {
+        var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
-            return;
-        }
-
-        String[] data = readStringInput(values);
-        if (data.length == 0) {
             return;
         }
 
@@ -29,16 +27,16 @@ public final class PlayerTSTSearch implements IPlayerSort {
 
         int root = 0;
         for (int insert = 1; insert < size; insert++) {
-            insert(root, insert, data, left, middle, right);
+            insert(root, insert, values, left, middle, right);
         }
 
         int targetIndex = size / 2;
-        String target = data[targetIndex];
+        T target = values.get(targetIndex);
 
         int cursor = root;
         while (cursor != -1) {
-            String current = data[cursor];
-            values.emit(new Compare(cursor, targetIndex, current, target));
+            T current = values.get(cursor);
+            ctx.emit(new Compare(cursor, targetIndex, current, target));
 
             int cmp = target.compareTo(current);
             if (cmp == 0) {
@@ -52,12 +50,12 @@ public final class PlayerTSTSearch implements IPlayerSort {
         }
     }
 
-    private static void insert(int root, int insert, String[] data, int[] left, int[] middle, int[] right) {
+    private void insert(int root, int insert, List<T> data, int[] left, int[] middle, int[] right) {
         int cursor = root;
-        String candidate = data[insert];
+        T candidate = data.get(insert);
 
         while (true) {
-            String current = data[cursor];
+            T current = data.get(cursor);
             int cmp = candidate.compareTo(current);
 
             if (cmp < 0) {
@@ -80,18 +78,6 @@ public final class PlayerTSTSearch implements IPlayerSort {
                 cursor = middle[cursor];
             }
         }
-    }
-
-    private static <T extends Comparable<T>> String[] readStringInput(ISort<T> values) {
-        String[] out = new String[values.size()];
-        for (int i = 0; i < values.size(); i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof String value)) {
-                return new String[0];
-            }
-            out[i] = value;
-        }
-        return out;
     }
 }
 

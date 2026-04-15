@@ -1,10 +1,12 @@
 package io.github.mcalgovisualizations.visualization;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
+import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
-import io.github.mcalgovisualizations.visualization.models.ISort;
-import io.github.mcalgovisualizations.visualization.models.SortingCollection;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
+import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
@@ -21,14 +23,14 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_ID_TAG;
@@ -37,20 +39,15 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR
 
 public final class AlgoCraft {
 
-    private record AlgorithmEntry<T extends Comparable<T>, O extends ISceneOps>(
-            IPlayerSort algorithm,
-            ISort<T> collection,
-            ILayout layout,
-            AlgorithmPlacement placement,
-            Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> eventHandlers,
-            Function<? super ISort<T>, ? extends AnimationPlan<O>> completeHandler,
-            Function<SceneContext, O> scene
-    ) {
-        @Override
-        public ISort<T> collection() {
-            return this.collection.copy();
-        }
-    }
+    private record AlgorithmEntry<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
+            @NotNull Supplier<? extends IPlayerSort<C>> ctor,
+            @NotNull C context,
+            @NotNull ILayout<T> layout,
+            @NotNull AlgorithmPlacement placement,
+            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
+            @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
+            @NotNull Function<SceneContext, O> scene
+    ) { }
 
     private static final class VisualizationSession {
         private final VisualizationController controls;
@@ -73,7 +70,7 @@ public final class AlgoCraft {
     private IAlgorithmUI ui = new AlgorithmUI();
     private final InstanceContainer instanceContainer;
     private final Map<UUID, VisualizationSession> sessions = new HashMap<>();
-    private final Map<String, AlgorithmEntry<?, ?>> algorithms = new HashMap<>();
+    private final Map<String, AlgorithmEntry<?, ?, ?>> algorithms = new HashMap<>();
     private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
     private Consumer<Player> spawnAction = player -> {};
 
@@ -122,24 +119,25 @@ public final class AlgoCraft {
         handler.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> removeVisualization(playerDisconnectEvent.getPlayer()));
     }
 
-    public <T extends Comparable<T>, O extends ISceneOps> void registerAlgorithm(Algorithm<T, O> algo) {
-        algorithms.put(
-                algo.id(),
-                new AlgorithmEntry<>(
-                        algo.ctor().get(),
-                        new SortingCollection<>(algo.model()),
-                        algo.layout(),
-                        algo.placement(),
-                        algo.handlerRegistry(),
-                        algo.onComplete(),
-                        algo.scene()
-                )
-        );
 
-        var presentation = Objects.isNull(algo.presentation())
-                ? new AlgorithmPresentation(algo.id())
-                : algo.presentation();
-        algorithmPresentations.put(algo.id(), presentation);
+
+    @SafeVarargs
+    public final <T, C extends AlgorithmContext<T>, O extends ISceneOps>
+    void registerAlgorithm(Algorithm<T, C, O>... algorithm) {
+        for (Algorithm<T, C, O> a : algorithm) {
+            algorithms.put(
+                    a.id(),
+                    new AlgorithmEntry<>(
+                            a.ctor(),
+                            a.model(),
+                            a.layout(),
+                            a.placement(),
+                            a.handlerRegistry(),
+                            a.onComplete(),
+                            a.scene()
+                    )
+            );
+        }
     }
 
     public void selectAlgorithm(Player player) {
@@ -210,8 +208,8 @@ public final class AlgoCraft {
                 : new AlgorithmPresentation(algorithmId);
     }
 
-    private <T extends Comparable<T>, O extends ISceneOps> VisualizationSession assignVisualization(
-            AlgorithmEntry<T, O> entry, InstanceContainer instance, Player player
+    private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualization(
+            AlgorithmEntry<T, C, O> entry, InstanceContainer instance, Player player
     ) {
         try {
             return assignVisualizationCaptured(instance, entry, player);
@@ -221,37 +219,40 @@ public final class AlgoCraft {
         }
     }
 
-    private <T extends Comparable<T>, O extends ISceneOps> VisualizationSession assignVisualizationCaptured(
+    private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualizationCaptured(
             InstanceContainer instance,
-            AlgorithmEntry<T, O> algo,
+            AlgorithmEntry<T, C, O> algo,
             Player player
     ) {
         removeVisualization(player);
 
         final var audience = new PlayerFeedback(player);
+        final var algoCtx = algo.context();
 
-        final var collection = algo.collection().copy();
-        final var algorithm = algo.algorithm();
-        algorithm.sort(collection);
-        final var onCompletePlan = algo.completeHandler().apply(collection);
+
+        final var algorithm = algo.ctor.get();
+        algorithm.run(algoCtx);
+        final AnimationPlan<O> onCompletePlan = algo.onComplete().apply(algoCtx);
 
         final var sceneCtx = new SceneContext(instance, audience, algo.placement().renderOrigin());
         final var scene = algo.scene().apply(sceneCtx);
 
-        final Renderer<O> renderer = new Renderer<>(
+        final var renderer = new Renderer<>(
                 instance,
                 algo.placement().renderOrigin(),
                 algo.layout(),
                 audience,
-                algo.eventHandlers(),
+                algo.handlerRegistry(),
                 onCompletePlan,
                 scene
         );
 
-        final var controller = new VisualizationController(
-                algo.algorithm(),
+        // TODO, remove the casting?
+        final var traceBuilder = new AlgorithmTraceBuilder<T, C>(algorithm, algo.context.copy());
+
+        final var controller = new VisualizationController<>(
                 renderer,
-                algo.collection(),
+                traceBuilder,
                 audience
         );
 

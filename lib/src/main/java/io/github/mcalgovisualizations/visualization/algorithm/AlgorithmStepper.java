@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.visualization.algorithms;
+package io.github.mcalgovisualizations.visualization.algorithm;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

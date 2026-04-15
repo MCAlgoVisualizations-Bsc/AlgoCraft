@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.events;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import org.jetbrains.annotations.NotNull;
 
 public record FlowStatus(Type type, int value, int total) implements IAlgorithmEvent {

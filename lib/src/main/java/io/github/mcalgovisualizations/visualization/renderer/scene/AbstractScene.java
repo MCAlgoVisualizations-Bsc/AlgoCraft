@@ -29,7 +29,7 @@ public abstract class AbstractScene implements ISceneOps {
         this.origin = context.origin();
     }
 
-    public abstract void setLayout(LayoutResult<?>[] layoutResults);
+    public abstract void setLayout(LayoutResult[] layoutResults);
 
     @Override
     public Pos getOrigin() {

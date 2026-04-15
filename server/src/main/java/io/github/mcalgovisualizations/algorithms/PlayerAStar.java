@@ -1,16 +1,16 @@
 package io.github.mcalgovisualizations.algorithms;
 
-import io.github.mcalgovisualizations.visualization.algorithms.IPlayerSort;
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.visualization.algorithms.Message;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.events.Message;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PlayerAStar implements IPlayerSort {
+public class PlayerAStar implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -24,21 +24,17 @@ public class PlayerAStar implements IPlayerSort {
     }
 
     @Override
-    public <T extends Comparable<T>> void sort(ISort<T> values) {
+    public void run(GridContext<Integer> ctx) {
+        var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
-            values.emit(new Message("A*: empty grid", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: empty grid", Message.MessageType.ERROR));
             return;
         }
 
         int[] cells = new int[size];
         for (int i = 0; i < size; i++) {
-            T raw = values.get(i);
-            if (!(raw instanceof Integer number)) {
-                values.emit(new Message("A*: expected integer grid values", Message.MessageType.ERROR));
-                return;
-            }
-            cells[i] = number;
+            cells[i] = values.get(i);
         }
 
         int rows = (int) Math.ceil(size / (double) columns);
@@ -51,7 +47,7 @@ public class PlayerAStar implements IPlayerSort {
         }
 
         if (start < 0 || goal < 0) {
-            values.emit(new Message("A*: start or goal missing", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: start or goal missing", Message.MessageType.ERROR));
             return;
         }
 
@@ -79,7 +75,7 @@ public class PlayerAStar implements IPlayerSort {
             closed[current] = true;
 
             if (current != start && current != goal) {
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
             if (current == goal) {
@@ -110,14 +106,14 @@ public class PlayerAStar implements IPlayerSort {
                 frontier.add(new Node(neighbor, tentativeG + h, h));
 
                 if (!seenOpen[neighbor] && neighbor != start && neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
+                    ctx.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
                 }
                 seenOpen[neighbor] = true;
             }
         }
 
         if (!found) {
-            values.emit(new Message("A*: no path found", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: no path found", Message.MessageType.ERROR));
             return;
         }
 
@@ -125,12 +121,12 @@ public class PlayerAStar implements IPlayerSort {
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
                 CellState previous = closed[pathCursor] ? CellState.CLOSED : CellState.OPEN;
-                values.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
+                ctx.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }
 
-        values.emit(new Message("A*: path found", Message.MessageType.SUCCESS));
+        ctx.emit(new Message("A*: path found", Message.MessageType.SUCCESS));
     }
 
     private static int heuristic(int from, int to, int columns) {

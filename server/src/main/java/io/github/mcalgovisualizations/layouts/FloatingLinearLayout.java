@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -21,11 +20,11 @@ import java.util.List;
  * @param yOffset vertical offset added to {@code origin.y()}
  * @param zOffset depth offset added to {@code origin.z()}
  */
-public record FloatingLinearLayout(
+public record FloatingLinearLayout<T>(
         double spacing,
         double yOffset,
         double zOffset
-) implements ILayout {
+) implements ILayout<List<T>> {
 
     /**
      * Creates a floating linear layout with default configuration:
@@ -57,12 +56,13 @@ public record FloatingLinearLayout(
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
-        if(model == null || model.isEmpty()) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
+
+        if((List<?>) model == null || ((List<?>) model).isEmpty()) {
             return new LayoutResult[0];
         }
 
-        final var size = model.size();
+        final var size = ((List<?>) model).size();
         final var out = new LayoutResult[size];
 
         final double y = origin.y() + yOffset;
@@ -72,7 +72,7 @@ public record FloatingLinearLayout(
             final double x = origin.x() + (i * spacing);
             final var pos = new Pos(x, y, z);
 
-            out[i] = new LayoutResult<>(model.get(i), pos, new StylingProfile());
+            out[i] = new LayoutResult(((List<?>) model).get(i), pos, new StylingProfile());
         }
 
         return out;

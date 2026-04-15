@@ -2,9 +2,8 @@ package io.github.mcalgovisualizations.layouts;
 
 import io.github.mcalgovisualizations.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.visualization.ILayout;
 import io.github.mcalgovisualizations.visualization.IStylingProfile;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
@@ -15,7 +14,7 @@ import net.minestom.server.particle.Particle;
 import java.util.ArrayList;
 import java.util.List;
 
-public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILayout {
+public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements ILayout<List<T>> {
     private static final int NODE_COUNT = FlowNetworkRules.NODE_COUNT;
     private static final int MATRIX_SIZE = FlowNetworkRules.MATRIX_SIZE;
     private static final double Z_SPREAD = 7.0;
@@ -29,8 +28,7 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Comparable<T>> LayoutResult<T>[] compute(List<Data<T>> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
         int size = model.size();
         var out = new LayoutResult[size];
         if (size == 0) {
@@ -47,16 +45,16 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
         for (int from = 0; from < NODE_COUNT; from++) {
             for (int to = 0; to < NODE_COUNT; to++) {
                 int idx = (from * NODE_COUNT) + to;
-                Data<T> data = model.get(idx);
-                int capacity = FlowNetworkRules.effectiveCapacity(from, to, readCapacity(data.value()));
+                var data = model.get(idx);
+                int capacity = FlowNetworkRules.effectiveCapacity(from, to, readCapacity(data));
 
                 if (from == to) {
-                    out[idx] = new LayoutResult<>(data, nodePositions[from], new NodeStylingProfile(nodeName(from), from == NODE_COUNT - 1));
+                    out[idx] = new LayoutResult(data, nodePositions[from], new NodeStylingProfile(nodeName(from), from == NODE_COUNT - 1));
                     continue;
                 }
 
                 if (capacity <= 0) {
-                    out[idx] = new LayoutResult<>(
+                    out[idx] = new LayoutResult(
                             data,
                             edgeLabelPos(nodePositions[from], nodePositions[to], y, 0, false),
                             new HiddenStylingProfile()
@@ -73,7 +71,7 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
                 boolean reciprocal = reciprocalSign != 0;
                 Pos labelPos = edgeLabelPos(fromPos, toPos, y, offsetSign, reciprocal);
 
-                out[idx] = new LayoutResult<>(
+                out[idx] = new LayoutResult(
                         data,
                         labelPos,
                         new FlowEdgeStylingProfile(capacity, fromPos, toPos, nodeName(from), nodeName(to), offsetSign)
@@ -137,15 +135,15 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
         return from < to ? 1 : -1;
     }
 
-    private static <T extends Comparable<T>> int crossingOffsetSign(int from, int to, List<Data<T>> model) {
+    private int crossingOffsetSign(int from, int to, List<T> model) {
         boolean isBtoE = from == NODE_B && to == NODE_E;
         boolean isCtoD = from == NODE_C && to == NODE_D;
         if (!isBtoE && !isCtoD) {
             return 0;
         }
 
-        int bToECapacity = readCapacity(model.get((NODE_B * NODE_COUNT) + NODE_E).value());
-        int cToDCapacity = readCapacity(model.get((NODE_C * NODE_COUNT) + NODE_D).value());
+        int bToECapacity = readCapacity(model.get((NODE_B * NODE_COUNT) + NODE_E));
+        int cToDCapacity = readCapacity(model.get((NODE_C * NODE_COUNT) + NODE_D));
         if (bToECapacity <= 0 || cToDCapacity <= 0) {
             return 0;
         }
@@ -153,12 +151,12 @@ public record GraphNetworkLayout(double xSpacing, double yOffset) implements ILa
         return isBtoE ? 1 : -1;
     }
 
-    private static <T extends Comparable<T>> boolean isFixedFlowMatrix(List<Data<T>> model) {
+    private boolean isFixedFlowMatrix(List<T> model) {
         if (model.size() != MATRIX_SIZE) {
             return false;
         }
-        for (Data<T> cell : model) {
-            if (!(cell.value() instanceof Integer)) {
+        for (T cell : model) {
+            if (!(cell instanceof Integer)) {
                 return false;
             }
         }
