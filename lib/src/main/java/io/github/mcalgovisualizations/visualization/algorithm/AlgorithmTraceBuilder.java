@@ -28,7 +28,8 @@ public final class AlgorithmTraceBuilder<T, C extends AlgorithmContext<T>> {
         var initialSnapshot = context.copyData();
         var context = this.context.copy();
 
-        algorithm.run(context.copy());
+        // TODO: remove the casting? More type safety!!
+        algorithm.run((C) context);
 
         return new AlgorithmTrace<>(
                 initialSnapshot,

@@ -24,9 +24,8 @@ public class SortingContext<T extends Comparable<T>> extends AbstractContext<Lis
 
     @Override
     public List<T> randomizeData() {
-        List<T> out= copyData();
-        Collections.shuffle(out);
-        return out;
+        Collections.shuffle(values);
+        return copyData();
     }
 
     public void swap(int idx1, int idx2) {

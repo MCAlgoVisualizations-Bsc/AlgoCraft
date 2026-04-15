@@ -26,9 +26,7 @@ public class GridContext<T> extends AbstractContext<List<T>> {
 
     @Override
     public List<T> randomizeData() {
-        List<T> out= copyData();
-        Collections.shuffle(out);
-        values = out;
-        return out;
+        Collections.shuffle(values);
+        return copyData();
     }
 }
