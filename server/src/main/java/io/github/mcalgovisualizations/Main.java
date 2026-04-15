@@ -15,6 +15,7 @@ import net.minestom.server.command.CommandManager;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerSkin;
+import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -56,6 +57,13 @@ public final class Main {
 
     static void registerListeners(InstanceContainer instance) {
         final var globalEventHandler = MinecraftServer.getGlobalEventHandler();
+
+        globalEventHandler.addListener(ItemDropEvent.class, event -> {
+            // Simply cancel the event to prevent the drop
+            event.setCancelled(true);
+
+            event.getPlayer().sendMessage(Component.text("You are not allowed to drop items!", NamedTextColor.RED));
+        });
 
         // Player configuration - set spawn instance and respawn point
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
