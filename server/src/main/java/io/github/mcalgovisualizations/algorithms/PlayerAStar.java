@@ -59,7 +59,6 @@ public class PlayerAStar implements IPlayerSort {
         int[] g = new int[size];
         int[] parent = new int[size];
         boolean[] closed = new boolean[size];
-        boolean[] seenOpen = new boolean[size];
         Arrays.fill(g, Integer.MAX_VALUE);
         Arrays.fill(parent, -1);
 
@@ -69,9 +68,9 @@ public class PlayerAStar implements IPlayerSort {
 
         g[start] = 0;
         frontier.add(new Node(start, heuristic(start, goal, columns), heuristic(start, goal, columns)));
-        seenOpen[start] = true;
 
         boolean found = false;
+        int activeHead = -1;
         while (!frontier.isEmpty()) {
             Node currentNode = frontier.poll();
             int current = currentNode.index();
@@ -79,13 +78,20 @@ public class PlayerAStar implements IPlayerSort {
             if (closed[current]) continue;
             closed[current] = true;
 
-            // Move villager to current cell
             if (current != start && current != goal) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                }
                 values.emit(new VillagerMove(current));
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                values.emit(new CellStateTransition(current, CellState.DEFAULT, CellState.OPEN));
+                activeHead = current;
             }
 
             if (current == goal) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                    activeHead = -1;
+                }
                 found = true;
                 break;
             }
@@ -111,15 +117,13 @@ public class PlayerAStar implements IPlayerSort {
 
                 int h = heuristic(neighbor, goal, columns);
                 frontier.add(new Node(neighbor, tentativeG + h, h));
-
-                if (!seenOpen[neighbor] && neighbor != start && neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
-                }
-                seenOpen[neighbor] = true;
             }
         }
 
         if (!found) {
+            if (activeHead != -1) {
+                values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+            }
             values.emit(new Message("A*: no path found", Message.MessageType.ERROR));
             return;
         }

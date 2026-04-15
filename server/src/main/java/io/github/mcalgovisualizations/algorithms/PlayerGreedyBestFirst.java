@@ -66,18 +66,27 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
         visited[start] = true;
 
         boolean found = false;
+        int activeHead = -1;
         while (!frontier.isEmpty()) {
             Node currentNode = frontier.poll();
             int current = currentNode.index();
 
             if (current == goal) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                    activeHead = -1;
+                }
                 found = true;
                 break;
             }
 
             if (current != start) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                }
                 values.emit(new VillagerMove(current));
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                values.emit(new CellStateTransition(current, CellState.DEFAULT, CellState.OPEN));
+                activeHead = current;
             }
 
             int row = current / columns;
@@ -96,14 +105,13 @@ public class PlayerGreedyBestFirst implements IPlayerSort {
                 parent[neighbor] = current;
                 frontier.add(new Node(neighbor, heuristic(neighbor, goal, columns)));
                 visited[neighbor] = true;
-
-                if (neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
-                }
             }
         }
 
         if (!found) {
+            if (activeHead != -1) {
+                values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+            }
             values.emit(new Message("Greedy Best-First: no path found", Message.MessageType.ERROR));
             return;
         }

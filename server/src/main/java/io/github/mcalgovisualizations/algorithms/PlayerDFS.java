@@ -63,6 +63,7 @@ public class PlayerDFS implements IPlayerSort {
         frontier.push(start);
 
         boolean found = false;
+        int activeHead = -1;
         while (!frontier.isEmpty()) {
             int current = frontier.pop();
 
@@ -70,13 +71,21 @@ public class PlayerDFS implements IPlayerSort {
             visited[current] = true;
 
             if (current == goal) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                    activeHead = -1;
+                }
                 found = true;
                 break;
             }
 
-            if (current != start && current != goal) {
+            if (current != start) {
+                if (activeHead != -1) {
+                    values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+                }
                 values.emit(new VillagerMove(current));
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+                values.emit(new CellStateTransition(current, CellState.DEFAULT, CellState.OPEN));
+                activeHead = current;
             }
 
             int row = current / columns;
@@ -94,14 +103,13 @@ public class PlayerDFS implements IPlayerSort {
 
                 parent[neighbor] = current;
                 frontier.push(neighbor);
-
-                if (neighbor != start && neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
-                }
             }
         }
 
         if (!found) {
+            if (activeHead != -1) {
+                values.emit(new CellStateTransition(activeHead, CellState.OPEN, CellState.CLOSED));
+            }
             values.emit(new Message("DFS: no path found", Message.MessageType.ERROR));
             return;
         }
@@ -109,8 +117,7 @@ public class PlayerDFS implements IPlayerSort {
         int pathCursor = goal;
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
-                CellState previous = visited[pathCursor] ? CellState.CLOSED : CellState.OPEN;
-                values.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
+                values.emit(new CellStateTransition(pathCursor, CellState.CLOSED, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }

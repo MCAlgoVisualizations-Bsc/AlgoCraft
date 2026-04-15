@@ -19,7 +19,7 @@ public record GridLayout(
 ) implements ILayout {
 
     public GridLayout(int columns) {
-        this(columns, 1.5, 0.0, 0.0);
+        this(columns, 1.0, 0.0, 0.0);
     }
 
     public GridLayout {
