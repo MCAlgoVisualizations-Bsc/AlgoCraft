@@ -15,6 +15,7 @@ import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;
 import io.github.mcalgovisualizations.events.FlowEdgeVisit;
 import io.github.mcalgovisualizations.events.FlowPathEdge;
 import io.github.mcalgovisualizations.events.FlowStatus;
+import io.github.mcalgovisualizations.events.VillagerMove;
 import io.github.mcalgovisualizations.visualization.algorithms.Message;
 import io.github.mcalgovisualizations.events.Swap;
 import io.github.mcalgovisualizations.visualization.models.Data;
@@ -242,6 +243,7 @@ public final class Main {
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), ASTAR_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
@@ -260,6 +262,7 @@ public final class Main {
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), BFS_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
@@ -278,6 +281,7 @@ public final class Main {
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), DFS_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
@@ -296,6 +300,7 @@ public final class Main {
                         .withData(aStarGrid)
                         .positioning(new GridLayout(gridX), GREEDY_2D_PLACEMENT)
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",

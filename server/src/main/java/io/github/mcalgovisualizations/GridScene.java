@@ -5,15 +5,14 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.Displays.MobDisplay;
 
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.instance.Instance;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -24,14 +23,17 @@ import java.util.*;
 public class GridScene extends AbstractScene {
     // Visual state
     private final Map<Integer, CellState> slotStates = new HashMap<>();
+    private Entity villagerEntity = null;
+    private LayoutResult<?>[] layoutResults = null;
 
     public GridScene(SceneContext context) {
         super(context);
     }
 
     @Override
-    public void setLayout(LayoutResult[] layoutResults) {
+    public void setLayout(LayoutResult<?>[] layoutResults) {
         cleanUp();
+        this.layoutResults = layoutResults;
         boolean useBlockGridDisplay = isAStarGrid(layoutResults);
 
         for(int i = 0; i < layoutResults.length; i++) {
@@ -45,12 +47,22 @@ public class GridScene extends AbstractScene {
                 // Maze cells are pure block visuals; hide numeric labels.
                 dv = new BlockDisplay(instance, pos, initialBlock, "maze", false);
                 slotStates.put(i, initialState);
+
+                // Create 2-block-high wall if needed
+                if (initialState == CellState.WALL) {
+                    createTwoBlockWall(pos);
+                }
             } else {
                 dv = new MobDisplay(pos, value.toString());
             }
 
             displaysBySlot.put(i, dv);
             dv.setInstance(instance);
+        }
+
+        // Spawn villager at start position
+        if (useBlockGridDisplay) {
+            spawnVillagerAtStart();
         }
     }
 
@@ -67,7 +79,62 @@ public class GridScene extends AbstractScene {
         applyCellState(slot, next);
     }
 
+    /**
+     * Move the villager to represent the current position in the maze.
+     */
+    public void moveVillager(int slot) {
+        if (layoutResults == null || slot < 0 || slot >= layoutResults.length) {
+            return;
+        }
 
+        Pos targetPos = layoutResults[slot].pos();
+        // Offset villager Y to stand on top of the cell
+        Pos villagerPos = targetPos.add(0, 0.5, 0);
+
+        if (villagerEntity == null) {
+            spawnVillagerAtPos(villagerPos);
+        } else {
+            villagerEntity.teleport(villagerPos);
+        }
+    }
+
+    private void spawnVillagerAtStart() {
+        if (layoutResults == null || layoutResults.length == 0) {
+            return;
+        }
+
+        // Find start cell (value = 2)
+        int startSlot = -1;
+        for (int i = 0; i < layoutResults.length; i++) {
+            Object value = layoutResults[i].value().value();
+            if (value instanceof Integer num && num == 2) {
+                startSlot = i;
+                break;
+            }
+        }
+
+        if (startSlot >= 0) {
+            moveVillager(startSlot);
+        }
+    }
+
+    private void spawnVillagerAtPos(Pos pos) {
+        if (villagerEntity != null) {
+            villagerEntity.remove();
+        }
+
+        villagerEntity = new Entity(EntityType.VILLAGER);
+        villagerEntity.setInstance(instance, pos);
+    }
+
+    private void createTwoBlockWall(Pos basePos) {
+        // Place a second wall block above the first one
+        // We need to place it in the world directly
+        if (instance != null) {
+            Pos abovePos = basePos.add(0, 1, 0);
+            instance.setBlock(abovePos, Block.OAK_LEAVES);
+        }
+    }
     private void applyCellState(int slot, CellState state) {
         var display = requireDisplay(slot);
         if (!(display instanceof IBlockStateDisplay blockDisplay)) {
@@ -91,7 +158,7 @@ public class GridScene extends AbstractScene {
     private static Block blockForState(CellState state) {
         return switch (state) {
             case DEFAULT -> Block.SMOOTH_STONE;
-            case WALL -> Block.BLACK_CONCRETE;
+            case WALL -> Block.OAK_LEAVES;
             case START -> Block.LIME_CONCRETE;
             case GOAL -> Block.RED_CONCRETE;
             case OPEN -> Block.LIGHT_BLUE_CONCRETE;
@@ -100,7 +167,7 @@ public class GridScene extends AbstractScene {
         };
     }
 
-    private boolean isAStarGrid(LayoutResult[] layoutResults) {
+    private boolean isAStarGrid(LayoutResult<?>[] layoutResults) {
         if (layoutResults.length == 0) return false;
         for (var layoutResult : layoutResults) {
             Object raw = layoutResult.value().value();
