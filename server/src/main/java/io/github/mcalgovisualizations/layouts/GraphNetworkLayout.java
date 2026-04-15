@@ -2,10 +2,10 @@ package io.github.mcalgovisualizations.layouts;
 
 import io.github.mcalgovisualizations.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
+import io.github.mcalgovisualizations.visualization.ui.IStylingProfile;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
