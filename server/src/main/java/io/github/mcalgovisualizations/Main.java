@@ -116,38 +116,4 @@ public final class Main {
         cm.register(new Gamemode());
         cm.register(new Spawn());
     }
-
-    private static ArrayList<Integer> buildPathGrid(int xSize, int ySize) {
-        if (xSize <= 0 || ySize <= 0) {
-            throw new IllegalArgumentException("Grid dimensions must be > 0");
-        }
-
-        ArrayList<Integer> grid = new ArrayList<>(xSize * ySize);
-        final int wallPercent = 30;
-
-        for (int y = 0; y < ySize; y++) {
-            for (int x = 0; x < xSize; x++) {
-                int value;
-                if (x == 0 && y == 0) {
-                    value = 2; // src at (0,0)
-                } else if (x == xSize - 1 && y == ySize - 1) {
-                    value = 3; // dst at (n,n)
-                } else if (y == 0 || x == xSize - 1) {
-                    // Keep one guaranteed open corridor: top row -> right column.
-                    value = 0;
-                } else {
-                    // Deterministic pseudo-random wall placement so each size has a stable maze.
-                    int noise = Math.floorMod((x * 37) + (y * 57) + (x * y * 11), 100);
-                    value = noise < wallPercent ? 1 : 0;
-                }
-                grid.add(value);
-            }
-        }
-        return grid;
-    }
-
-
-
-
-
 }

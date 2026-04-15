@@ -1,7 +1,11 @@
 package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
+import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
+import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.*;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
@@ -19,10 +23,14 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_ID_TAG;
@@ -31,39 +39,40 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.ALGO_SELECTOR
 
 public final class AlgoCraft {
 
+    private record AlgorithmEntry<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
+            @NotNull Supplier<? extends IPlayerSort<C>> ctor,
+            @NotNull C context,
+            @NotNull ILayout<T> layout,
+            @NotNull AlgorithmPlacement placement,
+            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
+            @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
+            @NotNull Function<SceneContext, O> scene
+    ) { }
+
     private static final class VisualizationSession {
         private final VisualizationController controls;
         private final PlayerFeedback audience;
 
-        VisualizationSession(VisualizationController controls, Player... players) {
+        VisualizationSession(VisualizationController controls, Audience... audience) {
             this.controls = controls;
-            this.audience = new PlayerFeedback(players);
+            this.audience = new PlayerFeedback(audience);
         }
 
-        PlayerControls controls() {
-            return controls;
-        }
+        PlayerControls controls() { return controls; }
 
-        void start() {
-            controls.startVisualization();
-        }
+        void start() { controls.startVisualization(); }
 
-        void clear() {
-            controls.clear();
-        }
+        void clear() { controls.clear(); }
 
-        PlayerFeedback audience() {
-            return audience;
-        }
+        PlayerFeedback audience() { return audience; }
     }
 
     private IAlgorithmUI ui = new AlgorithmUI();
     private final InstanceContainer instanceContainer;
     private final Map<UUID, VisualizationSession> sessions = new HashMap<>();
-    private final Map<String, Algorithm<?, ?, ?>> algorithms = new HashMap<>();
+    private final Map<String, AlgorithmEntry<?, ?, ?>> algorithms = new HashMap<>();
     private final Map<String, AlgorithmPresentation> algorithmPresentations = new HashMap<>();
-    private Consumer<Player> spawnAction = player -> {
-    };
+    private Consumer<Player> spawnAction = player -> {};
 
     public AlgoCraft(InstanceContainer instanceContainer) {
         this.instanceContainer = instanceContainer;
@@ -81,12 +90,12 @@ public final class AlgoCraft {
                 return;
             }
 
-            if (itemStack.hasTag(ALGO_INTERACTION_TAG) && itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
+            if(itemStack.hasTag(ALGO_INTERACTION_TAG) && itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
                 spawnAction.accept(player);
                 return;
             }
 
-            if (session == null) {
+            if(session == null) {
                 System.err.println("No controls for player " + player.getUsername());
                 return;
             }
@@ -111,11 +120,23 @@ public final class AlgoCraft {
     }
 
 
+
     @SafeVarargs
     public final <T, C extends AlgorithmContext<T>, O extends ISceneOps>
     void registerAlgorithm(Algorithm<T, C, O>... algorithm) {
         for (Algorithm<T, C, O> a : algorithm) {
-            algorithms.put(a.id(), a);
+            algorithms.put(
+                    a.id(),
+                    new AlgorithmEntry<>(
+                            a.ctor(),
+                            a.model(),
+                            a.layout(),
+                            a.placement(),
+                            a.handlerRegistry(),
+                            a.onComplete(),
+                            a.scene()
+                    )
+            );
         }
     }
 
@@ -168,8 +189,7 @@ public final class AlgoCraft {
     }
 
     public void setSpawnAction(Consumer<Player> spawnAction) {
-        this.spawnAction = spawnAction == null ? _ -> {
-        } : spawnAction;
+        this.spawnAction = spawnAction == null ? _ -> {} : spawnAction;
     }
 
     public void applyDefaultLayout(Player player) {
@@ -188,7 +208,7 @@ public final class AlgoCraft {
     }
 
     private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualization(
-            Algorithm<T, C, O> entry, InstanceContainer instance, Player player
+            AlgorithmEntry<T, C, O> entry, InstanceContainer instance, Player player
     ) {
         try {
             return assignVisualizationCaptured(instance, entry, player);
@@ -200,16 +220,16 @@ public final class AlgoCraft {
 
     private <T, C extends AlgorithmContext<T>, O extends ISceneOps> VisualizationSession assignVisualizationCaptured(
             InstanceContainer instance,
-            Algorithm<T, C, O> algo,
+            AlgorithmEntry<T, C, O> algo,
             Player player
     ) {
         removeVisualization(player);
 
         final var audience = new PlayerFeedback(player);
-        final var algoCtx = algo.contextFactory().create(algo.model().getData());
+        final var algoCtx = algo.context();
 
 
-        final var algorithm = algo.ctor().get();
+        final var algorithm = algo.ctor.get();
         algorithm.run(algoCtx);
         final AnimationPlan<O> onCompletePlan = algo.onComplete().apply(algoCtx);
 
@@ -226,7 +246,8 @@ public final class AlgoCraft {
                 scene
         );
 
-        final var traceBuilder = new AlgorithmTraceBuilder<>(algorithm, algo.model().getData(), algo.contextFactory());
+        // TODO, remove the casting?
+        final var traceBuilder = new AlgorithmTraceBuilder<T, C>(algorithm, algo.context.copy());
 
         final var controller = new VisualizationController<>(
                 renderer,

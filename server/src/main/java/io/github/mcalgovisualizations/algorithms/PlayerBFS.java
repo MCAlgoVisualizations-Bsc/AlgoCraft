@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.algorithms;
 
+import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
@@ -10,7 +11,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PlayerBFS implements IPlayerSort<SortingContext<Integer>> {
+public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -24,7 +25,7 @@ public class PlayerBFS implements IPlayerSort<SortingContext<Integer>> {
     }
 
     @Override
-    public void run(SortingContext<Integer> values) {
+    public void run(GridContext<Integer> values) {
         var arr = values.getData();
         int size = arr.size();
         if (size == 0) {
