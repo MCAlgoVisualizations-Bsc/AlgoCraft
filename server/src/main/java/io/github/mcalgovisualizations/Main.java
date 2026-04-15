@@ -102,5 +102,6 @@ public final class Main {
         cm.register(new Teleport());
         cm.register(new Gamemode());
         cm.register(new Spawn());
+        cm.register(new NightVisionCommand());
     }
 }
