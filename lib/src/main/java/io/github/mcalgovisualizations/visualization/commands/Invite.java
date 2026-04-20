@@ -22,7 +22,7 @@ public class Invite extends Command {
             var targets = context.get(targetArg).find(sender);
             if (targets.isEmpty()) return;
 
-            Player target = (Player) targets.get(0);
+            Player target = (Player) targets.getFirst();
 
             // cannot invite yourself
             if (target == player) {

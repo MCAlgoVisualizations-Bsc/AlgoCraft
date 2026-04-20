@@ -8,11 +8,11 @@ import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public final class Renderer<I, O extends ISceneOps> {
     private final O scene;
@@ -37,7 +37,6 @@ public final class Renderer<I, O extends ISceneOps> {
         this.executor = new Executor<>(scene);
         this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
-
         this.instance = instance;
         this.layout = layout;
         this.origin = origin;
@@ -48,10 +47,6 @@ public final class Renderer<I, O extends ISceneOps> {
         executor.setSpeed(ticksPerStep);
     }
 
-    /**
-     * Stop animation activity but keep the scene alive so you can resume.
-     * Typical use: controller.pause().
-     */
     public void pause() {
         executor.pause();
     }
@@ -85,33 +80,18 @@ public final class Renderer<I, O extends ISceneOps> {
         return !executor.isIdle();
     }
 
-    /**
-     * Full teardown. Not resumable.
-     * Typical use: application shutdown / leaving visualization.
-     */
     public void onCleanup() {
-        executor.onCleanup();   // kill tick loop + clear queue
-        scene.cleanUp();   // despawn entities
+        executor.onCleanup();
+        scene.cleanUp();
         instance = null;
     }
 
-    public void initialize(I initialModel) {
-        final var layoutResult = this.layout.compute(initialModel, origin, instance);
-        requireChunksLoaded(layoutResult);
-        scene.setLayout(layoutResult);
-    }
-
-    private void requireChunksLoaded(LayoutResult... layoutResult) {
-        final var allLoaded = Arrays.stream(layoutResult)
-                .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
-
-        if (!allLoaded) {
-            throw new IllegalStateException("Visualization area is not loaded yet.");
-        }
-    }
-
-    private void requireBlocksNotObscured(LayoutResult... layoutResult) {
-        final var allLoaded = Arrays.stream(layoutResult).allMatch(r -> instance.getBlock(r.pos()) == Block.AIR);
+    public CompletableFuture<Void> initialize(I initialModel) {
+        final var futures = Arrays.stream(layout.compute(initialModel, origin, instance))
+                .map(r -> instance.loadChunk(r.pos().chunkX(), r.pos().chunkZ()))
+                .distinct()
+                .toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(futures);
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
@@ -125,5 +105,4 @@ public final class Renderer<I, O extends ISceneOps> {
         }
         return builder.build();
     }
-
 }

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends ISceneOps> {
     private final Instance instance;
@@ -137,8 +138,8 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         }
     }
 
-    public void startVisualization() {
-        controller.startVisualization();
+    public CompletableFuture<Void> startVisualization() {
+        return controller.startVisualization();
     }
     public AlgorithmPresentation getPresentation() {
         return this.presentation;

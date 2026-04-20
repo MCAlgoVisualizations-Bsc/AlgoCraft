@@ -170,24 +170,16 @@ public class AlgoCraft {
             player.closeInventory();
             ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
-            player.setInstance(session.getInstance());
+            player.setInstance(session.getInstance())
+                    .thenCompose(_ -> player.teleport(AlgorithmInstance.origin))
+                    .thenCompose(_ -> session.startVisualization())
+                    .exceptionally(throwable -> {
+                        throwable.printStackTrace();
+                        player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
+                        return null;
+                    });
 
-            MinecraftServer.getSchedulerManager()
-                    .buildTask(() -> {
-                        try {
-                            player.teleport(AlgorithmInstance.origin)
-                                    .thenRun(session::startVisualization);
-                        } catch (IllegalStateException e) {
-                            player.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
-                        } catch (NullPointerException e) {
-                            player.sendMessage(Component.text("Failed to assign visualization : ", NamedTextColor.RED));
-                            player.setInstance(defaultInstance)
-                                    .thenRun(() -> player.teleport(new Pos(194.5, 137, -38.5)));
-                            ui.applyDefaultLayout(player);
-                        }
-                    })
-                    .delay(Duration.ofMillis(200))
-                    .schedule();
+
         });
 
         player.openInventory(inventory);
@@ -211,4 +203,7 @@ public class AlgoCraft {
         return pendingInvites;
     }
 
+    public Instance getDefaultInstance() {
+        return defaultInstance;
+    }
 }

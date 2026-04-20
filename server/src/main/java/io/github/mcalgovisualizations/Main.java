@@ -41,7 +41,7 @@ public final class Main {
         // Register visualization control listeners (item interactions)
         registerListeners(instance);
         // registerControls(instance, algo.visualizationManager);
-        registerCommands(MinecraftServer.getCommandManager());
+        registerCommands(MinecraftServer.getCommandManager(), algo);
 
         server.start("0.0.0.0", 25565);
     }
@@ -90,10 +90,10 @@ public final class Main {
 
 
 
-    static void registerCommands(CommandManager cm) {
+    static void registerCommands(CommandManager cm, AlgoCraft algo) {
         cm.register(new Greet());
         cm.register(new Teleport());
         cm.register(new Gamemode());
-        cm.register(new Spawn());
+        cm.register(new Spawn(algo));
     }
 }
