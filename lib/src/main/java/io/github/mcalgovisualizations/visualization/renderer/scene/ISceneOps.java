@@ -11,7 +11,6 @@ public interface ISceneOps {
 
     Pos getOrigin();
 
-    void setValue(int slot, int value);
     void setHighlighted(int slot, boolean highlighted);
     void clearGlowing();
     void hoverDisplay(int slot, boolean hover);

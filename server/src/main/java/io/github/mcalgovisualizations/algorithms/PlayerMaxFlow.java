@@ -11,6 +11,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+@Deprecated
 public final class PlayerMaxFlow implements IPlayerSort<GridContext<Integer>> {
     @Override
     public void run(GridContext<Integer> ctx) {

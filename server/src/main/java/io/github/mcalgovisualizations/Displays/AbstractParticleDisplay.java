@@ -65,11 +65,6 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
     }
 
     @Override
-    public void setValue(int value) {
-        base.setValue(value);
-    }
-
-    @Override
     public void setInstance(Instance instance) {
         this.instance = instance;
         base.setInstance(instance);

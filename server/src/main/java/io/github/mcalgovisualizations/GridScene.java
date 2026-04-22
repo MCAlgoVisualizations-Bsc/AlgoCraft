@@ -54,12 +54,6 @@ public class GridScene extends AbstractScene {
         }
     }
 
-    @Override
-    public void setValue(int slot, int value) {
-        var display = requireDisplay(slot);
-        display.setValue(value);
-    }
-
     public void toggleCellState(int slot, CellState first, CellState second) {
         var current = slotStates.getOrDefault(slot, CellState.DEFAULT);
         var next = current == first ? second : first;

@@ -41,7 +41,7 @@ public class RegisterAlgo {
             var e = Algorithm.builder(flowMatrix)
                 .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
                 .positioning(new GraphNetworkLayout<>(8.0, 5.0), MAX_FLOW_2D_PLACEMENT)
-                .withScene(DefaultScene::new)
+                .withScene(FlowScene::new)
                 .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
                 .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
                 .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())

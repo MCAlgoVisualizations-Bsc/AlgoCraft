@@ -49,7 +49,6 @@ public final class Main {
 
         // Register visualization control listeners (item interactions)
         registerListeners(instance);
-        // registerControls(instance, algo.visualizationManager);
         registerCommands(MinecraftServer.getCommandManager());
 
         server.start("0.0.0.0", 25565);
