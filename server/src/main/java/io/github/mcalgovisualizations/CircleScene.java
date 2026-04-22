@@ -43,7 +43,7 @@ public class CircleScene extends AbstractScene {
             var result = layoutResults[i];
             if (result == null) continue;
 
-            var display = result.getDisplayValue();
+            var display = result.displayValue();
             var pos = result.pos();
 
             displaysBySlot.put(i, display);

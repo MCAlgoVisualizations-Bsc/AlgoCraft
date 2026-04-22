@@ -1,9 +1,7 @@
 package io.github.mcalgovisualizations.layouts;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityType;
@@ -36,8 +34,10 @@ public record ArcLayout(
             double x = origin.x() + Math.cos(startAngle) * radius;
             double z = origin.z() + Math.sin(startAngle) * radius;
             Pos pos = new Pos(x, y, z);
-            out[0] = new LayoutResult(model.get(0), pos, (_, pos1)
-                    -> new EntityCreatureDisplay(pos1, EntityType.VILLAGER, Integer.toString(model.get(0))));
+            out[0] = new LayoutResult(
+                    model.getFirst(),
+                    pos,
+                    new EntityCreatureDisplay(pos, EntityType.VILLAGER, Integer.toString(model.getFirst())));
             return out;
         }
 
@@ -50,9 +50,7 @@ public record ArcLayout(
             double z = origin.z() + Math.sin(angle) * radius;
 
             Pos pos = new Pos(x, y, z);
-            int finalI = i;
-            out[i] = new LayoutResult(model.get(i), pos, (_, pos1)
-                    -> new EntityCreatureDisplay(pos1, EntityType.VILLAGER, Integer.toString(model.get(finalI))));
+            out[i] = new LayoutResult(model.get(i), pos, new EntityCreatureDisplay(pos, EntityType.VILLAGER, Integer.toString(model.get(i))));
         }
 
         return out;

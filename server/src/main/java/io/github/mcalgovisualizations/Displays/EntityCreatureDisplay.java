@@ -39,9 +39,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     }
 
     @Override
-    public void setValue(int value) { /* legacy */ }
-
-    @Override
     public void setInstance(Instance instance) {
         entity.setInstance(instance, pos);
         textEntity.setInstance(instance, pos.add(0, 2,0));
