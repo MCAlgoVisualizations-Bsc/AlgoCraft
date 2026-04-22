@@ -93,7 +93,6 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                             }
                             scene.restoreStagedCompare();
                         }
-
                         scene.stageCompare(left, right);
                     })
                     .build();
