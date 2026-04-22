@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
 import io.github.mcalgovisualizations.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
@@ -9,7 +8,7 @@ import net.minestom.server.instance.block.Block;
 
 import java.util.List;
 
-public final class ParticleTreeNodeStylingProfile implements IStylingProfile {
+public final class ParticleTreeNodeStylingProfile {
     private final BstNodeStylingProfile.NodeRole role;
     private final Pos[] targets;
 
@@ -18,7 +17,6 @@ public final class ParticleTreeNodeStylingProfile implements IStylingProfile {
         this.targets = targets == null ? new Pos[0] : targets;
     }
 
-    @Override
     public IDisplayValue applyStyle(String value, Pos pos) {
         Block block = switch (role) {
             case ROOT -> Block.OAK_LOG;

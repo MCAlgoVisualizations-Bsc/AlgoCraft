@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
@@ -72,7 +73,8 @@ public record FloatingLinearLayout<T>(
             final double x = origin.x() + (i * spacing);
             final var pos = new Pos(x, y, z);
 
-            out[i] = new LayoutResult(((List<?>) model).get(i), pos, new StylingProfile());
+            var value = ((List<?>) model).get(i);
+            out[i] = new LayoutResult(value, pos, new MobDisplay(pos, value.toString()));
         }
 
         return out;

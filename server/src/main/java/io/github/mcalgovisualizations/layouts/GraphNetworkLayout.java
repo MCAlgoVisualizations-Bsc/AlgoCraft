@@ -2,7 +2,6 @@ package io.github.mcalgovisualizations.layouts;
 
 import io.github.mcalgovisualizations.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
@@ -10,6 +9,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.particle.Particle;
+import org.intellij.lang.annotations.Flow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,15 +49,18 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
                 int capacity = FlowNetworkRules.effectiveCapacity(from, to, readCapacity(data));
 
                 if (from == to) {
-                    out[idx] = new LayoutResult(data, nodePositions[from], new NodeStylingProfile(nodeName(from), from == NODE_COUNT - 1));
+                    var pos = nodePositions[from];
+                    out[idx] = new LayoutResult(data, pos, new NodeDisplay(pos, nodeName(from), from == NODE_COUNT - 1));
                     continue;
                 }
 
+
                 if (capacity <= 0) {
+                    var pos = edgeLabelPos(nodePositions[from], nodePositions[to], y, 0, false);
                     out[idx] = new LayoutResult(
                             data,
-                            edgeLabelPos(nodePositions[from], nodePositions[to], y, 0, false),
-                            new HiddenStylingProfile()
+                            pos,
+                            new BlockDisplay(pos, Block.AIR, "", false)
                     );
                     continue;
                 }
@@ -70,11 +73,11 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
                         : crossingOffsetSign(from, to, model);
                 boolean reciprocal = reciprocalSign != 0;
                 Pos labelPos = edgeLabelPos(fromPos, toPos, y, offsetSign, reciprocal);
-
+                String label = nodeName(from) + "->" + nodeName(to) + "0/" + capacity;
                 out[idx] = new LayoutResult(
                         data,
                         labelPos,
-                        new FlowEdgeStylingProfile(capacity, fromPos, toPos, nodeName(from), nodeName(to), offsetSign)
+                        new FlowEdgeParticles(new BlockDisplay(labelPos, Block.AIR, label, true), capacity, fromPos, toPos, nodeName(from), nodeName(to), offsetSign)
                 );
             }
         }
@@ -167,21 +170,6 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
         return raw instanceof Integer number ? Math.max(0, number) : 0;
     }
 
-    private static final class NodeStylingProfile implements IStylingProfile {
-        private final char name;
-        private final boolean sinkNode;
-
-        private NodeStylingProfile(char name, boolean sinkNode) {
-            this.name = name;
-            this.sinkNode = sinkNode;
-        }
-
-        @Override
-        public IDisplayValue applyStyle(String value, Pos pos) {
-            return new NodeDisplay(pos, name, sinkNode);
-        }
-    }
-
     private static final class NodeDisplay extends BlockDisplay {
         private final char name;
         private final boolean sinkNode;
@@ -211,39 +199,7 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
             return Block.BLACK_CONCRETE;
         }
     }
-
-    private static final class HiddenStylingProfile implements IStylingProfile {
-        @Override
-        public IDisplayValue applyStyle(String value, Pos pos) {
-            return new BlockDisplay(pos, Block.AIR, "", false);
-        }
-    }
-
-    private static final class FlowEdgeStylingProfile implements IStylingProfile {
-        private final int capacity;
-        private final Pos from;
-        private final Pos to;
-        private final char fromName;
-        private final char toName;
-        private final int offsetSign;
-
-        private FlowEdgeStylingProfile(int capacity, Pos from, Pos to, char fromName, char toName, int offsetSign) {
-            this.capacity = capacity;
-            this.from = from;
-            this.to = to;
-            this.fromName = fromName;
-            this.toName = toName;
-            this.offsetSign = offsetSign;
-        }
-
-        @Override
-        public IDisplayValue applyStyle(String value, Pos pos) {
-            String label = fromName + "->" + toName + " 0/" + capacity;
-            BlockDisplay base = new BlockDisplay(pos, Block.AIR, label, true);
-            return new FlowEdgeParticles(base, capacity, from, to, fromName, toName, offsetSign);
-        }
-    }
-
+ 
     private static final class FlowEdgeParticles extends AbstractParticleDisplay {
         private final int capacity;
         private final Pos from;
