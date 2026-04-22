@@ -66,8 +66,10 @@ public class RegisterAlgo {
                         .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
                         .positioning(new ArcLayout(), INSERTION_INTS_PLACEMENT)
                         .withScene(CircleScene::new)
-                        .onEvent(Compare.class, new CircleCompareHandler())
-                        .onEvent(Swap.class, new CircleSwapHandler())
+                        .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
+                        .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
+                        .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
+                        .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion sort circular sorting",
                                 Material.GOLDEN_APPLE,
@@ -77,7 +79,7 @@ public class RegisterAlgo {
                             final int size = ctx.values.size();
                             var plan = AnimationPlan.<CircleScene>builder()
                                     .step(CircleScene::resetAllDisplaysToHome)
-                                    .step(CircleScene::clearTracker);
+                                    .step(CircleScene::clearTrackers);
 
                             for(int i = 0; i<size; i++) {
                                 int finalI = i;
