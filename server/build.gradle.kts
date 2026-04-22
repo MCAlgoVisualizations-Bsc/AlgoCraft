@@ -1,11 +1,16 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.3.0"
+    application
     jacoco
 }
 
 group = "io.github.mcalgovisualizations"
 version = "unspecified"
+
+application {
+    mainClass.set("io.github.mcalgovisualizations.Main")
+}
 
 repositories {
     mavenCentral()
