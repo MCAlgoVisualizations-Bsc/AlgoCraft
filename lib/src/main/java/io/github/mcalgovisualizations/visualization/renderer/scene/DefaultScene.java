@@ -10,7 +10,7 @@ public class DefaultScene extends AbstractScene {
     @Override
     public void setLayout(LayoutResult[] model) {
         for(int i = 0; i < model.length; i++) {
-            var dv = model[i].getDisplayValue();
+            var dv = model[i].displayValue();
             this.addDisplay(i, dv);
             dv.setInstance(instance);
         }
