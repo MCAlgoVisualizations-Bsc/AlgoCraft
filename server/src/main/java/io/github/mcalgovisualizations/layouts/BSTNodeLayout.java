@@ -101,7 +101,7 @@ public record BSTNodeLayout<T extends Comparable<T>>(
         out[node.originalIndex] = new LayoutResult(
                 node.data,
                 new Pos(x, y, z),
-                new ParticleTreeNodeStylingProfile(role, leftPos, rightPos)
+                new ParticleTreeNodeStylingProfile(role, leftPos, rightPos).applyStyle(node.data.toString(), new Pos(x,y,z))
         );
 
         assignPositions(node.left, origin, depth + 1, xOffset - step, maxDepth, out);

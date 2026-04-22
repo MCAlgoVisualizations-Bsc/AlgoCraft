@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.Displays.NodeDisplay;
 import io.github.mcalgovisualizations.algorithms.Node;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
@@ -38,7 +39,7 @@ public class LayoutPath implements ILayout<Node<Integer>> {
 
         // 2. Create the LayoutResult for the Label/Interactions
         // Note: Using LayoutPathProfile.create() ensures your logic is consistent
-        results.add(new LayoutResult(node.value(), currentPos, new NodeProfile()));
+        results.add(new LayoutResult(node.value(), currentPos, new NodeDisplay(node.value().toString(), currentPos)));
 
         // 3. Left Branch
         if (node.left() != null) {

@@ -15,12 +15,16 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         for (int i = 1; i < n; i++) {
             int j = i;
 
-            var x = values.get(j);
-            var y = values.get(j - 1);
+            while (j > 0) {
+                var x = values.get(j);
+                var y = values.get(j - 1);
 
+                ctx.emit(new Compare(j, j - 1, y, x));
 
-            ctx.emit(new Compare(j, j-1, y, x));
-            while (j > 0 && x.compareTo(y) < 0) {
+                if (x.compareTo(y) >= 0) {
+                    break;
+                }
+
                 ctx.emit(new Swap(j, j - 1, y, x));
                 ctx.swap(j, j - 1);
                 j--;

@@ -37,12 +37,6 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
-    public void setValue(int slot, int value) {
-        var display = requireDisplay(slot);
-        display.setValue(value);
-    }
-
-    @Override
     public void setHighlighted(int slot, boolean highlighted) {
         var dv = requireDisplay(slot);
         dv.setGlowing(highlighted);
@@ -74,6 +68,7 @@ public abstract class AbstractScene implements ISceneOps {
     public void moveSlotTo(int slot, Pos pos) {
         var display = requireDisplay(slot);
         display.teleport(pos);
+
     }
 
     @Override
@@ -84,11 +79,14 @@ public abstract class AbstractScene implements ISceneOps {
         displaysBySlot.put(a, db);
         displaysBySlot.put(b, da);
 
-        var posA = da.getPos();
-        var posB = db.getPos();
+        var oldPosA = da.getPos();
+        var oldPosB = db.getPos();
 
-        da.teleport(posB);
-        db.teleport(posA);
+        // update pos
+        da.getPos();
+
+        da.teleport(oldPosB);
+        db.teleport(oldPosA);
     }
 
     @Override

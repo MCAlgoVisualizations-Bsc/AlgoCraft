@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
@@ -25,7 +26,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout<Lis
         double y = origin.y() + yOffset;
 
         if (size == 1) {
-            out[0] = new LayoutResult(model.getFirst(), origin, new StylingProfile());
+            out[0] = new LayoutResult(model.getFirst(), origin, new MobDisplay(origin, model.getFirst().toString()));
             return out;
         }
 
@@ -35,7 +36,7 @@ public record CircleLayout(double radius, double yOffset) implements ILayout<Lis
             double z = origin.z() + (Math.sin(angle) * radius);
 
             final var pos = new Pos(x, y, z);
-            out[i] = new LayoutResult(model.get(i), pos, new StylingProfile());
+            out[i] = new LayoutResult(model.get(i), pos, new MobDisplay(pos, model.get(i).toString()));
 
         }
 

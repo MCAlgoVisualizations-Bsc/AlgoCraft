@@ -4,10 +4,7 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.events.CellStateTransition;
-import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.events.Message;
-import io.github.mcalgovisualizations.events.Swap;
+import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
@@ -41,15 +38,73 @@ public class RegisterAlgo {
                         .withScene(DefaultScene::new)
                         .create()
         );
-
 //        registerSortingAlgo(algo);
 //        registerTreeSearchAlgo(algo);
 //        registerPathFindingAlgo(algo);
     }
 
+    private static void registerFlowAlgo(AlgoCraft algo) {
+        var flowMatrix = new GridContext<Integer>(new ArrayList<>(Arrays.asList(
+                0,16, 13, 0,  0,  0,
+                0,0,  10, 12, 0,  0,
+                0,4,  0,  0,  14, 0,
+                0,0,  9,  0,  0,  20,
+                0,0,  0,  7,  0,  4,
+                0,0,  0,  0,  0,  0
+        )));
+            var e = Algorithm.builder(flowMatrix)
+                .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
+                .positioning(new GraphNetworkLayout<>(8.0, 5.0))
+                .withScene(FlowScene::new)
+                .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
+                .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
+                .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
+                .onEvent(FlowStatus.class, new FlowStatusHandler())
+                .withPresentation(new AlgorithmPresentation(
+                        "Max Flow (Edmonds-Karp)",
+                        Material.WATER_BUCKET,
+                        "Graph max-flow from source (0) to sink (n-1)",
+                        "Fixed 6-node flow graph with edge current/max labels",
+                        "Selected augmenting path edges turn particle color"
+                ))
+                .create();
+        algo.registerAlgorithm(e);
+    }
+
     private static void registerSortingAlgo(AlgoCraft algo) {
         var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
         var stringCollection1 = new SortingContext<>(new ArrayList<>(List.of("a", "b", "k", "x", "d", "h", "a", "b", "e")));
+        var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
+                        .positioning(new ArcLayout())
+                        .withScene(CircleScene::new)
+                        .onEvent(Compare.class, new CircleCompareHandler())
+                        .onEvent(Swap.class, new CircleSwapHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion sort circular sorting",
+                                Material.GOLDEN_APPLE,
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                        .onCompletion(ctx -> {
+                            final int size = ctx.values.size();
+                            var plan = AnimationPlan.<CircleScene>builder()
+                                    .step(CircleScene::resetAllDisplaysToHome)
+                                    .step(CircleScene::clearTracker);
+
+                            for(int i = 0; i<size; i++) {
+                                int finalI = i;
+                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, true));
+                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, false));
+                            }
+
+
+                            return plan.build();
+                        })
+                        .create()
+        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)
