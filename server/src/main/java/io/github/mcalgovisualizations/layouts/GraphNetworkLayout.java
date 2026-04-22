@@ -271,7 +271,7 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
         @Override
         public void setValue(int value) {
             this.currentFlow = Math.max(0, value);
-            base.setText(fromName + "->" + toName + " " + currentFlow + "/" + capacity);
+            ((BlockDisplay) base).setText(fromName + "->" + toName + " " + currentFlow + "/" + capacity);
         }
 
         @Override

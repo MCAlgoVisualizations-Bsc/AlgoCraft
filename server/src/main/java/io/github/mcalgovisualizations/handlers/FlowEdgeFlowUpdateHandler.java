@@ -7,7 +7,7 @@ import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 
 public final class FlowEdgeFlowUpdateHandler implements IAnimationHandler<FlowEdgeFlowUpdate> {
     @Override
-    public AnimationPlan<ISceneOps> handle(FlowEdgeFlowUpdate event) {
+    public <O extends ISceneOps> AnimationPlan<O> handle(FlowEdgeFlowUpdate event) {
         return AnimationPlan.instant(sceneOps -> sceneOps.setValue(event.slot(), event.currentFlow()));
     }
 }
