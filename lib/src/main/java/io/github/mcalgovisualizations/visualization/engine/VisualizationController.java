@@ -12,6 +12,7 @@ import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -44,11 +45,11 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         this.audience = audience;
     }
 
-    public void startVisualization() throws NullPointerException {
+    public CompletableFuture<Void> startVisualization() throws NullPointerException {
         assertNotCleared();
         applyPlaybackSpeed();
-        renderer.initialize(traceBuilder.getInitialData());
         state = State.INITIALIZED;
+        return renderer.initialize(traceBuilder.getInitialData());
     }
 
     @Override
@@ -137,6 +138,7 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
             state = State.PAUSED;
         }
     }
+
 
     private void scheduleSteppingTask() {
         cancelRunningTask();
