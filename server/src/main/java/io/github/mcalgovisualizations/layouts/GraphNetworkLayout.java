@@ -170,7 +170,7 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
         return raw instanceof Integer number ? Math.max(0, number) : 0;
     }
 
-    private static final class NodeDisplay extends BlockDisplay {
+    public static final class NodeDisplay extends BlockDisplay {
         private final char name;
         private final boolean sinkNode;
 
@@ -180,7 +180,6 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
             this.sinkNode = sinkNode;
         }
 
-        @Override
         public void setValue(int value) {
             int clamped = Math.max(0, value);
             if (sinkNode) {
@@ -222,12 +221,6 @@ public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements
 
         private static Pos particleAnchor(Pos nodePos) {
             return nodePos.add(0.5, 0.5, 0.5);
-        }
-
-        @Override
-        public void setValue(int value) {
-            this.currentFlow = Math.max(0, value);
-            ((BlockDisplay) base).setText(fromName + "->" + toName + " " + currentFlow + "/" + capacity);
         }
 
         @Override

@@ -6,7 +6,6 @@ import net.minestom.server.instance.Instance;
 
 public interface IDisplayValue {
     Pos getPos();
-    void setValue(int value);
     void setInstance(Instance instance);
     void addViewer(Player player);
     void remove();

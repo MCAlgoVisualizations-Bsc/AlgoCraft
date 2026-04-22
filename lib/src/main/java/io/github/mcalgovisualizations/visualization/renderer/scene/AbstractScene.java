@@ -37,12 +37,6 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
-    public void setValue(int slot, int value) {
-        var display = requireDisplay(slot);
-        display.setValue(value);
-    }
-
-    @Override
     public void setHighlighted(int slot, boolean highlighted) {
         var dv = requireDisplay(slot);
         dv.setGlowing(highlighted);

@@ -119,10 +119,6 @@ public class BlockDisplay implements IBlockStateDisplay {
         }
     }
 
-    public void setValue(int value) {
-        setText(Integer.toString(value));
-    }
-
     public void setText(String text) {
         if (textEntity == null) return;
         var meta = (TextDisplayMeta) textEntity.getEntityMeta();
