@@ -11,7 +11,6 @@ import io.github.mcalgovisualizations.visualization.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import net.minestom.server.item.Material;
 
@@ -60,6 +59,37 @@ public class RegisterAlgo {
     private static void registerSortingAlgo(AlgoCraft algo) {
         var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
         var stringCollection1 = new SortingContext<>(new ArrayList<>(List.of("a", "b", "k", "x", "d", "h", "a", "b", "e")));
+        var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
+                        .positioning(new ArcLayout(), INSERTION_INTS_PLACEMENT)
+                        .withScene(CircleScene::new)
+                        .onEvent(Compare.class, new CircleCompareHandler())
+                        .onEvent(Swap.class, new CircleSwapHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion sort circular sorting",
+                                Material.GOLDEN_APPLE,
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                        .onCompletion(ctx -> {
+                            final int size = ctx.values.size();
+                            var plan = AnimationPlan.<CircleScene>builder()
+                                    .step(CircleScene::resetAllDisplaysToHome)
+                                    .step(CircleScene::clearTracker);
+
+                            for(int i = 0; i<size; i++) {
+                                int finalI = i;
+                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, true));
+                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, false));
+                            }
+
+
+                            return plan.build();
+                        })
+                        .create()
+        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)

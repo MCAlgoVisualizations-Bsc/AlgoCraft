@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {
-    protected final BlockDisplay base;
+    protected final IDisplayValue base;
 
     private Instance instance;
     private Task task;
 
-    protected AbstractParticleDisplay(BlockDisplay base) {
+    protected AbstractParticleDisplay(IDisplayValue base) {
         this.base = base;
     }
 
@@ -82,6 +82,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
             task.cancel();
             task = null;
         }
+        this.instance = null;
         base.remove();
     }
 
