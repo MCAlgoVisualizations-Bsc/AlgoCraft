@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
+import io.github.mcalgovisualizations.algorithms.context.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Compare;
@@ -20,11 +21,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.github.mcalgovisualizations.DataTypes.NodeUtils.fromList;
+
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
-        registerSortingAlgo(algo);
-        registerTreeSearchAlgo(algo);
-        registerPathFindingAlgo(algo);
+        var integerCollection1 = new NodeContext<>(fromList(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
+
+        algo.registerAlgorithm(
+                Algorithm.builder(integerCollection1)
+                        .withIdentity("bst search", PlayerBSTSearch::new)
+                        //.withData(bstCollection)
+                        .positioning(new LayoutPath())
+                        .onEvent(Compare.class, new BstCompareHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Binary Search Tree (Search)",
+                                Material.SPYGLASS,
+                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
+                        ))
+                        .withScene(DefaultScene::new)
+                        .create()
+        );
+
+//        registerSortingAlgo(algo);
+//        registerTreeSearchAlgo(algo);
+//        registerPathFindingAlgo(algo);
     }
 
     private static void registerSortingAlgo(AlgoCraft algo) {
@@ -116,20 +136,20 @@ public class RegisterAlgo {
     private static void registerTreeSearchAlgo(AlgoCraft algo) {
         var bstCollection = new GridContext<>(Arrays.asList("a", "b", "k", "x", "d", "h", "a", "b", "e", "h", "s", "j", "s", "v", "k"));
 
-        algo.registerAlgorithm(
-                Algorithm.builder(bstCollection)
-                        .withIdentity("bst search", PlayerBSTSearch::new)
-                        //.withData(bstCollection)
-                        .positioning(new BSTNodeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Binary Search Tree (Search)",
-                                Material.SPYGLASS,
-                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
-                        ))
-                        .withScene(DefaultScene::new)
-                        .create()
-        );
+//        algo.registerAlgorithm(
+//                Algorithm.builder(bstCollection)
+//                        .withIdentity("bst search", PlayerBSTSearch::new)
+//                        //.withData(bstCollection)
+//                        .positioning(new BSTNodeLayout<>())
+//                        .onEvent(Compare.class, new BstCompareHandler())
+//                        .withPresentation(new AlgorithmPresentation(
+//                                "Binary Search Tree (Search)",
+//                                Material.SPYGLASS,
+//                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
+//                        ))
+//                        .withScene(DefaultScene::new)
+//                        .create()
+//        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(bstCollection)

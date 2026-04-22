@@ -1,68 +1,43 @@
 package io.github.mcalgovisualizations.algorithms;
 
-import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.algorithms.context.NodeContext;
+import io.github.mcalgovisualizations.events.NodeCompare;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
-import io.github.mcalgovisualizations.events.Compare;
 
-import java.util.Arrays;
-import java.util.Objects;
-
-public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<GridContext<I>> {
+public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<NodeContext<I>> {
 
     @Override
-    public void run(GridContext<I> ctx) {
-        var values = ctx.values;
-        int size = values.size();
-        if (size == 0) {
+    public void run(NodeContext<I> context) {
+        Node<I> root = context.values;
+        if (root == null) {
             return;
         }
 
-        int[] left = new int[size];
-        int[] right = new int[size];
-        Arrays.fill(left, -1);
-        Arrays.fill(right, -1);
+        // For visualization, let's pick a target value.
+        // In a real search, this might come from the context or user input.
+        // For now, let's assume we are searching for the root's value just as a placeholder.
+        I targetValue = root.value();
 
-        int root = 0;
-        for (int insert = 1; insert < size; insert++) {
-            var candidate = values.get(insert);
-            int cursor = root;
-            while (true) {
-                if (candidate.compareTo(values.get(cursor)) < 0) {
-                    if (left[cursor] == -1) {
-                        left[cursor] = insert;
-                        break;
-                    }
-                    cursor = left[cursor];
-                } else {
-                    if (right[cursor] == -1) {
-                        right[cursor] = insert;
-                        break;
-                    }
-                    cursor = right[cursor];
-                }
-            }
-        }
+        Node<I> cursor = root;
 
-        int targetIndex = size / 2;
-        var target = values.get(targetIndex);
+        while (cursor != null) {
+            // Emit a comparison event so the UI highlights the current node
+            // Note: You may need to adjust the Compare event parameters to fit your Node structure
+            context.emit(new NodeCompare<>(cursor, root));
 
-        int cursor = root;
-        while (cursor != -1) {
-            var current = values.get(cursor);
-            ctx.emit(new Compare(cursor, targetIndex, current, target));
+            int cmp = targetValue.compareTo(cursor.value());
 
-            if (Objects.equals(current, target)) {
+            if (cmp == 0) {
+                // Found the node!
                 return;
             }
 
-            int cmp = target.compareTo(current);
+            // Standard BST traversal
             if (cmp < 0) {
-                cursor = left[cursor];
+                cursor = cursor.left();
             } else {
-                cursor = right[cursor];
+                cursor = cursor.right();
             }
         }
     }
 }
-
