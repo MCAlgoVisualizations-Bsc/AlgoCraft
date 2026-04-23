@@ -1,17 +1,20 @@
 package io.github.mcalgovisualizations.Displays;
 
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.component.DataComponent;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityCreature;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
+import net.minestom.server.entity.metadata.villager.VillagerMeta;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -66,9 +69,21 @@ public class EntityCreatureDisplay implements IDisplayValue {
         setPos(pos);
     }
 
+    public void kill() {
+        entity.kill();
+        textEntity.remove();
+    }
+
     @Override
     public void setGlowing(boolean highlighted) {
         entity.setGlowing(highlighted);
+    }
+
+    public void shakeHead() {
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            var pos = entity.getPosition();
+            entity.teleport(pos.withYaw(pos.yaw() + 25f));
+        }).delay(2, TimeUnit.SERVER_TICK).schedule();
     }
 
     @Override

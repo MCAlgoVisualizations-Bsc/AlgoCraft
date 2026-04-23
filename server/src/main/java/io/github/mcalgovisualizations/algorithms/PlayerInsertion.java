@@ -8,6 +8,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -21,13 +22,13 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         for (int i = 1; i < n; i++) {
             int j = i;
 
-            ctx.emit(new TrackI(i));
+            ctx.emit(new TrackI(i, values.get(i)));
 
             while (j > 0) {
                 var x = values.get(j);
                 var y = values.get(j - 1);
 
-                ctx.emit(new TrackJ(j), new Compare(j, j - 1, y, x));
+                ctx.emit(new TrackJ(j, values.get(j)), new Compare(j, j - 1, y, x));
 
                 if (x.compareTo(y) >= 0) {
                     break;
@@ -38,21 +39,27 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                 j--;
             }
 
-            ctx.emit(new TrackJ(j));
+            ctx.emit(new TrackJ(j, values.get(j)));
         }
     }
 
-    public record TrackI(int idx) implements IAlgorithmEvent { }
-    public record TrackJ(int idx) implements IAlgorithmEvent { }
+    public record TrackI(int idx, Object value) implements IAlgorithmEvent { }
+    public record TrackJ(int idx, Object value) implements IAlgorithmEvent { }
 
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
         public AnimationPlan<CircleScene> handle(TrackI event) {
             return AnimationPlan.<CircleScene>builder()
                     .step(scene -> {
+                        scene.finishInnerLoopVisuals();
+                        scene.clearJTracker();
+                        scene.playSound("entity.chicken.death",1f, 1f);
+                        scene.clearGlowing();
+                    })
+                    .step(scene -> {
                         scene.trackI(event.idx());
                         scene.sendActionBar(Component.text(
-                                "i : [" + event.idx + "]",
+                                "i : [" + event.value() + "]",
                                 NamedTextColor.AQUA
                         ));
                     })
@@ -66,9 +73,10 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         public AnimationPlan<CircleScene> handle(TrackJ event) {
             return AnimationPlan.<CircleScene>builder()
                     .step(scene -> {
+                        scene.setHighlighted(event.idx(), true);
                         scene.trackJ(event.idx());
                         scene.sendActionBar(Component.text(
-                                "j : [" + event.idx + "]",
+                                "j : [" + event.value() + "]",
                                 NamedTextColor.GREEN
                         ));
                     })
@@ -81,9 +89,10 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         @SuppressWarnings("unchecked")
         public AnimationPlan<CircleScene> handle(Compare event) {
             return AnimationPlan.<CircleScene>builder()
-                    .step(scene -> scene.sendMessage(Component.text(
+                    .step(scene -> scene.sendActionBar(Component.text(
                             "Comparing [" + event.xValue() + "] with [" + event.yValue() + "]",
                             NamedTextColor.YELLOW)))
+                    .step(scene -> scene.playSound("entity.villager.trade",1f, 1f))
                     .step(scene -> {
                         int left = event.x();
                         int right = event.y();
@@ -93,7 +102,7 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                             }
                             scene.restoreStagedCompare();
                         }
-                        scene.stageCompare(left, right);
+                        scene.stageCompare(right, left);
                     })
                     .build();
         }
@@ -101,11 +110,15 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
 
     public static class SwapHandler implements IAnimationHandler<Swap> {
         @Override
+        @SuppressWarnings("unchecked")
         public AnimationPlan<CircleScene> handle(Swap event) {
             return AnimationPlan.<CircleScene>builder()
-                    .step(scene -> scene.sendActionBar(Component.text(
-                            event.xValue() + " is larger than " + event.yValue(),
-                            NamedTextColor.YELLOW)))
+                    .step(scene -> {
+                        scene.sendActionBar(Component.text(
+                                event.yValue() + " is smaller than " + event.xValue(),
+                                NamedTextColor.YELLOW));
+                    })
+                    .step(scene -> scene.playSound("entity.villager.celebrate",1f, 1f))
                     .step(scene -> {
                         int left = event.x();
                         int right = event.y();

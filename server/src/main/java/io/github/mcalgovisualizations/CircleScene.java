@@ -83,6 +83,9 @@ public class CircleScene extends AbstractScene {
         refreshJTracker();
     }
 
+    /**
+     * Clears the tracker for the currently tracked display for the I loop.
+     */
     public void clearITracker() {
         trackedISlot = null;
         trackedIDisplay = null;
@@ -93,21 +96,37 @@ public class CircleScene extends AbstractScene {
         }
     }
 
+    /**
+     * Clears the tracker for the currently tracked display for the J loop.
+     */
     public void clearJTracker() {
         trackedJSlot = null;
         trackedJDisplay = null;
 
         if (jTracker != null) {
-            jTracker.remove();
+            jTracker.kill();
             jTracker = null;
         }
     }
 
+    /**
+     * Clears all trackers for the I and J loops.
+     */
     public void clearTrackers() {
         clearITracker();
         clearJTracker();
     }
 
+    public void shakeHead(int slot) {
+        var dv = requireDisplay(slot);
+        dv.shakeHead();
+    }
+
+    /**
+     * Stages a compare pair for the given slots.
+     * @param leftSlot 1st display slot
+     * @param rightSlot 2nd display slot
+     */
     public void stageCompare(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) {
             throw new IllegalArgumentException("Cannot compare the same slot twice: " + leftSlot);
@@ -118,9 +137,6 @@ public class CircleScene extends AbstractScene {
 
         var leftDisplay = requireDisplay(leftSlot);
         var rightDisplay = requireDisplay(rightSlot);
-        leftDisplay.lookAt(rightDisplay.getPos());
-        rightDisplay.lookAt(leftDisplay.getPos());
-
 
         var leftHome = requireHomePosition(leftSlot);
         var rightHome = requireHomePosition(rightSlot);
@@ -134,6 +150,9 @@ public class CircleScene extends AbstractScene {
 
         lookAtOrigin(leftDisplay);
         lookAtOrigin(rightDisplay);
+        leftDisplay.lookAt(rightDisplay.getPos().add(0, 1, 0));
+        rightDisplay.lookAt(leftDisplay.getPos());
+
 
         stagedCompare = new StagedCompare(
                 leftSlot,
@@ -207,6 +226,20 @@ public class CircleScene extends AbstractScene {
         refreshTrackers();
     }
 
+    /**
+     * Finishes the inner loop visuals by restoring the original positions of the displays.
+     */
+    public void finishInnerLoopVisuals() {
+        if (hasStagedCompare()) {
+            restoreStagedCompare();
+        }
+    }
+
+    /**
+     * Swaps the positions of two displays without moving them to the home position.
+     * @param leftSlot 1st display slot
+     * @param rightSlot 2nd display slot
+     */
     public void swapDirect(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) {
             return;
@@ -231,6 +264,9 @@ public class CircleScene extends AbstractScene {
         refreshTrackers();
     }
 
+    /**
+     * Moves all displays to their home positions.
+     */
     public void resetAllDisplaysToHome() {
         clearCompareState();
 
@@ -350,11 +386,7 @@ public class CircleScene extends AbstractScene {
     }
 
     public EntityCreatureDisplay requireDisplay(int slot) {
-        var display = displaysBySlot.get(slot);
-        if (display == null) {
-            throw new IllegalArgumentException("No display for slot " + slot);
-        }
-        return (EntityCreatureDisplay) display;
+        return (EntityCreatureDisplay) super.requireDisplay(slot);
     }
 
     private Pos requireHomePosition(int slot) {
