@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
@@ -43,7 +44,8 @@ public record GridLayout(
 
             double x = origin.x() + (col * spacing);
             double z = zBase + (row * spacing);
-            out[idx] = new LayoutResult(model.get(idx), new Pos(x, y, z), new StylingProfile());
+            var pos = new Pos(x, y, z);
+            out[idx] = new LayoutResult(model.get(idx), pos, new MobDisplay(pos, model.get(idx).toString()));
         }
 
         return out;

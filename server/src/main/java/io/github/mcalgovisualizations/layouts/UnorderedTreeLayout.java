@@ -53,7 +53,7 @@ public record UnorderedTreeLayout<T extends Comparable<T>>(
             out[i] = new LayoutResult(
                     model.get(i),
                     positions[i],
-                    new ParticleTreeNodeStylingProfile(role, leftPos, rightPos)
+                    new ParticleTreeNodeStylingProfile(role, leftPos, rightPos).applyStyle(model.get(i).toString(), positions[i])
             );
         }
 

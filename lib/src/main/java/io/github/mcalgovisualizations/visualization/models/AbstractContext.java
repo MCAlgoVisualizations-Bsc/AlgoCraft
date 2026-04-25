@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.models;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractContext<T> implements AlgorithmContext<T> {
@@ -19,8 +20,8 @@ public abstract class AbstractContext<T> implements AlgorithmContext<T> {
     }
 
     @Override
-    public void emit(IAlgorithmEvent e) {
-        events.add(e);
+    public void emit(IAlgorithmEvent... e) {
+        events.addAll(Arrays.asList(e));
     }
 
     @Override

@@ -1,12 +1,11 @@
 package io.github.mcalgovisualizations.layouts;
 
-import io.github.mcalgovisualizations.visualization.ui.IStylingProfile;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.block.Block;
 
-public final class BstNodeStylingProfile implements IStylingProfile {
+public final class BstNodeStylingProfile {
 
     public enum NodeRole {
         ROOT,
@@ -20,7 +19,6 @@ public final class BstNodeStylingProfile implements IStylingProfile {
         this.role = role;
     }
 
-    @Override
     public IDisplayValue applyStyle(String value, Pos pos) {
         Block block = switch (role) {
             case ROOT -> Block.OAK_LOG;

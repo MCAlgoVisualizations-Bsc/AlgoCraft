@@ -15,10 +15,10 @@ public class InsertionTreeScene extends AbstractScene {
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
         this.layoutResults = layoutResults;
-        displaysBySlot.put(0, layoutResults[0].getDisplayValue());
+        displaysBySlot.put(0, layoutResults[0].displayValue());
     }
 
     public void insertNewLayout() {
-        displaysBySlot.put(1, layoutResults[1].getDisplayValue());
+        displaysBySlot.put(1, layoutResults[1].displayValue());
     }
 }

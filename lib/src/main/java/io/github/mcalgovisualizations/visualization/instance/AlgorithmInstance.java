@@ -28,15 +28,13 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends ISceneOps> {
-    private final Instance instance;
+    private final Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
     private final AlgorithmPresentation presentation;
     private final PlayerFeedback audience;
     private final VisualizationController<T, C> controller;
     public static final Pos origin = new Pos(0, 40, 0);
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
-        var container = MinecraftServer.getInstanceManager().createInstanceContainer();
-        this.instance = container;
         this.presentation = algorithm.presentation();
         this.audience = new PlayerFeedback(players);
 
@@ -52,7 +50,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
             }
         });
 
-        container.setChunkSupplier(LightingChunk::new);
+        instance.setChunkSupplier(LightingChunk::new);
 
         //container.setChunkLoader(new AnvilLoader(worldPath));
 
@@ -87,6 +85,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
         // teleport all players to the instance
         // Arrays.stream(players).forEach(player -> player.setInstance(instance));
+        System.out.println(instance.isRegistered());
     }
 
     public Instance getInstance() {
@@ -139,6 +138,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     }
 
     public CompletableFuture<Void> startVisualization() {
+        Objects.requireNonNull(this.instance, "Tried to start a visualization on an uninitialized instance");
         return controller.startVisualization();
     }
     public AlgorithmPresentation getPresentation() {

@@ -170,6 +170,7 @@ public class AlgoCraft {
             player.closeInventory();
             ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
+            System.err.println(session.getInstance());
             player.setInstance(session.getInstance())
                     .thenCompose(_ -> player.teleport(AlgorithmInstance.origin))
                     .thenCompose(_ -> session.startVisualization())

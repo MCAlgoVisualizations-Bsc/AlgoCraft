@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.layouts;
 
+import io.github.mcalgovisualizations.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
@@ -84,7 +85,8 @@ public record MatrixLayout (
             Cell cell = cells.get(id);
             final double x = startX + cell.col * spacing;
             final double z = startZ + cell.row * spacing;
-            out[id] = new LayoutResult(id, new Pos(x, y, z), new StylingProfile());
+            var pos = new Pos(x, y, z);
+            out[id] = new LayoutResult(id, new Pos(x, y, z), new MobDisplay(pos, String.valueOf(id)));
         }
 
         return out;
