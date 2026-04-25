@@ -32,19 +32,31 @@ public class EntityCreatureDisplay implements IDisplayValue {
         setupText(displayText);
     }
 
+
     @Override
     public Pos getPos() {
         return this.pos;
     }
 
-    public void setPos(Pos pos) {
-        this.pos = pos;
-    }
-
     @Override
     public void setInstance(Instance instance) {
         entity.setInstance(instance, pos);
-        textEntity.setInstance(instance, pos.add(0, 2,0));
+        textEntity.setInstance(instance, getTextOffset());
+    }
+
+    @Override
+    public void teleport(Pos pos) {
+        this.pos = pos;
+        entity.teleport(pos);
+        textEntity.teleport(getTextOffset());
+    }
+
+    private Pos getTextOffset() {
+        return pos.add(0, entity.getEyeHeight() + 1, 0);
+    }
+
+    public double getEyeHeight() {
+        return entity.getEyeHeight();
     }
 
     @Override
@@ -62,12 +74,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
         textEntity.remove();
     }
 
-    @Override
-    public void teleport(Pos pos) {
-        entity.teleport(pos);
-        textEntity.teleport(pos.add(0,2,0));
-        setPos(pos);
-    }
 
     public void kill() {
         entity.kill();

@@ -71,18 +71,6 @@ public class CircleScene extends AbstractScene {
         refreshJTracker();
     }
 
-    public void trackIDisplay(EntityCreatureDisplay display) {
-        trackedIDisplay = Objects.requireNonNull(display, "display");
-        trackedISlot = null;
-        refreshITracker();
-    }
-
-    public void trackJDisplay(EntityCreatureDisplay display) {
-        trackedJDisplay = Objects.requireNonNull(display, "display");
-        trackedJSlot = null;
-        refreshJTracker();
-    }
-
     /**
      * Clears the tracker for the currently tracked display for the I loop.
      */
@@ -323,13 +311,14 @@ public class CircleScene extends AbstractScene {
 
         Pos trackerPos = getITrackerPosition(base);
 
+
         if (iTracker == null) {
             iTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "I");
             iTracker.setInstance(instance);
         }
 
         iTracker.teleport(trackerPos);
-        iTracker.lookAt(base);
+        iTracker.lookAt(base.add(0, requireDisplay(trackedISlot).getEyeHeight() + 2, 0));
     }
 
     private void refreshJTracker() {
@@ -346,7 +335,7 @@ public class CircleScene extends AbstractScene {
         }
 
         jTracker.teleport(trackerPos);
-        jTracker.lookAt(base);
+        jTracker.lookAt(base.add(0, requireDisplay(trackedJSlot).getEyeHeight() + 2, 0));
     }
 
     private EntityCreatureDisplay resolveTrackedDisplay(EntityCreatureDisplay explicitDisplay, Integer slot) {
@@ -410,11 +399,13 @@ public class CircleScene extends AbstractScene {
     }
 
     private Pos getITrackerPosition(Pos base) {
-        return base.add(-0.8, 2.5, 0.0);
+        var tracked = requireDisplay(trackedISlot);
+        return base.add(-0.8, tracked.getEyeHeight() + 2, 0.0);
     }
 
     private Pos getJTrackerPosition(Pos base) {
-        return base.add(0.8, 2.5, 0.0);
+        var tracked = requireDisplay(trackedJSlot);
+        return base.add(0.8, tracked.getEyeHeight() + 2, 0.0);
     }
 
     private void lookAtOrigin(IDisplayValue display) {

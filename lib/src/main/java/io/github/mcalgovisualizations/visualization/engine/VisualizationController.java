@@ -113,7 +113,6 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
 
         final IAlgorithmEvent event = algorithmStepper.step();
         if (event != null) {
-            System.err.println("Rendering event: " + event);
             renderer.render(event);
             audience.step();
         }

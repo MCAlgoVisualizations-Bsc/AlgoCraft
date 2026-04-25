@@ -1,7 +1,6 @@
 package io.github.mcalgovisualizations.visualization;
 
 import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
-import io.github.mcalgovisualizations.visualization.algorithm.ContextFactory;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.engine.VisualizationController;
