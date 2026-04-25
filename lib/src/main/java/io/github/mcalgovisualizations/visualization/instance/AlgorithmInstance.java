@@ -83,62 +83,57 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
                 audience
         );
 
-        // teleport all players to the instance
-        // Arrays.stream(players).forEach(player -> player.setInstance(instance));
-        System.out.println(instance.isRegistered());
     }
 
     public Instance getInstance() {
         return this.instance;
     }
 
-    public UUID getUuid() {
-        return this.instance.getUuid();
-    }
-
     public boolean containsPlayer(Player... players) {
         return this.audience.containsPlayer(players);
     }
 
-    public void addPlayer(Player... players) {
-        Arrays.stream(players).forEach( player -> {
-            // add the player to the audience so they get notified when they join
-            this.audience.addAudience(player);
-            final var message = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
-            this.audience.sendMessage(message);
-            player.setInstance(this.instance);
-        });
+    public CompletableFuture<Void> addPlayer(Player... players) {
+        final var futures = Arrays.stream(players)
+                .filter(Objects::nonNull)
+                        .map( player -> {
+                    // add the player to the audience so they get notified when they join
+                    this.audience.addAudience(player);
+                    final var message = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
+                    this.audience.sendMessage(message);
+                    return player.setInstance(this.instance).thenCompose(_ -> player.teleport(origin));
+                })
+                .toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(futures);
     }
 
     public boolean isEmpty() {
         return audience.isEmpty();
     }
 
-    public void removePlayer(@NotNull Instance returnInstance, Player... players) {
+    public CompletableFuture<Void> removePlayer(@NotNull Instance returnInstance, Player... players) {
         final var instance = Objects.requireNonNull(returnInstance, "Tried to send player to null returnInstance");
+
         if (instance == this.instance) {
             System.err.println("Tried to remove player from the instance they are already in");
             this.audience.sendMessage(Component.text("An error occurred", NamedTextColor.RED));
-            return;
+            return CompletableFuture.completedFuture(null);
         }
-        for (var player : players) {
-            if (player == null) continue;
 
+        final var future = Arrays.stream(players).map(player -> {
             this.audience.removeAudience(player);
             this.audience.sendMessage(Component.text(player.getUsername() + " left the session", NamedTextColor.RED));
-            player.setInstance(instance).thenRun(() -> player.teleport(new Pos(194.5, 137, -38.5)));
+            return player.setInstance(instance).thenCompose(_ -> player.teleport(new Pos(194.5, 137, -38.5)));
+        }).toArray(CompletableFuture[]::new);
 
-        }
-    }
-
-    public void teleportPlayer(Player... players) {
-        for (var player : players) {
-            player.setInstance(this.instance);
-        }
+        return CompletableFuture.allOf(future)
+                .thenRun(() -> {
+                    // health check to make sure the instance is empty before unregistering it
+                    if (this.audience.isEmpty()) MinecraftServer.getInstanceManager().unregisterInstance(this.instance);
+                });
     }
 
     public CompletableFuture<Void> startVisualization() {
-        Objects.requireNonNull(this.instance, "Tried to start a visualization on an uninitialized instance");
         return controller.startVisualization();
     }
     public AlgorithmPresentation getPresentation() {

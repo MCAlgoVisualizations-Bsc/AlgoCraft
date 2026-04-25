@@ -64,18 +64,7 @@ public class AlgoCraft {
         for(var player : players) {
             var instance = requireInstance(player);
             instance.removePlayer(defaultInstance, player);
-            playerInstance.remove(player.getUuid());
         }
-
-        // dereference and clear instance if members are empty
-        playerInstance.entrySet().removeIf(entry -> {
-            var algorithmInstance = entry.getValue();
-            if (algorithmInstance.isEmpty()) {
-                algorithmInstance.getController().clear();
-                return true;
-            }
-            return false;
-        });
     }
 
     public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
@@ -116,31 +105,25 @@ public class AlgoCraft {
             return;
         }
 
-
-
-
         if (itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
             if(player.getInstance() == defaultInstance)
                 return;
-            if(instance != null)
+            if(instance != null) {
                 instance.removePlayer(defaultInstance, player);
+            }
             return;
         }
 
-
-//        if (session == null) {
-//            System.err.println("No controls for player " + player.getUsername());
-//            return;
-//        }
-
+        final var controller = instance.getController();
         switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-            case RANDOMIZE -> instance.getController().randomize();
-            case START -> instance.getController().start();
-            case STOP -> instance.getController().pause();
-            case FORWARD -> instance.getController().step();
-            case BACKWARD -> instance.getController().back();
-            case SET_SPEED -> instance.getController().changeSpeed();
+            case RANDOMIZE -> controller.randomize();
+            case START -> controller.start();
+            case STOP -> controller.pause();
+            case FORWARD -> controller.step();
+            case BACKWARD -> controller.back();
+            case SET_SPEED -> controller.changeSpeed();
             default -> {
+                controller.clear();
                 ui.applyDefaultLayout(player);
             }
         }
@@ -152,6 +135,7 @@ public class AlgoCraft {
             return entry != null ? entry : new AlgorithmPresentation(presentation);
         });
 
+        // TODO : this shouldn't be nested
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
             if (event.getPlayer() != player) return;
             if (event.getInventory() != inventory) return;
@@ -170,17 +154,14 @@ public class AlgoCraft {
             player.closeInventory();
             ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
-            System.err.println(session.getInstance());
-            player.setInstance(session.getInstance())
-                    .thenCompose(_ -> player.teleport(AlgorithmInstance.origin))
-                    .thenCompose(_ -> session.startVisualization())
-                    .exceptionally(throwable -> {
-                        throwable.printStackTrace();
-                        player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
-                        return null;
-                    });
 
-
+            session.startVisualization()
+                .thenCompose(_ -> session.addPlayer(player))
+                .exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
+                    return null;
+                });
         });
 
         player.openInventory(inventory);

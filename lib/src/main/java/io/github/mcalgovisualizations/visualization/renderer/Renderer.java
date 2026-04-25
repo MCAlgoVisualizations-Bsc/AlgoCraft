@@ -6,12 +6,15 @@ import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.InstanceContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public final class Renderer<I, O extends ISceneOps> {
@@ -83,16 +86,28 @@ public final class Renderer<I, O extends ISceneOps> {
     public void onCleanup() {
         executor.onCleanup();
         scene.cleanUp();
-        instance = null;
     }
 
     public CompletableFuture<Void> initialize(I initialModel) {
-        final var futures = Arrays.stream(layout.compute(initialModel, origin, instance))
-                .map(r -> instance.loadChunk(r.pos().chunkX(), r.pos().chunkZ()))
+        Objects.requireNonNull(instance, "Renderer.instance is null");
+        final var layoutResults = Objects.requireNonNull(
+                this.layout.compute(initialModel, origin, instance),
+                "layout.compute returned null"
+        );
+
+        final var futures = Arrays.stream(layoutResults)
+                .filter(Objects::nonNull)
+                .map(LayoutResult::pos)
+                .map(pos -> new ChunkKey(pos.chunkX(), pos.chunkZ()))
                 .distinct()
+                .map(key -> instance.loadChunk(key.x(), key.z()))
                 .toArray(CompletableFuture[]::new);
-        return CompletableFuture.allOf(futures);
+
+        return CompletableFuture.allOf(futures)
+                .thenRun(() -> scene.setLayout(layoutResults));
     }
+
+    private record ChunkKey(int x, int z) {}
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
         if (!collapseAnimationDelays || plan.isEmpty()) {

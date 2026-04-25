@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.algorithms.playerAStar.PlayerAStar;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
