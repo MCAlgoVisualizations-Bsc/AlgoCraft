@@ -97,10 +97,14 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         final var futures = Arrays.stream(players)
                 .filter(Objects::nonNull)
                         .map( player -> {
-                    // add the player to the audience so they get notified when they join
+                    final var instanceMessage = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
+                    final var playerMessage = Component.text("Teleporting you to: " + presentation.algorithmId(), NamedTextColor.GREEN);
+                    // broadcast to all players in the instance
+                    this.audience.sendMessage(instanceMessage);
+                    // privately message player
+                    player.sendMessage(playerMessage);
+                    // add player to audience
                     this.audience.addAudience(player);
-                    final var message = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
-                    this.audience.sendMessage(message);
                     return player.setInstance(this.instance).thenCompose(_ -> player.teleport(origin));
                 })
                 .toArray(CompletableFuture[]::new);

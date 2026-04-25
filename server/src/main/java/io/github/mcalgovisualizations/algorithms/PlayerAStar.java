@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms.playerAStar;
+package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
