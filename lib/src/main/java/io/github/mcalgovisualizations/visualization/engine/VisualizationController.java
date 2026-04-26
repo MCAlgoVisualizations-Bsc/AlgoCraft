@@ -5,7 +5,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuil
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
-import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
+import io.github.mcalgovisualizations.visualization.instance.PlayerFeedback;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A controller of time so forwards, back, adjusting speed belongs here.

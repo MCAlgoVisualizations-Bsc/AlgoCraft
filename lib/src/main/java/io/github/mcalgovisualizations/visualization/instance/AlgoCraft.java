@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -32,9 +33,9 @@ public class AlgoCraft {
     // player uuid for fast lookup
     private final Map<UUID, AlgorithmInstance<?,?,?>> playerInstance = new HashMap<>();
     private final Map<UUID, PlayerInventory> playerInventory = new HashMap<>();
-    private final Map<String, AlgorithmPresentation> presentations = new HashMap<>();
     private final AlgorithmUI ui = new AlgorithmUI();
     private final Instance defaultInstance;
+    public final static Pos SPAWN_POS = new Pos(194.5, 137, -38.5);
 
     public AlgoCraft(InstanceContainer defaultInstance) {
         this.defaultInstance = defaultInstance;
@@ -54,6 +55,7 @@ public class AlgoCraft {
 
     public void addPlayerToInstance(UUID instanceId, Player... players) {
         final var instance = playerInstance.get(instanceId);
+
         if (instance == null) {
             //createInstance(instanceId, players);
         }
@@ -108,6 +110,7 @@ public class AlgoCraft {
         if (itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
             if(player.getInstance() == defaultInstance)
                 return;
+
             if(instance != null) {
                 instance.removePlayer(defaultInstance, player);
             }
@@ -131,7 +134,7 @@ public class AlgoCraft {
 
     public void selectAlgorithm(Player player) {
         final var inventory = ui.openSelector(algorithmRegistry.keySet(), presentation -> {
-            var entry = presentations.get(presentation);
+            var entry = algorithmRegistry.get(presentation).presentation();
             return entry != null ? entry : new AlgorithmPresentation(presentation);
         });
 
@@ -152,7 +155,6 @@ public class AlgoCraft {
             if (entry == null) return;
 
             player.closeInventory();
-            ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
 
             session.startVisualization()
@@ -161,7 +163,8 @@ public class AlgoCraft {
                     throwable.printStackTrace();
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
-                });
+                })
+                .thenRun(() -> ui.applyRunningLayout(player));
         });
 
         player.openInventory(inventory);

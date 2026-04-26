@@ -2,14 +2,12 @@ package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.instance.InstanceContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -97,9 +95,7 @@ public final class Renderer<I, O extends ISceneOps> {
 
         final var futures = Arrays.stream(layoutResults)
                 .filter(Objects::nonNull)
-                .map(LayoutResult::pos)
-                .map(pos -> new ChunkKey(pos.chunkX(), pos.chunkZ()))
-                .distinct()
+                .map(ChunkKey::new)
                 .map(key -> instance.loadChunk(key.x(), key.z()))
                 .toArray(CompletableFuture[]::new);
 
@@ -107,14 +103,18 @@ public final class Renderer<I, O extends ISceneOps> {
                 .thenRun(() -> scene.setLayout(layoutResults));
     }
 
-    private record ChunkKey(int x, int z) {}
+    private record ChunkKey(LayoutResult layoutResult, int x, int z) {
+        public ChunkKey(LayoutResult layoutResult) {
+            this(layoutResult, layoutResult.pos().chunkX(), layoutResult.pos().chunkZ());
+        }
+    }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
         if (!collapseAnimationDelays || plan.isEmpty()) {
             return plan;
         }
 
-        AnimationPlan.Builder<O> builder = AnimationPlan.builder();
+        var builder = AnimationPlan.<O>builder();
         for (var step : plan.steps()) {
             builder.step(0, step.op());
         }

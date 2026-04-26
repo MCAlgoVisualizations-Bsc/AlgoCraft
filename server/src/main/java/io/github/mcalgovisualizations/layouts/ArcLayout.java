@@ -100,13 +100,15 @@ public record ArcLayout(
         return entities;
     }
 
+    /**
+     * Sorted by height.
+     */
     private static final EntityType[] sortedEntities = Stream.of(
                     "allay",
                     "armadillo",
                     "axolotl",
                     "bat",
                     "bee",
-                    "blaze",
                     "bogged",
                     "breeze",
                     "camel",

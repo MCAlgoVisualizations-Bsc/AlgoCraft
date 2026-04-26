@@ -1,16 +1,13 @@
-package io.github.mcalgovisualizations.visualization.ui;
+package io.github.mcalgovisualizations.visualization.instance;
 
 import io.github.mcalgovisualizations.visualization.engine.PlayerControls;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.Supplier;
 
 
 /**
@@ -21,46 +18,16 @@ import java.util.Set;
  */
 public final class PlayerFeedback implements AudienceChannel, PlayerControls {
 
-    /**
-     * The aggregated audience receiving feedback.
-     */
-    private final Set<Player> audiences = new HashSet<>();
+    private final Supplier<Audience> supplier;
+    private Audience audience() { return this.supplier.get(); }
 
-    /**
-     * Constructs a {@code PlayerFeedback} instance with an initial set of audiences.
-     *
-     * @param players the initial audiences to include
-     */
-    public PlayerFeedback(@NotNull final Player... players) {
-        addAudience(players);
-    }
-
-    /**
-     * Adds one or more audiences to the existing aggregated audience.
-     *
-     * @param players the audiences to add
-     */
-    public void addAudience(@NotNull final Player... players) {
-        this.audiences.addAll(Arrays.asList(players));
-    }
-
-    public void removeAudience(@NotNull final Player... players) {
-        for (var player : players) {
-            this.audiences.remove(player);
-        }
+    public PlayerFeedback(@NotNull Supplier<Audience> supplier) {
+        this.supplier = supplier;
     }
 
     @Override
     public void sendActionBar(@NotNull final Component message) {
-        Audience.audience(this.audiences).sendActionBar(message);
-    }
-
-    public boolean isEmpty() {
-        return this.audiences.isEmpty();
-    }
-
-    public boolean containsPlayer(Player... players) {
-        return this.audiences.containsAll(Arrays.asList(players));
+        audience().sendActionBar(message);
     }
 
     /**
@@ -72,7 +39,7 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      */
     @Override
     public void playSound(@NotNull final String key, final float volume, final float pitch) {
-        Audience.audience(this.audiences).playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
+        audience().playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
     }
 
     /**
@@ -82,7 +49,7 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
      */
     @Override
     public void sendMessage(@NotNull final Component message) {
-        Audience.audience(this.audiences).sendMessage(message);
+        audience().sendMessage(message);
     }
 
     /**
@@ -141,4 +108,5 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         playSound("minecraft:block.note_block.amethyst", 0.7f, 1.2f);
         return 0;
     }
+
 }
