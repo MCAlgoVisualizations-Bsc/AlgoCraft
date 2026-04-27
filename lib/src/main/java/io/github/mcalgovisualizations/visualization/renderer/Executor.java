@@ -30,6 +30,7 @@ public final class Executor<O extends ISceneOps> {
     private final O scene;
     private Task runningTask = null;
     private boolean waitingForAsyncStep = false;
+    private int executionId = 0;
 
     private final Queue<AnimationPlan<O>> queue = new LinkedList<>();
 
@@ -164,7 +165,10 @@ public final class Executor<O extends ISceneOps> {
                 waitingForAsyncStep = true;
                 stepJustEntered = false;
 
+                final int currentExecutionId = executionId;
                 step.run(scene).whenComplete((_, throwable) -> {
+                    if (currentExecutionId != executionId) return;
+
                     if (throwable != null) {
                         throwable.printStackTrace();
                         onCleanup();
@@ -217,6 +221,8 @@ public final class Executor<O extends ISceneOps> {
         stepIndex = 0;
         ticksRemaining = 0;
         stepJustEntered = false;
+        waitingForAsyncStep = false;
+        executionId++;
         queue.clear();
     }
 }
