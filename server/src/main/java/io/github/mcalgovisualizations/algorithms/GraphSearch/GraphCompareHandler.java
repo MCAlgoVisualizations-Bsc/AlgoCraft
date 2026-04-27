@@ -4,9 +4,13 @@ import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.ItemEntity;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +42,17 @@ public final class GraphCompareHandler implements IAnimationHandler<Compare> {
                     } else {
                         // The villager walks. Since the search emits nodes in order,
                         // he will follow the path back and forth.
-                        return sceneOps.walkSlotTo(SEARCHER_SLOT, targetDisplay.getPos());
+                        return sceneOps.walkSlotTo(SEARCHER_SLOT, targetDisplay.getPos())
+                                .thenRun(() -> {
+                                    // Drop bread after reaching the node
+                                    ItemStack breadItem = ItemStack.builder(Material.BREAD)
+                                            .amount(1)
+                                            .build();
+                                    ItemEntity breadEntity = new ItemEntity(breadItem);
+                                    // Cast sceneOps to AbstractScene to access the instance
+                                    GraphScene abstractScene = (GraphScene) sceneOps;
+                                    breadEntity.setInstance(abstractScene.getInstance(), targetDisplay.getPos().add(0, 0.5, 0)); // Slightly above the block
+                                });
                     }
                 })
                 .build();
