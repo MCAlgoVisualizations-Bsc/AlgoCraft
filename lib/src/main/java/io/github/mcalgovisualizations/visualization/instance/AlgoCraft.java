@@ -1,7 +1,5 @@
 package io.github.mcalgovisualizations.visualization.instance;
 
-import io.github.mcalgovisualizations.visualization.commands.Accept;
-import io.github.mcalgovisualizations.visualization.commands.Invite;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
@@ -17,13 +15,9 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -65,7 +59,8 @@ public class AlgoCraft {
     public void removePlayerFromInstance(Player... players) {
         for(var player : players) {
             var instance = requireInstance(player);
-            instance.removePlayer(defaultInstance, player);
+            instance.removePlayer(defaultInstance, player)
+                    .thenRun(() -> ui.applyDefaultLayout(player));
         }
     }
 
@@ -74,11 +69,7 @@ public class AlgoCraft {
     }
 
     public AlgorithmInstance<?,?,?> requireInstance(Player player) {
-        var instance = playerInstance.get(player.getUuid());
-        if (instance == null) {
-            throw new IllegalStateException("No instance for player " + player.getUsername());
-        }
-        return instance;
+        return playerInstance.get(player.getUuid());
     }
 
     public void applyDefaultLayout(Player player) {
@@ -87,8 +78,7 @@ public class AlgoCraft {
 
     public void addListener(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
-        MinecraftServer.getCommandManager().register(new Invite(this));
-        MinecraftServer.getCommandManager().register(new Accept(this));
+
 //        handler.addListener(InventoryPreClickEvent.class, this::onInventoryPreClick);
 //        handler.addListener(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
     }
@@ -170,25 +160,69 @@ public class AlgoCraft {
         player.openInventory(inventory);
     }
 
-    private final Map<UUID, PendingInvite> pendingInvites = new HashMap<>();
+    private final Map<UUID, Set<PendingInvite>> pendingInvites = new HashMap<>();
 
-    public static class PendingInvite {
-        public final UUID inviter;
-        public final AlgorithmInstance<?, ?, ?> instance;
-        public final long expiresAt;
+    public record PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
+        public boolean isExpired() {
+                return System.currentTimeMillis() > expiresAt;
+        }
+        public long remainingMillis() {
+            return Math.max(0, expiresAt - System.currentTimeMillis());
+        }
+        @Override
+        public @NonNull String toString() {
+            long totalSeconds = remainingMillis() / 1000;
+            long minutes = totalSeconds / 60;
+            long seconds = totalSeconds % 60;
 
-        public PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
-            this.inviter = inviter;
-            this.instance = instance;
-            this.expiresAt = expiresAt;
+            return minutes > 0
+                    ? String.format("%dm %02ds", minutes, seconds)
+                    : seconds + "s";
         }
     }
 
-    public Map<UUID, PendingInvite> getPendingInvites() {
-        return pendingInvites;
+    public Set<PendingInvite> getPendingInvites(Player player) {
+        var invites = pendingInvites.getOrDefault(player.getUuid(), new HashSet<>());
+        invites.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
+        return Set.copyOf(invites);
     }
 
-    public Instance getDefaultInstance() {
-        return defaultInstance;
+    public void invitePlayer(Player inviter, Player target, long expiresIn) {
+        final var inviterInstance = requireInstance(inviter);
+
+        if(inviter.getInstance().equals(defaultInstance) || inviterInstance == null) {
+            inviter.sendMessage(Component.text("You have to be in a visualization before inviting others", NamedTextColor.RED));
+            return;
+        }
+
+        if(inviter.getInstance().equals(target.getInstance())) {
+            inviter.sendMessage(Component.text("You cannot invite players from the same instance", NamedTextColor.RED));
+            return;
+        }
+
+        inviter.sendMessage(Component.text("You have invited " + target.getUsername() + " to your instance."));
+        target.sendMessage(Component.text("You have been invited to join: " + inviterInstance.getPresentation().algorithmId(), NamedTextColor.GREEN));
+        final var invites = pendingInvites.computeIfAbsent(target.getUuid(), _ -> new HashSet<>());
+        invites.add(new PendingInvite(inviter.getUuid(), inviterInstance, expiresIn));
+    }
+
+    public boolean acceptInvite(Player invited, Player inviter) {
+        var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
+        inviteList.removeIf(PendingInvite::isExpired);
+
+        if(inviteList.stream().noneMatch(invite -> invite.inviter().equals(inviter.getUuid())))
+            invited.sendMessage(Component.text("You have no active invite sent to you from: " + inviter.getUsername(), NamedTextColor.RED));
+
+        for(var invite : inviteList) {
+            if(!invite.inviter().equals(inviter.getUuid()))
+                continue;
+            var instance = requireInstance(inviter);
+            this.playerInstance.put(invited.getUuid(), instance);
+            instance.addPlayer(invited);
+            inviteList.remove(invite);
+            return true;
+        }
+
+        return false;
     }
 }

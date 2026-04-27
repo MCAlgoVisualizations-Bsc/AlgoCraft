@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.layouts;
+package io.github.mcalgovisualizations.algorithms.sort;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
@@ -8,7 +8,6 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.instance.Instance;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record ArcLayout(

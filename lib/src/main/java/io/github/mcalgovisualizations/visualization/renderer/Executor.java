@@ -29,6 +29,7 @@ public final class Executor<O extends ISceneOps> {
 
     private final O scene;
     private Task runningTask = null;
+    private boolean waitingForAsyncStep = false;
 
     private final Queue<AnimationPlan<O>> queue = new LinkedList<>();
 
@@ -129,16 +130,18 @@ public final class Executor<O extends ISceneOps> {
      */
     private void tick() {
         if (paused) return;
+        if (waitingForAsyncStep) return;
 
         int opsThisTick = 0;
+
         while (opsThisTick < MAX_OPS_PER_TICK) {
-            // If we're waiting inside a step, consume one tick and return.
+            if (waitingForAsyncStep) return;
+
             if (ticksRemaining > 0) {
                 ticksRemaining--;
                 return;
             }
 
-            // Ensure we have a plan.
             if (currentPlan == null) {
                 currentPlan = queue.poll();
                 stepIndex = 0;
@@ -150,7 +153,6 @@ public final class Executor<O extends ISceneOps> {
                 }
             }
 
-            // Finished plan?
             if (stepIndex >= currentPlan.steps().size()) {
                 finishCurrentPlan();
                 continue;
@@ -158,21 +160,27 @@ public final class Executor<O extends ISceneOps> {
 
             if (stepJustEntered) {
                 AnimationPlan.Step<O> step = currentPlan.steps().get(stepIndex);
-                step.op().accept(scene);
-                ticksRemaining = step.ticks();
 
+                waitingForAsyncStep = true;
                 stepJustEntered = false;
-                stepIndex++;
-                stepJustEntered = true;
-                opsThisTick++;
 
-                // Stay in the loop to consume zero-wait steps immediately.
-                if (ticksRemaining > 0) {
-                    return;
-                }
+                step.run(scene).whenComplete((_, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                        onCleanup();
+                        return;
+                    }
+
+                    ticksRemaining = step.ticks();
+                    stepIndex++;
+                    stepJustEntered = true;
+                    waitingForAsyncStep = false;
+                });
+
+                opsThisTick++;
+                return;
             }
         }
-
     }
 
     /**

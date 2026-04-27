@@ -1,6 +1,5 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.sort.insertion;
 
-import io.github.mcalgovisualizations.CircleScene;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Swap;
@@ -8,7 +7,6 @@ import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.instance;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
@@ -45,7 +46,7 @@ public class PartyService {
                             player.setGameMode(GameMode.SPECTATOR);
                         spectators.add(player);
 
-                        player.setFlying(true);
+                        player.setAllowFlying(true);
 
                         audience().sendMessage(Component.text(
                             player.getUsername() + " joined the session",
@@ -111,8 +112,11 @@ public class PartyService {
             .toArray(CompletableFuture[]::new);
 
         spectators.clear();
+        return CompletableFuture.allOf(futures).thenRun(() -> {
+            MinecraftServer.getInstanceManager().unregisterInstance(instance);
+            System.out.println(instance.isRegistered());
 
-        return CompletableFuture.allOf(futures);
+        });
     }
 
     /**

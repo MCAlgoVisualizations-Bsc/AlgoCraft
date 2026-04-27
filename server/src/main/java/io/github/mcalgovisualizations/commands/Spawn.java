@@ -10,10 +10,7 @@ public class Spawn extends Command {
         super("spawn");
         addSyntax((sender, context) -> {
             if (!(sender instanceof Player p)) return;
-            p.sendMessage("Teleporting to spawn...");
-            p.setInstance(algo.getDefaultInstance())
-                    .thenRun(() -> p.sendMessage("Teleported to spawn!"))
-                    .thenRun(() -> p.teleport(new Pos(194, 137, -38)));
+            algo.removePlayerFromInstance(p);
         });
     }
 }
