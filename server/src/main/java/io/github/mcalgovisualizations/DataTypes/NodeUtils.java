@@ -5,44 +5,22 @@ import io.github.mcalgovisualizations.algorithms.TreeSearch.Node;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NodeUtils {
-    public static <V extends Comparable<V>> Node<V> shuffleTree(Node<V> root) {
-        List<V> values = new ArrayList<>();
-        collectValues(root, values);
-        Collections.shuffle(values);
-
-        Node<V> newRoot = null;
-        for (int i = 0; i < values.size(); i++) {
-            newRoot = insert(newRoot, values.get(i), i);
-        }
-        return newRoot;
-    }
-
     public static <V extends Comparable<V>> Node<V> fromList(List<V> list) {
         if (list == null || list.isEmpty()) return null;
 
-        Node<V> root = null;
-        for (int i = 0; i < list.size(); i++) {
-            root = insert(root, list.get(i), i);
+        Node<V> root = new Node<>(0, list.get(0));
+        List<Node<V>> nodes = new ArrayList<>();
+        nodes.add(root);
+
+        for (int i = 1; i < list.size(); i++) {
+            Node<V> node = new Node<>(i, list.get(i));
+            nodes.add(node);
+            // Connect to a previous node to ensure connectivity (simulating a simple graph)
+            nodes.get(ThreadLocalRandom.current().nextInt(i)).addNeighbor(node);
         }
         return root;
-    }
-
-    private static <V extends Comparable<V>> void collectValues(Node<V> node, List<V> list) {
-        if (node == null) return;
-        list.add(node.value());
-        collectValues(node.left(), list);
-        collectValues(node.right(), list);
-    }
-
-    private static <V extends Comparable<V>> Node<V> insert(Node<V> node, V value, int id) {
-        if (node == null) return new Node<>(id, value, null, null);
-
-        if (value.compareTo(node.value()) < 0) {
-            return new Node<>(node.id(), node.value(), insert(node.left(), value, id), node.right());
-        } else {
-            return new Node<>(node.id(), node.value(), node.left(), insert(node.right(), value, id));
-        }
     }
 }

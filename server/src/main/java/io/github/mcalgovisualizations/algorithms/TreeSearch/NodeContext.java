@@ -2,7 +2,7 @@ package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
 import io.github.mcalgovisualizations.visualization.models.AbstractContext;
 
-import static io.github.mcalgovisualizations.DataTypes.NodeUtils.shuffleTree;
+import java.util.ArrayList;
 
 public class NodeContext<V extends Comparable<V>> extends AbstractContext<Node<V>> {
     public NodeContext(Node<V> values) {
@@ -17,12 +17,12 @@ public class NodeContext<V extends Comparable<V>> extends AbstractContext<Node<V
     @Override
     public Node<V> copyData() {
         if (values == null) return null;
-        return new Node<>(values.id(), values.value(), values.left(), values.right());
+        return new Node<>(values.id(), values.value(), new ArrayList<>(values.neighbors()));
     }
 
     @Override
     public Node<V> randomizeData() {
-        values = shuffleTree(values);
+        // Randomizing a graph is more complex than a tree, so we'll leave it for now
         return copyData();
     }
 }

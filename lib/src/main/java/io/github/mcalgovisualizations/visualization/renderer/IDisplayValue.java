@@ -51,6 +51,17 @@ public interface IDisplayValue {
     void teleport(Pos pos);
 
     /**
+     * Requests the display to move to a new position, potentially using pathfinding.
+     *
+     * @param pos the target position
+     * @return a future that completes when the target is reached
+     */
+    default CompletableFuture<Void> walkTo(Pos pos) {
+        teleport(pos);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
      * Sets whether this display is visually highlighted (e.g. glowing).
      *
      * @param highlighted {@code true} to enable highlighting, {@code false} to disable

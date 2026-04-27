@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.DataTypes.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.TreeSearch.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
@@ -33,23 +32,34 @@ public class RegisterAlgo {
         var l = ThreadLocalRandom.current()
                 .ints(0, 10000) // Generate stream of ints in range
                 .distinct()         // Ensure uniqueness
-                .limit(200)       // Stop once we hit our target size
+                .limit(20)       // Smaller limit for graph search
                 .boxed()
                 .collect(Collectors.toList());
-        var integerCollection1 = new NodeContext<>(NodeUtils.fromList(l));
+        
+        // Build a simple graph for the demonstration
+        Node<Integer> root = new Node<>(0, l.get(0));
+        List<Node<Integer>> nodes = new ArrayList<>();
+        nodes.add(root);
+        for (int i = 1; i < l.size(); i++) {
+            Node<Integer> node = new Node<>(i, l.get(i));
+            nodes.add(node);
+            // Connect to a previous node to ensure connectivity
+            nodes.get(ThreadLocalRandom.current().nextInt(i)).addNeighbor(node);
+        }
+
+        var graphCollection = new NodeContext<>(root);
 
         algo.registerAlgorithm(
-                Algorithm.<Node<Integer>, NodeContext<Integer>, TreeScene>builder(integerCollection1)
-                        .withIdentity("bst search", PlayerBSTSearch<Integer>::new)
-                        //.withData(bstCollection)
+                Algorithm.<Node<Integer>, NodeContext<Integer>, GraphScene>builder(graphCollection)
+                        .withIdentity("graph search", PlayerGraphSearch<Integer>::new)
                         .positioning(new LayoutPath<Integer>())
-                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Compare.class, new GraphCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
-                                "Binary Search Tree (Search)",
+                                "Graph Search (BFS)",
                                 Material.SPYGLASS,
-                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
+                                "Searches a graph using Breadth-First Search.", "Visit nodes level by level.", "Demonstrates pathfinding on a dynamic graph."
                         ))
-                        .withScene(TreeScene::new)
+                        .withScene(GraphScene::new)
                         .create()
         );
 //        registerSortingAlgo(algo);
@@ -232,7 +242,7 @@ public class RegisterAlgo {
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
                         .positioning(new UnorderedTreeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Compare.class, new GraphCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Unordered Binary Tree (Linear Search)",
                                 Material.DARK_OAK_LOG,
@@ -247,7 +257,7 @@ public class RegisterAlgo {
                         .withIdentity("tst search", PlayerTSTSearch::new)
                         //.withData(stringCollection1)
                         .positioning(new TSTNodeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Ternary Search Tree (Search)",
