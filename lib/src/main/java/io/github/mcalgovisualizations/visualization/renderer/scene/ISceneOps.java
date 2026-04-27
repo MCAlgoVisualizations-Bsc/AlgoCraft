@@ -19,11 +19,8 @@ public interface ISceneOps {
     void hoverDisplay(int slot, boolean hover);
 
     void moveSlotTo(int slot, Pos position);
-    CompletableFuture<Void> walkSlotTo(int slot, Pos position);
     void swapSlots(int a, int b);
     void addDisplay(int slot, IDisplayValue display);
-
-    @Nullable IDisplayValue getDisplay(int slot);
 
     void playSound(String key, float volume, float pitch);
     void sendMessage(Component message);

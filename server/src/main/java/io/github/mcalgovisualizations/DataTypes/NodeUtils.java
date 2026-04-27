@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.DataTypes;
 
-import io.github.mcalgovisualizations.algorithms.Node;
+import io.github.mcalgovisualizations.algorithms.TreeSearch.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -66,7 +66,12 @@ public class EntityCreatureDisplay implements IDisplayValue {
         }
     }
 
-    @Override
+    /**
+     * Requests the display to move to a new position, potentially using pathfinding.
+     *
+     * @param pos the target position
+     * @return a future that completes when the target is reached
+     */
     public CompletableFuture<Void> walkTo(Pos pos) {
         if (entity.isActive()) {
             CompletableFuture<Void> future = new CompletableFuture<>();

@@ -73,12 +73,6 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
-    public CompletableFuture<Void> walkSlotTo(int slot, Pos pos) {
-        var display = requireDisplay(slot);
-        return display.walkTo(pos);
-    }
-
-    @Override
     public void swapSlots(int a, int b) {
         var da = requireDisplay(a);
         var db = requireDisplay(b);
@@ -120,11 +114,6 @@ public abstract class AbstractScene implements ISceneOps {
         }
         displaysBySlot.put(slot, display);
         display.setInstance(instance);
-    }
-
-    @Override
-    public @Nullable IDisplayValue getDisplay(int slot) {
-        return displaysBySlot.get(slot);
     }
 
     @Override

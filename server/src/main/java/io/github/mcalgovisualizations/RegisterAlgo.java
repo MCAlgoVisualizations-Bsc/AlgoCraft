@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.*;
+import io.github.mcalgovisualizations.algorithms.TreeSearch.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
@@ -31,7 +32,7 @@ public class RegisterAlgo {
         var integerCollection1 = new NodeContext<>(fromList(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
 
         algo.registerAlgorithm(
-                Algorithm.<Node<Integer>, NodeContext<Integer>, DefaultScene>builder(integerCollection1)
+                Algorithm.<Node<Integer>, NodeContext<Integer>, TreeScene>builder(integerCollection1)
                         .withIdentity("bst search", PlayerBSTSearch<Integer>::new)
                         //.withData(bstCollection)
                         .positioning(new LayoutPath<Integer>())
@@ -41,7 +42,7 @@ public class RegisterAlgo {
                                 Material.SPYGLASS,
                                 "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
                         ))
-                        .withScene(DefaultScene::new)
+                        .withScene(TreeScene::new)
                         .create()
         );
 //        registerSortingAlgo(algo);

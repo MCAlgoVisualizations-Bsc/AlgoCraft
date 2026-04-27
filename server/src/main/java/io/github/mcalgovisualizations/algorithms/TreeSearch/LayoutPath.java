@@ -1,15 +1,11 @@
-package io.github.mcalgovisualizations.layouts;
+package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
 import io.github.mcalgovisualizations.Displays.NodeDisplay;
-import io.github.mcalgovisualizations.algorithms.Node;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
 

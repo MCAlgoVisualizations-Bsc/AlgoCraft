@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
 public record Node<V extends Comparable<V>> (
     int id,

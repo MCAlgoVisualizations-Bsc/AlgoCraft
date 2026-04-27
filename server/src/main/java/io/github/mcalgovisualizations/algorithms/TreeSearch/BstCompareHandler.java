@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.handlers;
+package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.events.Compare;
@@ -15,10 +15,10 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
     private static final int SEARCHER_SLOT = -100; // A unique slot for the searcher villager
 
     @Override
-    public AnimationPlan handle(Compare event) {
+    public AnimationPlan<TreeScene> handle(Compare event) {
         String narration = buildNarration(event);
 
-        return AnimationPlan.builder()
+        return AnimationPlan.<TreeScene>builder()
                 .stepAsync(1, sceneOps -> {
                     // Handle the searcher villager
                     var searcher = sceneOps.getDisplay(SEARCHER_SLOT);
@@ -26,9 +26,14 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
                     sceneOps.sendActionBar(Component.text(
                             "BST compare [" + event.xValue() + "] vs [" + event.yValue() + "]",
                             NamedTextColor.AQUA));
-                    sceneOps.setHighlighted(event.x(), true);
-                    // Only highlight y if it's a valid slot (not -1)
-                    if (event.y() != -1) {
+                    
+                    // Only highlight if the display exists (avoid slot 0 error if it's -1 or missing)
+                    if (event.x() != -1 && sceneOps.getDisplay(event.x()) != null) {
+                        sceneOps.setHighlighted(event.x(), true);
+                    }
+                    
+                    // Only highlight y if it's a valid slot (not -1) and exists
+                    if (event.y() != -1 && sceneOps.getDisplay(event.y()) != null) {
                         sceneOps.setHighlighted(event.y(), true);
                     }
                     sceneOps.sendMessage(Component.text(narration, NamedTextColor.GRAY));
@@ -52,20 +57,26 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
                     }
                 })
                 .step(1, sceneOps -> {
-                    sceneOps.hoverDisplay(event.x(), true);
-                    if (event.y() != -1) {
+                    if (event.x() != -1 && sceneOps.getDisplay(event.x()) != null) {
+                        sceneOps.hoverDisplay(event.x(), true);
+                    }
+                    if (event.y() != -1 && sceneOps.getDisplay(event.y()) != null) {
                         sceneOps.hoverDisplay(event.y(), true);
                     }
                 })
                 .step(1, sceneOps -> {
-                    sceneOps.hoverDisplay(event.x(), false);
-                    if (event.y() != -1) {
+                    if (event.x() != -1 && sceneOps.getDisplay(event.x()) != null) {
+                        sceneOps.hoverDisplay(event.x(), false);
+                    }
+                    if (event.y() != -1 && sceneOps.getDisplay(event.y()) != null) {
                         sceneOps.hoverDisplay(event.y(), false);
                     }
                 })
                 .step(1, sceneOps -> {
-                    sceneOps.setHighlighted(event.x(), false);
-                    if (event.y() != -1) {
+                    if (event.x() != -1 && sceneOps.getDisplay(event.x()) != null) {
+                        sceneOps.setHighlighted(event.x(), false);
+                    }
+                    if (event.y() != -1 && sceneOps.getDisplay(event.y()) != null) {
                         sceneOps.setHighlighted(event.y(), false);
                     }
                 })
