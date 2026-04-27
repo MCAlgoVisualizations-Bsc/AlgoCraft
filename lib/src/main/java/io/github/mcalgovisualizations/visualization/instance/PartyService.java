@@ -112,11 +112,7 @@ public class PartyService {
             .toArray(CompletableFuture[]::new);
 
         spectators.clear();
-        return CompletableFuture.allOf(futures).thenRun(() -> {
-            MinecraftServer.getInstanceManager().unregisterInstance(instance);
-            System.out.println(instance.isRegistered());
-
-        });
+        return CompletableFuture.allOf(futures);
     }
 
     /**

@@ -102,8 +102,10 @@ public class AlgoCraft {
                 return;
 
             if(instance != null) {
-                instance.removePlayer(defaultInstance, player);
+                instance.removePlayer(defaultInstance, player).thenRun(() -> MinecraftServer.getInstanceManager().unregisterInstance(instance.getInstance()));
+
             }
+
             return;
         }
 
@@ -208,7 +210,8 @@ public class AlgoCraft {
 
     public boolean acceptInvite(Player invited, Player inviter) {
         var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
-        inviteList.removeIf(PendingInvite::isExpired);
+        inviteList.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
+
 
         if(inviteList.stream().noneMatch(invite -> invite.inviter().equals(inviter.getUuid())))
             invited.sendMessage(Component.text("You have no active invite sent to you from: " + inviter.getUsername(), NamedTextColor.RED));
