@@ -20,11 +20,14 @@ public class SelectionScene extends AbstractScene {
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
         for(int i = 0; i < layoutResults.length; i++) {
-            displaysBySlot.put(i, layoutResults[i].displayValue());
+            final var dv = (EntityCreatureDisplay) layoutResults[i].displayValue();
+            displaysBySlot.put(i, dv);
+            dv.setInstance(instance);
+            dv.lookAt(origin);
         }
 
-        golemTracker = new EntityCreatureDisplay(origin, EntityType.COPPER_GOLEM, "Golem");
-
+        golemTracker = new EntityCreatureDisplay(origin.add(0, -1, 0), EntityType.COPPER_GOLEM, "Golem");
+        golemTracker.setInstance(instance);
 
         golemTracker.goTo(displaysBySlot.get(0).getPos());
     }

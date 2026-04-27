@@ -1,12 +1,12 @@
 package io.github.mcalgovisualizations.algorithms.sort.selection;
 
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.events.Swap;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 
 public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>> {
     @Override
@@ -30,8 +30,8 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(TrackI event) {
-            var plan = AnimationPlan.builder();
+        public AnimationPlan<SelectionScene> handle(TrackI event) {
+            var plan = AnimationPlan.<SelectionScene>builder();
             plan.step(1, scene -> {
 
             });
@@ -42,18 +42,27 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
     public static class TrackJHandler implements IAnimationHandler<TrackJ> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(TrackJ event) {
-            var plan = AnimationPlan.builder();
+        public AnimationPlan<SelectionScene> handle(TrackJ event) {
+            var plan = AnimationPlan.<SelectionScene>builder();
             plan.step(1, scene -> scene.setHighlighted(event.j(), true));
             return plan.build();
+        }
+    }
+
+    public static class CompareHandler implements IAnimationHandler<Compare> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public AnimationPlan<SelectionScene> handle(Compare event) {
+            return null;
         }
     }
 
     public static class SwapHandler implements IAnimationHandler<Swap> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(Swap event) {
-            var plan = AnimationPlan.builder();
+        public AnimationPlan<SelectionScene> handle(Swap event) {
+            var plan = AnimationPlan.<SelectionScene>builder();
             plan.step(5, scene -> {
                 scene.hoverDisplay(event.x(), true);
                 scene.swapSlots(event.x(), event.y());
