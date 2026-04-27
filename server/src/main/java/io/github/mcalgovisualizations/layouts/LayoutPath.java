@@ -34,24 +34,22 @@ public class LayoutPath implements ILayout<Node<Integer>> {
     private void renderNode(Node<Integer> node, Pos currentPos, Instance instance, int spread, List<LayoutResult> results) {
         if (node == null) return;
 
-        // 1. Place the physical Node block (White Wool)
+        // Place the node block (using White Wool as requested, or you could swap to Path here too)
         instance.setBlock(currentPos, Block.WHITE_WOOL);
 
-        // 2. Create the LayoutResult for the Label/Interactions
-        // Note: Using LayoutPathProfile.create() ensures your logic is consistent
         results.add(new LayoutResult(node.value(), currentPos, new NodeDisplay(node.value().toString(), currentPos)));
 
-        // 3. Left Branch
         if (node.left() != null) {
             Pos leftPos = currentPos.add(-spread, 0, DEPTH_SPACING);
-            drawConnection(currentPos, leftPos, instance, Block.GRAY_WOOL);
+            // Updated to use Dirt Path
+            drawConnection(currentPos, leftPos, instance, Block.DIRT_PATH);
             renderNode(node.left(), leftPos, instance, Math.max(1, spread / 2), results);
         }
 
-        // 4. Right Branch
         if (node.right() != null) {
             Pos rightPos = currentPos.add(spread, 0, DEPTH_SPACING);
-            drawConnection(currentPos, rightPos, instance, Block.GRAY_WOOL);
+            // Updated to use Dirt Path
+            drawConnection(currentPos, rightPos, instance, Block.DIRT_PATH);
             renderNode(node.right(), rightPos, instance, Math.max(1, spread / 2), results);
         }
     }
@@ -60,11 +58,29 @@ public class LayoutPath implements ILayout<Node<Integer>> {
         double dist = start.distance(end);
         int steps = (int) Math.ceil(dist);
 
-        for (int i = 1; i <= steps; i++) {
+        // Calculate the direction vector of the path
+        double dx = end.x() - start.x();
+        double dz = end.z() - start.z();
+
+        // Calculate the perpendicular (normal) vector for the width
+        // For a 2D plane (x, z), the perpendicular of (x, z) is (-z, x)
+        double length = Math.sqrt(dx * dx + dz * dz);
+        double nx = -dz / length;
+        double nz = dx / length;
+
+        for (int i = 0; i <= steps; i++) {
             double ratio = (double) i / steps;
-            double x = start.x() + (end.x() - start.x()) * ratio;
-            double z = start.z() + (end.z() - start.z()) * ratio;
-            instance.setBlock(new Pos(x, start.y(), z), block);
+            double centerX = start.x() + dx * ratio;
+            double centerZ = start.z() + dz * ratio;
+
+            // Offset by -1, 0, and 1 to create a width of 3
+            for (int offset = -1; offset <= 1; offset++) {
+                double finalX = centerX + (nx * offset);
+                double finalZ = centerZ + (nz * offset);
+
+                // We round to ensure we hit block coordinates properly
+                instance.setBlock(new Pos(Math.round(finalX), start.y(), Math.round(finalZ)), block);
+            }
         }
     }
 }
