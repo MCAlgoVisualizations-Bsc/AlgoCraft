@@ -5,15 +5,11 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.Displays.MobDisplay;
 
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 

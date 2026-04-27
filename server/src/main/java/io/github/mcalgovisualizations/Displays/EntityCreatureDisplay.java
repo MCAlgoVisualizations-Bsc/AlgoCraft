@@ -1,17 +1,20 @@
 package io.github.mcalgovisualizations.Displays;
 
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.component.DataComponent;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityCreature;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
+import net.minestom.server.entity.metadata.villager.VillagerMeta;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -29,19 +32,31 @@ public class EntityCreatureDisplay implements IDisplayValue {
         setupText(displayText);
     }
 
+
     @Override
     public Pos getPos() {
         return this.pos;
     }
 
-    public void setPos(Pos pos) {
-        this.pos = pos;
-    }
-
     @Override
     public void setInstance(Instance instance) {
         entity.setInstance(instance, pos);
-        textEntity.setInstance(instance, pos.add(0, 2,0));
+        textEntity.setInstance(instance, getTextOffset());
+    }
+
+    @Override
+    public void teleport(Pos pos) {
+        this.pos = pos;
+        entity.teleport(pos);
+        textEntity.teleport(getTextOffset());
+    }
+
+    private Pos getTextOffset() {
+        return pos.add(0, entity.getEyeHeight() + 1, 0);
+    }
+
+    public double getEyeHeight() {
+        return entity.getEyeHeight();
     }
 
     @Override
@@ -59,16 +74,22 @@ public class EntityCreatureDisplay implements IDisplayValue {
         textEntity.remove();
     }
 
-    @Override
-    public void teleport(Pos pos) {
-        entity.teleport(pos);
-        textEntity.teleport(pos.add(0,2,0));
-        setPos(pos);
+
+    public void kill() {
+        entity.kill();
+        textEntity.remove();
     }
 
     @Override
     public void setGlowing(boolean highlighted) {
         entity.setGlowing(highlighted);
+    }
+
+    public void shakeHead() {
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            var pos = entity.getPosition();
+            entity.teleport(pos.withYaw(pos.yaw() + 25f));
+        }).delay(2, TimeUnit.SERVER_TICK).schedule();
     }
 
     @Override

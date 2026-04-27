@@ -2,13 +2,14 @@ package io.github.mcalgovisualizations.layouts;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.instance.Instance;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record ArcLayout(
         double radius,
@@ -28,30 +29,167 @@ public record ArcLayout(
             return new LayoutResult[0];
         }
         int size = model.size();
-        LayoutResult[] out = new LayoutResult[size];
         double y = origin.y() + yOffset;
 
         if (size == 1) {
             double x = origin.x() + Math.cos(startAngle) * radius;
             double z = origin.z() + Math.sin(startAngle) * radius;
             Pos pos = new Pos(x, y, z);
-            out[0] = new LayoutResult(model.get(0), pos, new EntityCreatureDisplay(pos, EntityType.VILLAGER, Integer.toString(model.get(0))));
-            return out;
+            return getEntities(new Pos[] {pos}, new int[] {model.getFirst()});
         }
 
         int divisor = closed ? size : size - 1;
         double step = sweepAngle / divisor;
+
+        Pos[] pos = new Pos[size];
+        int[] values = new int[size];
 
         for (int i = 0; i < size; i++) {
             double angle = startAngle + step * i;
             double x = origin.x() + Math.cos(angle) * radius;
             double z = origin.z() + Math.sin(angle) * radius;
 
-            Pos pos = new Pos(x, y, z);
-            int finalI = i;
-            out[i] = new LayoutResult(model.get(i), pos, new EntityCreatureDisplay(pos, EntityType.VILLAGER, Integer.toString(model.get(finalI))));
+            pos[i] = new Pos(x, y, z);
+            values[i] = model.get(i);
         }
 
-        return out;
+        return getEntities(pos, values);
     }
+
+    private LayoutResult[] getEntities(Pos[] pos, int[] values) {
+        if (pos.length != values.length) {
+            throw new IllegalArgumentException("pos and values must be the same length!");
+        }
+
+        LayoutResult[] entities = new LayoutResult[pos.length];
+
+        int[] sorted = Arrays.stream(values)
+                .sorted()
+                .toArray();
+
+        Map<Integer, Integer> rankByValue = new HashMap<>();
+        for (int i = 0; i < sorted.length; i++) {
+            rankByValue.putIfAbsent(sorted[i], i);
+        }
+
+        for (int i = 0; i < pos.length; i++) {
+            int value = values[i];
+            int rank = rankByValue.get(value);
+
+            int entityIndex;
+
+            if (values.length == 1) {
+                entityIndex = 0;
+            } else {
+                entityIndex = (int) Math.round(
+                        rank * (sortedEntities.length - 1.0) / (values.length - 1.0)
+                );
+            }
+
+            EntityType type = sortedEntities.length == 0
+                    ? EntityType.VILLAGER
+                    : sortedEntities[entityIndex];
+
+            entities[i] = new LayoutResult(
+                    value,
+                    pos[i],
+                    new EntityCreatureDisplay(pos[i], type, Integer.toString(value))
+            );
+        }
+
+        return entities;
+    }
+
+    /**
+     * Sorted by height.
+     */
+    private static final EntityType[] sortedEntities = Stream.of(
+                    "allay",
+                    "armadillo",
+                    "axolotl",
+                    "bat",
+                    "bee",
+                    "bogged",
+                    "breeze",
+                    "camel",
+                    "camel_husk",
+                    "cat",
+                    "cave_spider",
+                    "chicken",
+                    "cod",
+                    "copper_golem",
+                    "cow",
+                    "creaking",
+                    "creeper",
+                    "dolphin",
+                    "donkey",
+                    "drowned",
+                    "elder_guardian",
+                    "enderman",
+                    "endermite",
+                    "evoker",
+                    "fox",
+                    "frog",
+                    "glow_squid",
+                    "goat",
+                    "guardian",
+                    "hoglin",
+                    "horse",
+                    "husk",
+                    "illusioner",
+                    "iron_golem",
+                    "llama",
+                    "magma_cube",
+                    "mooshroom",
+                    "mule",
+                    "ocelot",
+                    "panda",
+                    "parched",
+                    "parrot",
+                    "phantom",
+                    "pig",
+                    "piglin",
+                    "piglin_brute",
+                    "pillager",
+                    "polar_bear",
+                    "pufferfish",
+                    "rabbit",
+                    "ravager",
+                    "salmon",
+                    "sheep",
+                    "shulker",
+                    "silverfish",
+                    "skeleton",
+                    "skeleton_horse",
+                    "slime",
+                    "sniffer",
+                    "snow_golem",
+                    "spider",
+                    "squid",
+                    "stray",
+                    "strider",
+                    "tadpole",
+                    "trader_llama",
+                    "tropical_fish",
+                    "turtle",
+                    "vex",
+                    "villager",
+                    "vindicator",
+                    "wandering_trader",
+                    "warden",
+                    "witch",
+                    "wither",
+                    "wither_skeleton",
+                    "wolf",
+                    "zoglin",
+                    "zombie",
+                    "zombie_horse",
+                    "zombie_nautilus",
+                    "zombie_villager",
+                    "zombified_piglin"
+            )
+            .map(EntityType::fromKey)
+            .filter(Objects::nonNull)
+            .sorted(Comparator.comparingDouble(EntityType::height)) // sort by height
+            .toArray(EntityType[]::new);
 }

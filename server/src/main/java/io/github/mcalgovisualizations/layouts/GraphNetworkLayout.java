@@ -3,7 +3,6 @@ package io.github.mcalgovisualizations.layouts;
 import io.github.mcalgovisualizations.Displays.AbstractParticleDisplay;
 import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;

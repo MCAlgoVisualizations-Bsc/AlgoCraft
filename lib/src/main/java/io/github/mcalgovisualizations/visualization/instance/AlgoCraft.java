@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -32,9 +33,9 @@ public class AlgoCraft {
     // player uuid for fast lookup
     private final Map<UUID, AlgorithmInstance<?,?,?>> playerInstance = new HashMap<>();
     private final Map<UUID, PlayerInventory> playerInventory = new HashMap<>();
-    private final Map<String, AlgorithmPresentation> presentations = new HashMap<>();
     private final AlgorithmUI ui = new AlgorithmUI();
     private final Instance defaultInstance;
+    public final static Pos SPAWN_POS = new Pos(194.5, 137, -38.5);
 
     public AlgoCraft(InstanceContainer defaultInstance) {
         this.defaultInstance = defaultInstance;
@@ -54,6 +55,7 @@ public class AlgoCraft {
 
     public void addPlayerToInstance(UUID instanceId, Player... players) {
         final var instance = playerInstance.get(instanceId);
+
         if (instance == null) {
             //createInstance(instanceId, players);
         }
@@ -64,18 +66,7 @@ public class AlgoCraft {
         for(var player : players) {
             var instance = requireInstance(player);
             instance.removePlayer(defaultInstance, player);
-            playerInstance.remove(player.getUuid());
         }
-
-        // dereference and clear instance if members are empty
-        playerInstance.entrySet().removeIf(entry -> {
-            var algorithmInstance = entry.getValue();
-            if (algorithmInstance.isEmpty()) {
-                algorithmInstance.getController().clear();
-                return true;
-            }
-            return false;
-        });
     }
 
     public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
@@ -116,31 +107,26 @@ public class AlgoCraft {
             return;
         }
 
-
-
-
         if (itemStack.getTag(ALGO_INTERACTION_TAG).equals(SPAWN)) {
             if(player.getInstance() == defaultInstance)
                 return;
-            if(instance != null)
+
+            if(instance != null) {
                 instance.removePlayer(defaultInstance, player);
+            }
             return;
         }
 
-
-//        if (session == null) {
-//            System.err.println("No controls for player " + player.getUsername());
-//            return;
-//        }
-
+        final var controller = instance.getController();
         switch (itemStack.getTag(ALGO_INTERACTION_TAG)) {
-            case RANDOMIZE -> instance.getController().randomize();
-            case START -> instance.getController().start();
-            case STOP -> instance.getController().pause();
-            case FORWARD -> instance.getController().step();
-            case BACKWARD -> instance.getController().back();
-            case SET_SPEED -> instance.getController().changeSpeed();
+            case RANDOMIZE -> controller.randomize();
+            case START -> controller.start();
+            case STOP -> controller.pause();
+            case FORWARD -> controller.step();
+            case BACKWARD -> controller.back();
+            case SET_SPEED -> controller.changeSpeed();
             default -> {
+                controller.clear();
                 ui.applyDefaultLayout(player);
             }
         }
@@ -148,10 +134,11 @@ public class AlgoCraft {
 
     public void selectAlgorithm(Player player) {
         final var inventory = ui.openSelector(algorithmRegistry.keySet(), presentation -> {
-            var entry = presentations.get(presentation);
+            var entry = algorithmRegistry.get(presentation).presentation();
             return entry != null ? entry : new AlgorithmPresentation(presentation);
         });
 
+        // TODO : this shouldn't be nested
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
             if (event.getPlayer() != player) return;
             if (event.getInventory() != inventory) return;
@@ -168,18 +155,16 @@ public class AlgoCraft {
             if (entry == null) return;
 
             player.closeInventory();
-            ui.applyRunningLayout(player);
             var session = createInstance(entry.id(), player);
-            player.setInstance(session.getInstance())
-                    .thenCompose(_ -> player.teleport(AlgorithmInstance.origin))
-                    .thenCompose(_ -> session.startVisualization())
-                    .exceptionally(throwable -> {
-                        throwable.printStackTrace();
-                        player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
-                        return null;
-                    });
 
-
+            session.startVisualization()
+                .thenCompose(_ -> session.addPlayer(player))
+                .exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
+                    return null;
+                })
+                .thenRun(() -> ui.applyRunningLayout(player));
         });
 
         player.openInventory(inventory);

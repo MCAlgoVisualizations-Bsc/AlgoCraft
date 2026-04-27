@@ -20,7 +20,6 @@ public final class AlgorithmTraceBuilder<T, C extends AlgorithmContext<T>> {
 
     }
 
-
     /**
      * Builds a fresh immutable trace from the current initial data.
      */
@@ -39,7 +38,7 @@ public final class AlgorithmTraceBuilder<T, C extends AlgorithmContext<T>> {
     }
 
     /**
-     * Replaces the initial data with a shuffled version, then builds a new trace.
+     * Replaces the initial data with a user-defined randomized version, then builds a new trace.
      */
     public @NotNull AlgorithmTrace<T> randomizeAndBuild() {
         this.initialData = context.randomizeData();

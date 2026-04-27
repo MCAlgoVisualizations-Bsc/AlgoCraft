@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
@@ -12,6 +13,8 @@ import io.github.mcalgovisualizations.visualization.instance.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.Material;
 
 import java.util.ArrayList;
@@ -81,8 +84,10 @@ public class RegisterAlgo {
                         .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
                         .positioning(new ArcLayout())
                         .withScene(CircleScene::new)
-                        .onEvent(Compare.class, new CircleCompareHandler())
-                        .onEvent(Swap.class, new CircleSwapHandler())
+                        .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
+                        .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
+                        .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
+                        .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion sort circular sorting",
                                 Material.GOLDEN_APPLE,
@@ -92,14 +97,19 @@ public class RegisterAlgo {
                             final int size = ctx.values.size();
                             var plan = AnimationPlan.<CircleScene>builder()
                                     .step(CircleScene::resetAllDisplaysToHome)
-                                    .step(CircleScene::clearTracker);
+                                    .step(CircleScene::clearTrackers)
+                                    .step(CircleScene::clearGlowing)
+                                    .step(circleScene -> circleScene.sendMessage(Component.text(
+                                            "Final sorted array: " + ctx.values.toString(), NamedTextColor.GREEN)));
 
                             for(int i = 0; i<size; i++) {
                                 int finalI = i;
                                 plan.step(circleScene -> circleScene.hoverDisplay(finalI, true));
+                            }
+                            for(int i = 0; i<size; i++) {
+                                int finalI = i;
                                 plan.step(circleScene -> circleScene.hoverDisplay(finalI, false));
                             }
-
 
                             return plan.build();
                         })

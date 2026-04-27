@@ -9,36 +9,27 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
-import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.LightingChunk;
-import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends ISceneOps> {
-    private final Instance instance;
+    private final Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
     private final AlgorithmPresentation presentation;
-    private final PlayerFeedback audience;
+    private final PartyService partyService;
     private final VisualizationController<T, C> controller;
-    public static final Pos origin = new Pos(0, 40, 0);
+    public static final Pos INSTANCE_ORIGIN = new Pos(0, 40, 0);
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
-        var container = MinecraftServer.getInstanceManager().createInstanceContainer();
-        this.instance = container;
         this.presentation = algorithm.presentation();
-        this.audience = new PlayerFeedback(players);
+        this.partyService = new PartyService(players[0]);
 
         instance.setGenerator(unit -> {
             final Point start = unit.absoluteStart();
@@ -52,7 +43,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
             }
         });
 
-        container.setChunkSupplier(LightingChunk::new);
+        instance.setChunkSupplier(LightingChunk::new);
 
         //container.setChunkLoader(new AnvilLoader(worldPath));
 
@@ -61,12 +52,13 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         a.run(algorithmCtx);
         final AnimationPlan<O> onCompletePlan = algorithm.onComplete().apply(algorithmCtx);
 
-        final var sceneCtx = new SceneContext(instance, audience, new Pos(0, 40, 0));
+        final var audience = new PlayerFeedback(partyService::audience);
+        final var sceneCtx = new SceneContext(instance, audience, INSTANCE_ORIGIN);
         final var scene = algorithm.scene().apply(sceneCtx);
 
         final var renderer = new Renderer<>(
                 instance,
-                new Pos(0, 40, 0),
+                INSTANCE_ORIGIN,
                 algorithm.layout(),
                 audience,
                 algorithm.handlerRegistry(),
@@ -85,57 +77,18 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
                 audience
         );
 
-        // teleport all players to the instance
-        // Arrays.stream(players).forEach(player -> player.setInstance(instance));
     }
 
     public Instance getInstance() {
         return this.instance;
     }
 
-    public UUID getUuid() {
-        return this.instance.getUuid();
+    public CompletableFuture<Void> addPlayer(Player... players) {
+        return partyService.addSpectator(instance, INSTANCE_ORIGIN, players);
     }
 
-    public boolean containsPlayer(Player... players) {
-        return this.audience.containsPlayer(players);
-    }
-
-    public void addPlayer(Player... players) {
-        Arrays.stream(players).forEach( player -> {
-            // add the player to the audience so they get notified when they join
-            this.audience.addAudience(player);
-            final var message = Component.text(player.getUsername() + " joined the session", NamedTextColor.GREEN);
-            this.audience.sendMessage(message);
-            player.setInstance(this.instance);
-        });
-    }
-
-    public boolean isEmpty() {
-        return audience.isEmpty();
-    }
-
-    public void removePlayer(@NotNull Instance returnInstance, Player... players) {
-        final var instance = Objects.requireNonNull(returnInstance, "Tried to send player to null returnInstance");
-        if (instance == this.instance) {
-            System.err.println("Tried to remove player from the instance they are already in");
-            this.audience.sendMessage(Component.text("An error occurred", NamedTextColor.RED));
-            return;
-        }
-        for (var player : players) {
-            if (player == null) continue;
-
-            this.audience.removeAudience(player);
-            this.audience.sendMessage(Component.text(player.getUsername() + " left the session", NamedTextColor.RED));
-            player.setInstance(instance).thenRun(() -> player.teleport(new Pos(194.5, 137, -38.5)));
-
-        }
-    }
-
-    public void teleportPlayer(Player... players) {
-        for (var player : players) {
-            player.setInstance(this.instance);
-        }
+    public CompletableFuture<Void> removePlayer(@NotNull Instance returnInstance, Player... players) {
+        return partyService.removeSpectator(returnInstance, AlgoCraft.SPAWN_POS, players);
     }
 
     public CompletableFuture<Void> startVisualization() {

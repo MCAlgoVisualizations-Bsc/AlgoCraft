@@ -2,7 +2,7 @@ package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public final class Renderer<I, O extends ISceneOps> {
@@ -83,15 +84,29 @@ public final class Renderer<I, O extends ISceneOps> {
     public void onCleanup() {
         executor.onCleanup();
         scene.cleanUp();
-        instance = null;
     }
 
     public CompletableFuture<Void> initialize(I initialModel) {
-        final var futures = Arrays.stream(layout.compute(initialModel, origin, instance))
-                .map(r -> instance.loadChunk(r.pos().chunkX(), r.pos().chunkZ()))
-                .distinct()
+        Objects.requireNonNull(instance, "Renderer.instance is null");
+        final var layoutResults = Objects.requireNonNull(
+                this.layout.compute(initialModel, origin, instance),
+                "layout.compute returned null"
+        );
+
+        final var futures = Arrays.stream(layoutResults)
+                .filter(Objects::nonNull)
+                .map(ChunkKey::new)
+                .map(key -> instance.loadChunk(key.x(), key.z()))
                 .toArray(CompletableFuture[]::new);
-        return CompletableFuture.allOf(futures);
+
+        return CompletableFuture.allOf(futures)
+                .thenRun(() -> scene.setLayout(layoutResults));
+    }
+
+    private record ChunkKey(LayoutResult layoutResult, int x, int z) {
+        public ChunkKey(LayoutResult layoutResult) {
+            this(layoutResult, layoutResult.pos().chunkX(), layoutResult.pos().chunkZ());
+        }
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
@@ -99,7 +114,7 @@ public final class Renderer<I, O extends ISceneOps> {
             return plan;
         }
 
-        AnimationPlan.Builder<O> builder = AnimationPlan.builder();
+        var builder = AnimationPlan.<O>builder();
         for (var step : plan.steps()) {
             builder.step(0, step.op());
         }

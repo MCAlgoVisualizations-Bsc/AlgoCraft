@@ -5,7 +5,6 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityType;
@@ -21,9 +20,14 @@ public class CircleScene extends AbstractScene {
 
     private final Map<Integer, Pos> homePositions = new HashMap<>();
 
-    private EntityCreatureDisplay tracker;
-    private Integer trackedSlot;
-    private EntityCreatureDisplay trackedDisplay;
+    private EntityCreatureDisplay iTracker;
+    private EntityCreatureDisplay jTracker;
+
+    private Integer trackedISlot;
+    private Integer trackedJSlot;
+
+    private EntityCreatureDisplay trackedIDisplay;
+    private EntityCreatureDisplay trackedJDisplay;
 
     private StagedCompare stagedCompare;
 
@@ -34,7 +38,7 @@ public class CircleScene extends AbstractScene {
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
         clearCompareState();
-        clearTracker();
+        clearTrackers();
 
         displaysBySlot.clear();
         homePositions.clear();
@@ -55,28 +59,62 @@ public class CircleScene extends AbstractScene {
         }
     }
 
-    public void trackSlot(int slot) {
-        trackedSlot = slot;
-        trackedDisplay = requireDisplay(slot);
-        refreshTracker();
+    public void trackI(int slot) {
+        trackedISlot = slot;
+        trackedIDisplay = null;
+        refreshITracker();
     }
 
-    public void trackDisplay(EntityCreatureDisplay display) {
-        trackedDisplay = Objects.requireNonNull(display, "display");
-        trackedSlot = null;
-        refreshTracker();
+    public void trackJ(int slot) {
+        trackedJSlot = slot;
+        trackedJDisplay = null;
+        refreshJTracker();
     }
 
-    public void clearTracker() {
-        trackedSlot = null;
-        trackedDisplay = null;
+    /**
+     * Clears the tracker for the currently tracked display for the I loop.
+     */
+    public void clearITracker() {
+        trackedISlot = null;
+        trackedIDisplay = null;
 
-        if (tracker != null) {
-            tracker.remove();
-            tracker = null;
+        if (iTracker != null) {
+            iTracker.remove();
+            iTracker = null;
         }
     }
 
+    /**
+     * Clears the tracker for the currently tracked display for the J loop.
+     */
+    public void clearJTracker() {
+        trackedJSlot = null;
+        trackedJDisplay = null;
+
+        if (jTracker != null) {
+            jTracker.kill();
+            jTracker = null;
+        }
+    }
+
+    /**
+     * Clears all trackers for the I and J loops.
+     */
+    public void clearTrackers() {
+        clearITracker();
+        clearJTracker();
+    }
+
+    public void shakeHead(int slot) {
+        var dv = requireDisplay(slot);
+        dv.shakeHead();
+    }
+
+    /**
+     * Stages a compare pair for the given slots.
+     * @param leftSlot 1st display slot
+     * @param rightSlot 2nd display slot
+     */
     public void stageCompare(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) {
             throw new IllegalArgumentException("Cannot compare the same slot twice: " + leftSlot);
@@ -100,6 +138,9 @@ public class CircleScene extends AbstractScene {
 
         lookAtOrigin(leftDisplay);
         lookAtOrigin(rightDisplay);
+        leftDisplay.lookAt(rightDisplay.getPos().add(0, 1, 0));
+        rightDisplay.lookAt(leftDisplay.getPos());
+
 
         stagedCompare = new StagedCompare(
                 leftSlot,
@@ -114,7 +155,7 @@ public class CircleScene extends AbstractScene {
 
         emitLines(leftHome, middle);
         emitLines(rightHome, middle);
-        refreshTracker();
+        refreshTrackers();
     }
 
     public void restoreStagedCompare() {
@@ -129,7 +170,7 @@ public class CircleScene extends AbstractScene {
         lookAtOrigin(stagedCompare.rightDisplay);
 
         clearCompareState();
-        refreshTracker();
+        refreshTrackers();
     }
 
     public void swapStagedComparePositions() {
@@ -143,7 +184,7 @@ public class CircleScene extends AbstractScene {
         lookAtOrigin(stagedCompare.leftDisplay);
         lookAtOrigin(stagedCompare.rightDisplay);
 
-        refreshTracker();
+        refreshTrackers();
     }
 
     public void commitStagedSwap() {
@@ -170,9 +211,23 @@ public class CircleScene extends AbstractScene {
         displaysBySlot.put(rightSlot, leftDisplay);
 
         clearCompareState();
-        trackSlot(leftSlot);
+        refreshTrackers();
     }
 
+    /**
+     * Finishes the inner loop visuals by restoring the original positions of the displays.
+     */
+    public void finishInnerLoopVisuals() {
+        if (hasStagedCompare()) {
+            restoreStagedCompare();
+        }
+    }
+
+    /**
+     * Swaps the positions of two displays without moving them to the home position.
+     * @param leftSlot 1st display slot
+     * @param rightSlot 2nd display slot
+     */
     public void swapDirect(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) {
             return;
@@ -194,9 +249,12 @@ public class CircleScene extends AbstractScene {
         displaysBySlot.put(rightSlot, leftDisplay);
 
         clearCompareState();
-        trackSlot(leftSlot);
+        refreshTrackers();
     }
 
+    /**
+     * Moves all displays to their home positions.
+     */
     public void resetAllDisplaysToHome() {
         clearCompareState();
 
@@ -209,7 +267,7 @@ public class CircleScene extends AbstractScene {
             lookAtOrigin(display);
         }
 
-        refreshTracker();
+        refreshTrackers();
     }
 
     public boolean hasStagedCompare() {
@@ -240,37 +298,84 @@ public class CircleScene extends AbstractScene {
         return requireHomePosition(slot);
     }
 
-    private void refreshTracker() {
-        EntityCreatureDisplay target = null;
+    private void refreshTrackers() {
+        refreshITracker();
+        refreshJTracker();
+    }
 
-        if (trackedDisplay != null) {
-            target = trackedDisplay;
-        } else if (trackedSlot != null) {
-            target = requireDisplay(trackedSlot);
-        }
-
-        if (target == null) {
+    private void refreshITracker() {
+        Pos base = resolveITrackerBase();
+        if (base == null) {
             return;
         }
 
-        Pos base = target.getPos();
-        Pos trackerPos = getTrackerPosition(base);
+        Pos trackerPos = getITrackerPosition(base);
 
-        if (tracker == null) {
-            tracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "");
-            tracker.setInstance(instance);
+
+        if (iTracker == null) {
+            iTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "I");
+            iTracker.setInstance(instance);
         }
 
-        tracker.teleport(trackerPos);
-        tracker.lookAt(base);
+        iTracker.teleport(trackerPos);
+        iTracker.lookAt(base.add(0, requireDisplay(trackedISlot).getEyeHeight() + 2, 0));
     }
 
-     public EntityCreatureDisplay requireDisplay(int slot) {
-        var display = displaysBySlot.get(slot);
-        if (display == null) {
-            throw new IllegalArgumentException("No display for slot " + slot);
+    private void refreshJTracker() {
+        Pos base = resolveJTrackerBase();
+        if (base == null) {
+            return;
         }
-        return ((EntityCreatureDisplay) display);
+
+        Pos trackerPos = getJTrackerPosition(base);
+
+        if (jTracker == null) {
+            jTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "J");
+            jTracker.setInstance(instance);
+        }
+
+        jTracker.teleport(trackerPos);
+        jTracker.lookAt(base.add(0, requireDisplay(trackedJSlot).getEyeHeight() + 2, 0));
+    }
+
+    private EntityCreatureDisplay resolveTrackedDisplay(EntityCreatureDisplay explicitDisplay, Integer slot) {
+        if (explicitDisplay != null) {
+            return explicitDisplay;
+        }
+
+        if (slot != null) {
+            return requireDisplay(slot);
+        }
+
+        return null;
+    }
+
+    private Pos resolveITrackerBase() {
+        if (trackedIDisplay != null) {
+            return trackedIDisplay.getPos();
+        }
+
+        if (trackedISlot != null) {
+            return requireHomePosition(trackedISlot);
+        }
+
+        return null;
+    }
+
+    private Pos resolveJTrackerBase() {
+        if (trackedJDisplay != null) {
+            return trackedJDisplay.getPos();
+        }
+
+        if (trackedJSlot != null) {
+            return requireDisplay(trackedJSlot).getPos();
+        }
+
+        return null;
+    }
+
+    public EntityCreatureDisplay requireDisplay(int slot) {
+        return (EntityCreatureDisplay) super.requireDisplay(slot);
     }
 
     private Pos requireHomePosition(int slot) {
@@ -293,8 +398,14 @@ public class CircleScene extends AbstractScene {
         return origin.add(0.0, 5.0, 0.0);
     }
 
-    private Pos getTrackerPosition(Pos base) {
-        return base.add(0.0, 2.5, 0.0);
+    private Pos getITrackerPosition(Pos base) {
+        var tracked = requireDisplay(trackedISlot);
+        return base.add(-0.8, tracked.getEyeHeight() + 2, 0.0);
+    }
+
+    private Pos getJTrackerPosition(Pos base) {
+        var tracked = requireDisplay(trackedJSlot);
+        return base.add(0.8, tracked.getEyeHeight() + 2, 0.0);
     }
 
     private void lookAtOrigin(IDisplayValue display) {
@@ -306,7 +417,7 @@ public class CircleScene extends AbstractScene {
     @Override
     public void cleanUp() {
         clearCompareState();
-        clearTracker();
+        clearTrackers();
         super.cleanUp();
         homePositions.clear();
     }
