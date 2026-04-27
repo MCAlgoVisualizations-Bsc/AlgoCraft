@@ -26,7 +26,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     private final EntityCreature entity;
     private final Entity textEntity;
 
-
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
         this(pos, entityType, displayText, false);
     }

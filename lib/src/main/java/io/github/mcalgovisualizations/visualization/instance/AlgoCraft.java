@@ -15,6 +15,7 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -68,11 +69,7 @@ public class AlgoCraft {
     }
 
     public AlgorithmInstance<?,?,?> requireInstance(Player player) {
-        var instance = playerInstance.get(player.getUuid());
-        if (instance == null) {
-            throw new IllegalStateException("No instance for player " + player.getUsername());
-        }
-        return instance;
+        return playerInstance.get(player.getUuid());
     }
 
     public void applyDefaultLayout(Player player) {
@@ -169,12 +166,24 @@ public class AlgoCraft {
         public boolean isExpired() {
                 return System.currentTimeMillis() > expiresAt;
         }
+        public long remainingMillis() {
+            return Math.max(0, expiresAt - System.currentTimeMillis());
+        }
+        @Override
+        public @NonNull String toString() {
+            long totalSeconds = remainingMillis() / 1000;
+            long minutes = totalSeconds / 60;
+            long seconds = totalSeconds % 60;
+
+            return minutes > 0
+                    ? String.format("%dm %02ds", minutes, seconds)
+                    : seconds + "s";
+        }
     }
 
     public Set<PendingInvite> getPendingInvites(Player player) {
         var invites = pendingInvites.getOrDefault(player.getUuid(), new HashSet<>());
-
-        invites.removeIf(PendingInvite::isExpired);
+        invites.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
         return Set.copyOf(invites);
     }
 
@@ -182,17 +191,17 @@ public class AlgoCraft {
         final var inviterInstance = requireInstance(inviter);
 
         if(inviter.getInstance().equals(defaultInstance) || inviterInstance == null) {
-            target.sendMessage(Component.text("You have to be in a visualization before inviting others", NamedTextColor.RED));
+            inviter.sendMessage(Component.text("You have to be in a visualization before inviting others", NamedTextColor.RED));
             return;
         }
 
         if(inviter.getInstance().equals(target.getInstance())) {
-            target.sendMessage(Component.text("You cannot invite players from the same instance", NamedTextColor.RED));
+            inviter.sendMessage(Component.text("You cannot invite players from the same instance", NamedTextColor.RED));
             return;
         }
 
-
-        target.sendMessage(Component.text("You have been invited to join: ", NamedTextColor.GREEN));
+        inviter.sendMessage(Component.text("You have invited " + target.getUsername() + " to your instance."));
+        target.sendMessage(Component.text("You have been invited to join: " + inviterInstance.getPresentation().algorithmId(), NamedTextColor.GREEN));
         final var invites = pendingInvites.computeIfAbsent(target.getUuid(), _ -> new HashSet<>());
         invites.add(new PendingInvite(inviter.getUuid(), inviterInstance, expiresIn));
     }
@@ -208,15 +217,12 @@ public class AlgoCraft {
             if(!invite.inviter().equals(inviter.getUuid()))
                 continue;
             var instance = requireInstance(inviter);
+            this.playerInstance.put(invited.getUuid(), instance);
             instance.addPlayer(invited);
             inviteList.remove(invite);
             return true;
         }
 
         return false;
-    }
-
-    public Instance getDefaultInstance() {
-        return defaultInstance;
     }
 }

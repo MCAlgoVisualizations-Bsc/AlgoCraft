@@ -27,10 +27,9 @@ public class Invite extends Command {
                 player.sendMessage(Component.text("You cannot invite yourself", NamedTextColor.RED));
                 return;
             }
-
-            Player target = (Player) targets.getFirst();
-            long ttl = System.currentTimeMillis() + 1000 * 60 * 60;
-            algoCraft.invitePlayer(player, target, ttl);
+           Player target = (Player) targets.getFirst();
+           long ttl = System.currentTimeMillis() + 1000 * 60 * 60;
+           algoCraft.invitePlayer(player, target, ttl);
         }, targetArg);
 
         setDefaultExecutor((sender, context) -> {
