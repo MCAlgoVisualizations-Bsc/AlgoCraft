@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations;
 import io.github.mcalgovisualizations.DataTypes.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.PlayerDFS;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
@@ -44,6 +45,20 @@ public class RegisterAlgo {
                                 "Graph Search (BFS)",
                                 Material.SPYGLASS,
                                 "Searches a graph using Breadth-First Search.", "Visit nodes level by level.", "Demonstrates pathfinding on a dynamic graph."
+                        ))
+                        .withScene(GraphScene::new)
+                        .create()
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.builder(graphCollection)
+                        .withIdentity("graph dfs", PlayerDFS::new)
+                        .positioning(new LayoutPath(NodeUtils.GRID_COLS))
+                        .onEvent(Compare.class, new GraphCompareHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Graph Search (DFS)",
+                                Material.SPYGLASS,
+                                "Searches a graph using Depth-First Search.", "Explores as far as possible along each branch.", "Demonstrates pathfinding on a dynamic graph."
                         ))
                         .withScene(GraphScene::new)
                         .create()
@@ -294,6 +309,7 @@ public class RegisterAlgo {
                         .create()
         );
 
+        /*
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
@@ -310,7 +326,7 @@ public class RegisterAlgo {
                         .withScene(GridScene::new)
                         .create()
         );
-
+*/
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
