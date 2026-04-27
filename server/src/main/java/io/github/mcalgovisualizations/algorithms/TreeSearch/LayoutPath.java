@@ -9,8 +9,9 @@ import net.minestom.server.instance.block.Block;
 
 public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
 
-    private static final int INITIAL_HORIZONTAL_SPREAD = 16;
-    private static final int DEPTH_SPACING = 6;
+    private static final int SCALE = 2;
+    private static final int INITIAL_HORIZONTAL_SPREAD = 32 * SCALE;
+    private static final int DEPTH_SPACING = 6 * SCALE;
 
     public LayoutPath() {}
 

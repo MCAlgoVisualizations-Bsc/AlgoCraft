@@ -1,16 +1,7 @@
 package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
-import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
-import io.github.mcalgovisualizations.algorithms.context.NodeContext;
 import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
-import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
-import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.entity.EntityType;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<NodeContext<I>> {
 

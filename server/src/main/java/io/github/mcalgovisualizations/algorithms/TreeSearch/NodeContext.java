@@ -1,6 +1,5 @@
-package io.github.mcalgovisualizations.algorithms.context;
+package io.github.mcalgovisualizations.algorithms.TreeSearch;
 
-import io.github.mcalgovisualizations.algorithms.TreeSearch.Node;
 import io.github.mcalgovisualizations.visualization.models.AbstractContext;
 
 import static io.github.mcalgovisualizations.DataTypes.NodeUtils.shuffleTree;

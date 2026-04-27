@@ -1,9 +1,10 @@
 package io.github.mcalgovisualizations;
 
+import io.github.mcalgovisualizations.DataTypes.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.TreeSearch.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.context.NodeContext;
+import io.github.mcalgovisualizations.algorithms.TreeSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
@@ -24,12 +25,18 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static io.github.mcalgovisualizations.DataTypes.NodeUtils.fromList;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
-        var integerCollection1 = new NodeContext<>(fromList(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
+        var l = ThreadLocalRandom.current()
+                .ints(0, 10000) // Generate stream of ints in range
+                .distinct()         // Ensure uniqueness
+                .limit(200)       // Stop once we hit our target size
+                .boxed()
+                .collect(Collectors.toList());
+        var integerCollection1 = new NodeContext<>(NodeUtils.fromList(l));
 
         algo.registerAlgorithm(
                 Algorithm.<Node<Integer>, NodeContext<Integer>, TreeScene>builder(integerCollection1)
