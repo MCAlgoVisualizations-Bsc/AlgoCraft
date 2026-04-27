@@ -1,7 +1,7 @@
 package io.github.mcalgovisualizations.algorithms;
 
 import io.github.mcalgovisualizations.algorithms.context.NodeContext;
-import io.github.mcalgovisualizations.events.NodeCompare;
+import io.github.mcalgovisualizations.events.Compare;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSort<NodeContext<I>> {
@@ -14,16 +14,17 @@ public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSo
         }
 
         // For visualization, let's pick a target value.
-        // In a real search, this might come from the context or user input.
-        // For now, let's assume we are searching for the root's value just as a placeholder.
-        I targetValue = root.value();
+        I targetValue = findSomeValue(root);
 
         Node<I> cursor = root;
 
         while (cursor != null) {
-            // Emit a comparison event so the UI highlights the current node
-            // Note: You may need to adjust the Compare event parameters to fit your Node structure
-            context.emit(new NodeCompare<>(cursor, root));
+            // Emit a comparison event. 
+            // x: current node being visited
+            // y: -1 (no physical slot for the target value)
+            // xValue: value of current node
+            // yValue: the target value we are searching for
+            context.emit(new Compare(cursor.id(), -1, cursor.value(), targetValue));
 
             int cmp = targetValue.compareTo(cursor.value());
 
@@ -39,5 +40,13 @@ public final class PlayerBSTSearch<I extends Comparable<I>> implements IPlayerSo
                 cursor = cursor.right();
             }
         }
+    }
+
+    private I findSomeValue(Node<I> node) {
+        // Try to find a leaf or something deep to make the search interesting
+        if (node.left() != null && Math.random() > 0.5) return findSomeValue(node.left());
+        if (node.right() != null) return findSomeValue(node.right());
+        if (node.left() != null) return findSomeValue(node.left());
+        return node.value();
     }
 }

@@ -18,7 +18,8 @@ public class NodeContext<V extends Comparable<V>> extends AbstractContext<Node<V
 
     @Override
     public Node<V> copyData() {
-        return new Node<>(values.value(), values.left(), values.right());
+        if (values == null) return null;
+        return new Node<>(values.id(), values.value(), values.left(), values.right());
     }
 
     @Override

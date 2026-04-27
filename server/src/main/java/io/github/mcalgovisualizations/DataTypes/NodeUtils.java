@@ -13,8 +13,8 @@ public class NodeUtils {
         Collections.shuffle(values);
 
         Node<V> newRoot = null;
-        for (V val : values) {
-            newRoot = insert(newRoot, val);
+        for (int i = 0; i < values.size(); i++) {
+            newRoot = insert(newRoot, values.get(i), i);
         }
         return newRoot;
     }
@@ -23,8 +23,8 @@ public class NodeUtils {
         if (list == null || list.isEmpty()) return null;
 
         Node<V> root = null;
-        for (V value : list) {
-            root = insert(root, value);
+        for (int i = 0; i < list.size(); i++) {
+            root = insert(root, list.get(i), i);
         }
         return root;
     }
@@ -36,13 +36,13 @@ public class NodeUtils {
         collectValues(node.right(), list);
     }
 
-    private static <V extends Comparable<V>> Node<V> insert(Node<V> node, V value) {
-        if (node == null) return new Node<>(value, null, null);
+    private static <V extends Comparable<V>> Node<V> insert(Node<V> node, V value, int id) {
+        if (node == null) return new Node<>(id, value, null, null);
 
         if (value.compareTo(node.value()) < 0) {
-            return new Node<>(node.value(), insert(node.left(), value), node.right());
+            return new Node<>(node.id(), node.value(), insert(node.left(), value, id), node.right());
         } else {
-            return new Node<>(node.value(), node.left(), insert(node.right(), value));
+            return new Node<>(node.id(), node.value(), node.left(), insert(node.right(), value, id));
         }
     }
 }

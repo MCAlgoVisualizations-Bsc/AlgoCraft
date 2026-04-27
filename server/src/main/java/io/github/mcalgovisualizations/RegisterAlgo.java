@@ -28,10 +28,10 @@ public class RegisterAlgo {
         var integerCollection1 = new NodeContext<>(fromList(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
 
         algo.registerAlgorithm(
-                Algorithm.builder(integerCollection1)
-                        .withIdentity("bst search", PlayerBSTSearch::new)
+                Algorithm.<Node<Integer>, NodeContext<Integer>, DefaultScene>builder(integerCollection1)
+                        .withIdentity("bst search", PlayerBSTSearch<Integer>::new)
                         //.withData(bstCollection)
-                        .positioning(new LayoutPath())
+                        .positioning(new LayoutPath<Integer>())
                         .onEvent(Compare.class, new BstCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Binary Search Tree (Search)",

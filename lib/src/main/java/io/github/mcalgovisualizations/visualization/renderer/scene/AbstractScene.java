@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -113,6 +114,11 @@ public abstract class AbstractScene implements ISceneOps {
         }
         displaysBySlot.put(slot, display);
         display.setInstance(instance);
+    }
+
+    @Override
+    public @Nullable IDisplayValue getDisplay(int slot) {
+        return displaysBySlot.get(slot);
     }
 
     @Override

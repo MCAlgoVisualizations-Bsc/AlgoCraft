@@ -11,7 +11,7 @@ import net.minestom.server.instance.block.Block;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LayoutPath implements ILayout<Node<Integer>> {
+public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
 
     private static final int INITIAL_HORIZONTAL_SPREAD = 16;
     private static final int DEPTH_SPACING = 6;
@@ -19,36 +19,41 @@ public class LayoutPath implements ILayout<Node<Integer>> {
     public LayoutPath() {}
 
     @Override
-    public LayoutResult[] compute(Node<Integer> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(Node<V> model, Pos origin, Instance instance) {
         if (model == null) return new LayoutResult[0];
 
-        List<LayoutResult> results = new ArrayList<>();
+        int maxId = findMaxId(model);
+        LayoutResult[] results = new LayoutResult[maxId + 1];
+
         double floorY = Math.floor(origin.y()) - 1;
         Pos floorOrigin = new Pos(origin.x(), floorY, origin.z());
 
         renderNode(model, floorOrigin, instance, INITIAL_HORIZONTAL_SPREAD, results);
 
-        return results.toArray(new LayoutResult[0]);
+        return results;
     }
 
-    private void renderNode(Node<Integer> node, Pos currentPos, Instance instance, int spread, List<LayoutResult> results) {
+    private int findMaxId(Node<V> node) {
+        if (node == null) return -1;
+        return Math.max(node.id(), Math.max(findMaxId(node.left()), findMaxId(node.right())));
+    }
+
+    private void renderNode(Node<V> node, Pos currentPos, Instance instance, int spread, LayoutResult[] results) {
         if (node == null) return;
 
-        // Place the node block (using White Wool as requested, or you could swap to Path here too)
+        // Place the node block
         instance.setBlock(currentPos, Block.WHITE_WOOL);
 
-        results.add(new LayoutResult(node.value(), currentPos, new NodeDisplay(node.value().toString(), currentPos)));
+        results[node.id()] = new LayoutResult(node.value(), currentPos, new NodeDisplay(node.value().toString(), currentPos));
 
         if (node.left() != null) {
             Pos leftPos = currentPos.add(-spread, 0, DEPTH_SPACING);
-            // Updated to use Dirt Path
             drawConnection(currentPos, leftPos, instance, Block.DIRT_PATH);
             renderNode(node.left(), leftPos, instance, Math.max(1, spread / 2), results);
         }
 
         if (node.right() != null) {
             Pos rightPos = currentPos.add(spread, 0, DEPTH_SPACING);
-            // Updated to use Dirt Path
             drawConnection(currentPos, rightPos, instance, Block.DIRT_PATH);
             renderNode(node.right(), rightPos, instance, Math.max(1, spread / 2), results);
         }
@@ -58,12 +63,9 @@ public class LayoutPath implements ILayout<Node<Integer>> {
         double dist = start.distance(end);
         int steps = (int) Math.ceil(dist);
 
-        // Calculate the direction vector of the path
         double dx = end.x() - start.x();
         double dz = end.z() - start.z();
 
-        // Calculate the perpendicular (normal) vector for the width
-        // For a 2D plane (x, z), the perpendicular of (x, z) is (-z, x)
         double length = Math.sqrt(dx * dx + dz * dz);
         double nx = -dz / length;
         double nz = dx / length;
@@ -73,12 +75,10 @@ public class LayoutPath implements ILayout<Node<Integer>> {
             double centerX = start.x() + dx * ratio;
             double centerZ = start.z() + dz * ratio;
 
-            // Offset by -1, 0, and 1 to create a width of 3
             for (int offset = -1; offset <= 1; offset++) {
                 double finalX = centerX + (nx * offset);
                 double finalZ = centerZ + (nz * offset);
 
-                // We round to ensure we hit block coordinates properly
                 instance.setBlock(new Pos(Math.round(finalX), start.y(), Math.round(finalZ)), block);
             }
         }

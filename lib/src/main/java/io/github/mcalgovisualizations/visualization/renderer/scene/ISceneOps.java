@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
+import org.jetbrains.annotations.Nullable;
 
 public interface ISceneOps {
 
@@ -19,10 +20,11 @@ public interface ISceneOps {
     void swapSlots(int a, int b);
     void addDisplay(int slot, IDisplayValue display);
 
+    @Nullable IDisplayValue getDisplay(int slot);
+
     void playSound(String key, float volume, float pitch);
     void sendMessage(Component message);
     void sendActionBar(Component message);
 
     void cleanUp();
 }
-
