@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations;
 
+import io.github.mcalgovisualizations.DataTypes.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
@@ -30,23 +31,13 @@ import java.util.stream.Collectors;
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
         var l = ThreadLocalRandom.current()
-                .ints(0, 10000) // Generate stream of ints in range
-                .distinct()         // Ensure uniqueness
-                .limit(20)       // Smaller limit for graph search
+                .ints(0, 10000)
+                .distinct()
+                .limit(20)
                 .boxed()
                 .collect(Collectors.toList());
-        
-        // Build a simple graph for the demonstration
-        Node root = new Node(0, l.get(0));
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(root);
-        for (int i = 1; i < l.size(); i++) {
-            Node node = new Node(i, l.get(i));
-            nodes.add(node);
-            // Connect to a previous node to ensure connectivity
-            nodes.get(ThreadLocalRandom.current().nextInt(i)).addNeighbor(node);
-        }
 
+        var root = NodeUtils.fromList(l);
         var graphCollection = new NodeContext(root);
 
         algo.registerAlgorithm(

@@ -106,8 +106,8 @@ public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
 
     private int findDeepValue(Node root) {
         if (!root.neighbors().isEmpty()) {
-            Node child = root.neighbors().get(0);
-            if (!child.neighbors().isEmpty()) return child.neighbors().get(0).value();
+            Node child = root.neighbors().getFirst();
+            if (!child.neighbors().isEmpty()) return child.neighbors().getFirst().value();
             return child.value();
         }
         return root.value();

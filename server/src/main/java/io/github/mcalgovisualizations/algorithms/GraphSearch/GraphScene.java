@@ -18,9 +18,4 @@ public class GraphScene extends AbstractScene {
             addDisplay(i, layoutResults[i].displayValue());
         }
     }
-
-    @Override
-    public @Nullable IDisplayValue getDisplay(int slot) {
-        return displaysBySlot.get(slot);
-    }
 }
