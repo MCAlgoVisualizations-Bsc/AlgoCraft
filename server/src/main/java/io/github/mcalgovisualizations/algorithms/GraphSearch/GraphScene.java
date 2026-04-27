@@ -1,15 +1,11 @@
-package io.github.mcalgovisualizations.algorithms.TreeSearch;
+package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
-import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.CompletableFuture;
 
 public class GraphScene extends AbstractScene {
     public GraphScene(@NotNull SceneContext context) {

@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms.TreeSearch;
+package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms.TreeSearch;
+package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.events.Compare;

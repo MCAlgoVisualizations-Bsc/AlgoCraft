@@ -1,9 +1,9 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.*;
-import io.github.mcalgovisualizations.algorithms.TreeSearch.*;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.TreeSearch.NodeContext;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;

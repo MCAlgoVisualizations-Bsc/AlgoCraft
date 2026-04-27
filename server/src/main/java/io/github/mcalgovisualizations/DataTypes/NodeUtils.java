@@ -1,9 +1,8 @@
 package io.github.mcalgovisualizations.DataTypes;
 
-import io.github.mcalgovisualizations.algorithms.TreeSearch.Node;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.Node;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms.TreeSearch;
+package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import io.github.mcalgovisualizations.Displays.NodeDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
@@ -9,7 +9,6 @@ import net.minestom.server.instance.block.Block;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Objects;
 
 public class LayoutPath implements ILayout<Node> {
 
