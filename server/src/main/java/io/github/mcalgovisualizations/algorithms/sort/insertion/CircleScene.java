@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations;
+package io.github.mcalgovisualizations.algorithms.sort.insertion;
 
 import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
@@ -47,7 +47,8 @@ public class CircleScene extends AbstractScene {
             var result = layoutResults[i];
             if (result == null) continue;
 
-            var display = result.displayValue();
+            var display = (EntityCreatureDisplay) result.displayValue();
+            display.setNoGravity(true);
             var pos = result.pos();
 
             displaysBySlot.put(i, display);
@@ -313,7 +314,7 @@ public class CircleScene extends AbstractScene {
 
 
         if (iTracker == null) {
-            iTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "I");
+            iTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "I", true);
             iTracker.setInstance(instance);
         }
 
@@ -330,7 +331,7 @@ public class CircleScene extends AbstractScene {
         Pos trackerPos = getJTrackerPosition(base);
 
         if (jTracker == null) {
-            jTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "J");
+            jTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "J", true);
             jTracker.setInstance(instance);
         }
 

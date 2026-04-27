@@ -10,12 +10,15 @@ import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.ai.EntityAI;
+import net.minestom.server.entity.ai.EntityAIGroup;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.entity.metadata.villager.VillagerMeta;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.utils.time.TimeUnit;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class EntityCreatureDisplay implements IDisplayValue {
@@ -23,15 +26,27 @@ public class EntityCreatureDisplay implements IDisplayValue {
     private final EntityCreature entity;
     private final Entity textEntity;
 
+
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
+        this(pos, entityType, displayText, false);
+    }
+
+    public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText, boolean setNoGravity) {
         this.pos = pos;
         this.entity = new EntityCreature(entityType);
-        this.entity.setNoGravity(true);
+        this.entity.setNoGravity(setNoGravity);
 
         this.textEntity = new Entity(EntityType.TEXT_DISPLAY);
         setupText(displayText);
     }
 
+    public void setNoGravity(boolean setNoGravity) {
+        entity.setNoGravity(setNoGravity);
+    }
+
+    public Collection<EntityAIGroup> getGoalSelector() {
+        return entity.getAIGroups();
+    }
 
     @Override
     public Pos getPos() {
@@ -74,6 +89,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
         textEntity.remove();
     }
 
+    public void goTo(Pos pos) {
+        entity.getNavigator().setPathTo(pos);
+    }
 
     public void kill() {
         entity.kill();

@@ -97,7 +97,7 @@ public final class Renderer<I, O extends ISceneOps> {
                 .filter(Objects::nonNull)
                 .map(ChunkKey::new)
                 .map(key -> instance.loadChunk(key.x(), key.z()))
-                .toArray(CompletableFuture[]::new);
+                .toArray(CompletableFuture<?>[]::new);
 
         return CompletableFuture.allOf(futures)
                 .thenRun(() -> scene.setLayout(layoutResults));
@@ -115,9 +115,11 @@ public final class Renderer<I, O extends ISceneOps> {
         }
 
         var builder = AnimationPlan.<O>builder();
+
         for (var step : plan.steps()) {
-            builder.step(0, step.op());
+            builder.stepAsync(0, step.op());
         }
+
         return builder.build();
     }
 }

@@ -4,6 +4,9 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
+import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
+import io.github.mcalgovisualizations.algorithms.sort.insertion.CircleScene;
+import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
@@ -86,11 +89,11 @@ public class RegisterAlgo {
 
                             for(int i = 0; i<size; i++) {
                                 int finalI = i;
-                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, true));
+                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, true));
                             }
                             for(int i = 0; i<size; i++) {
                                 int finalI = i;
-                                plan.step(circleScene -> circleScene.hoverDisplay(finalI, false));
+                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, false));
                             }
 
                             return plan.build();

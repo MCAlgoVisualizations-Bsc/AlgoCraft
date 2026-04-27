@@ -45,7 +45,7 @@ public class PartyService {
                             player.setGameMode(GameMode.SPECTATOR);
                         spectators.add(player);
 
-                        player.setFlying(true);
+                        player.setAllowFlying(true);
 
                         audience().sendMessage(Component.text(
                             player.getUsername() + " joined the session",
