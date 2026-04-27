@@ -105,11 +105,28 @@ public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
     }
 
     private int findDeepValue(Node root) {
-        if (!root.neighbors().isEmpty()) {
-            Node child = root.neighbors().getFirst();
-            if (!child.neighbors().isEmpty()) return child.neighbors().getFirst().value();
-            return child.value();
+        // Find a node that is relatively far from the root using a quick BFS
+        Queue<Node> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        
+        queue.add(root);
+        visited.add(root.id());
+        
+        Node deepestNode = root;
+        int count = 0;
+        int maxDepth = 20; // limit how deep we go to find a target
+
+        while (!queue.isEmpty() && count < maxDepth) {
+            deepestNode = queue.poll();
+            for (Node neighbor : deepestNode.neighbors()) {
+                if (!visited.contains(neighbor.id())) {
+                    visited.add(neighbor.id());
+                    queue.add(neighbor);
+                }
+            }
+            count++;
         }
-        return root.value();
+        
+        return deepestNode.value();
     }
 }

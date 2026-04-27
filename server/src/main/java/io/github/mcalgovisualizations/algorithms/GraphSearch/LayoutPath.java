@@ -14,11 +14,11 @@ public class LayoutPath implements ILayout<Node> {
 
     private static final int SCALE = 2;
     private static final int SPACING = 10 * SCALE;
+    private final int gridCols;
 
-    // Helper class to track occupied grid coordinates
-    private record GridPos(int x, int z) {}
-
-    public LayoutPath() {}
+    public LayoutPath(int gridCols) {
+        this.gridCols = gridCols;
+    }
 
     @Override
     public LayoutResult[] compute(Node model, Pos origin, Instance instance) {
@@ -30,12 +30,25 @@ public class LayoutPath implements ILayout<Node> {
         double floorY = Math.floor(origin.y()) - 1;
         Pos floorOrigin = new Pos(origin.x(), floorY, origin.z());
 
-        // Track occupied grid cells to prevent stacking
-        Set<GridPos> occupiedCells = new HashSet<>();
+        // Clear previous paths/blocks in the expected grid area
+        // Assuming the grid is roughly rows x gridCols. NodeUtils uses 4 rows and 6 cols.
+        // We can dynamically find the max row as well.
+        int maxRow = (maxId / gridCols) + 1;
+        clearArea(floorOrigin, instance, gridCols, maxRow);
 
-        renderGraph(model, floorOrigin, instance, 0, 0, results, new HashSet<>(), occupiedCells);
+        renderGraph(model, floorOrigin, instance, results, new HashSet<>());
 
         return results;
+    }
+
+    private void clearArea(Pos origin, Instance instance, int cols, int rows) {
+        // Clear a slightly larger area to be safe
+        int margin = 5;
+        for (int r = -margin; r < rows * SPACING + margin; r++) {
+            for (int c = -margin; c < cols * SPACING + margin; c++) {
+                instance.setBlock(origin.add(c, 0, r), Block.STONE);
+            }
+        }
     }
 
     private int findMaxId(Node node, Set<Integer> visited) {
@@ -48,57 +61,29 @@ public class LayoutPath implements ILayout<Node> {
         return max;
     }
 
-    private void renderGraph(Node node, Pos origin, Instance instance, int xIdx, int zIdx,
-                             LayoutResult[] results, Set<Integer> visited, Set<GridPos> occupiedCells) {
+    private void renderGraph(Node node, Pos origin, Instance instance,
+                             LayoutResult[] results, Set<Integer> visited) {
 
         if (node == null || visited.contains(node.id())) return;
         visited.add(node.id());
-        occupiedCells.add(new GridPos(xIdx, zIdx));
+
+        int xIdx = node.id() % gridCols;
+        int zIdx = node.id() / gridCols;
 
         Pos currentPos = origin.add(xIdx * SPACING, 0, zIdx * SPACING);
         instance.setBlock(currentPos, Block.WHITE_WOOL);
 
         results[node.id()] = new LayoutResult(node.value(), currentPos, new NodeDisplay(String.valueOf(node.value()), currentPos));
 
-        int attemptDir = 0;
         for (Node neighbor : node.neighbors()) {
             if (!visited.contains(neighbor.id())) {
-                int nextX = xIdx;
-                int nextZ = zIdx;
-
-                // Find the next available empty spot around the current node
-                boolean foundSpot = false;
-                while (!foundSpot && attemptDir < 100) { // Safety cap
-                    int tempX = xIdx;
-                    int tempZ = zIdx;
-
-                    // Simple spiral-out or directional logic
-                    switch (attemptDir % 4) {
-                        case 0 -> tempX++;
-                        case 1 -> tempZ++;
-                        case 2 -> tempX--;
-                        case 3 -> tempZ--;
-                    }
-
-                    // If we are spreading further out (diagonal/extended)
-                    if (attemptDir >= 4) {
-                        int multiplier = (attemptDir / 4) + 1;
-                        tempX = xIdx + ((tempX - xIdx) * multiplier);
-                        tempZ = zIdx + ((tempZ - zIdx) * multiplier);
-                    }
-
-                    if (!occupiedCells.contains(new GridPos(tempX, tempZ))) {
-                        nextX = tempX;
-                        nextZ = tempZ;
-                        foundSpot = true;
-                    }
-                    attemptDir++;
-                }
+                int nextX = neighbor.id() % gridCols;
+                int nextZ = neighbor.id() / gridCols;
 
                 Pos neighborPos = origin.add(nextX * SPACING, 0, nextZ * SPACING);
                 drawConnection(currentPos, neighborPos, instance, Block.DIRT_PATH);
 
-                renderGraph(neighbor, origin, instance, nextX, nextZ, results, visited, occupiedCells);
+                renderGraph(neighbor, origin, instance, results, visited);
             } else {
                 LayoutResult neighborResult = results[neighbor.id()];
                 if (neighborResult != null) {
@@ -117,8 +102,8 @@ public class LayoutPath implements ILayout<Node> {
         double dz = end.z() - start.z();
         double length = Math.sqrt(dx * dx + dz * dz);
 
-        double nx = -dz / length;
-        double nz = dx / length;
+        double nx = length > 0 ? -dz / length : 0;
+        double nz = length > 0 ? dx / length : 0;
 
         for (int i = 0; i <= steps; i++) {
             double ratio = (double) i / steps;

@@ -25,25 +25,20 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
-        var l = ThreadLocalRandom.current()
-                .ints(0, 10000)
-                .distinct()
-                .limit(20)
-                .boxed()
-                .collect(Collectors.toList());
+        var node = NodeUtils.RandomizeNode();
 
-        var root = NodeUtils.fromList(l);
-        var graphCollection = new NodeContext(root);
+        var graphCollection = new NodeContext(node);
 
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
                         .withIdentity("graph search", PlayerGraphSearch::new)
-                        .positioning(new LayoutPath())
+                        .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Graph Search (BFS)",
