@@ -37,7 +37,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
             for (int x = 0; x < size.blockX(); x++) {
                 for (int z = 0; z < size.blockZ(); z++) {
                     for (int y = 0; y < Math.min(40 - start.blockY(), size.blockY()); y++) {
-                        unit.modifier().setBlock(start.add(x, y, z), Block.STONE);
+                        unit.modifier().setBlock(start.add(x, y, z), Block.GRASS_BLOCK);
                     }
                 }
             }

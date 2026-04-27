@@ -46,7 +46,7 @@ public class LayoutPath implements ILayout<Node> {
         int margin = 5;
         for (int r = -margin; r < rows * SPACING + margin; r++) {
             for (int c = -margin; c < cols * SPACING + margin; c++) {
-                instance.setBlock(origin.add(c, 0, r), Block.STONE);
+                instance.setBlock(origin.add(c, 0, r), Block.GRASS_BLOCK);
             }
         }
     }
