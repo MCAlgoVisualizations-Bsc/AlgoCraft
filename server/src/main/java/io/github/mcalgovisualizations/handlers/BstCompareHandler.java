@@ -8,6 +8,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.entity.EntityType;
 
+import java.util.concurrent.CompletableFuture;
+
 public final class BstCompareHandler implements IAnimationHandler<Compare> {
 
     private static final int SEARCHER_SLOT = -100; // A unique slot for the searcher villager
@@ -17,24 +19,9 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
         String narration = buildNarration(event);
 
         return AnimationPlan.builder()
-                .step(1, sceneOps -> {
+                .stepAsync(1, sceneOps -> {
                     // Handle the searcher villager
                     var searcher = sceneOps.getDisplay(SEARCHER_SLOT);
-                    if (searcher == null) {
-                        // Spawn the searcher at the current node's position
-                        var startDisplay = sceneOps.getDisplay(event.x());
-                        if (startDisplay != null) {
-                            var startPos = startDisplay.getPos().add(0, 2, 0); // Offset above the node
-                            sceneOps.addDisplay(SEARCHER_SLOT, new EntityCreatureDisplay(startPos, EntityType.VILLAGER, "Searcher"));
-                        }
-                    } else {
-                        // Move the searcher to the current node's position
-                        var targetDisplay = sceneOps.getDisplay(event.x());
-                        if (targetDisplay != null) {
-                            var targetPos = targetDisplay.getPos().add(0, 2, 0); // Offset above the node
-                            sceneOps.moveSlotTo(SEARCHER_SLOT, targetPos);
-                        }
-                    }
 
                     sceneOps.sendActionBar(Component.text(
                             "BST compare [" + event.xValue() + "] vs [" + event.yValue() + "]",
@@ -45,6 +32,24 @@ public final class BstCompareHandler implements IAnimationHandler<Compare> {
                         sceneOps.setHighlighted(event.y(), true);
                     }
                     sceneOps.sendMessage(Component.text(narration, NamedTextColor.GRAY));
+
+                    if (searcher == null) {
+                        // Spawn the searcher at the current node's position
+                        var startDisplay = sceneOps.getDisplay(event.x());
+                        if (startDisplay != null) {
+                            var startPos = startDisplay.getPos(); // Use node's position directly
+                            sceneOps.addDisplay(SEARCHER_SLOT, new EntityCreatureDisplay(startPos, EntityType.VILLAGER, "Searcher", true));
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    } else {
+                        // Walk the searcher to the current node's position and return the completion future
+                        var targetDisplay = sceneOps.getDisplay(event.x());
+                        if (targetDisplay != null) {
+                            var targetPos = targetDisplay.getPos(); // Use node's position directly
+                            return sceneOps.walkSlotTo(SEARCHER_SLOT, targetPos);
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    }
                 })
                 .step(1, sceneOps -> {
                     sceneOps.hoverDisplay(event.x(), true);

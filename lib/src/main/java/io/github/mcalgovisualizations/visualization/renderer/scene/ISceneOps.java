@@ -6,6 +6,8 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface ISceneOps {
 
     void setLayout(LayoutResult[] model);
@@ -17,6 +19,7 @@ public interface ISceneOps {
     void hoverDisplay(int slot, boolean hover);
 
     void moveSlotTo(int slot, Pos position);
+    CompletableFuture<Void> walkSlotTo(int slot, Pos position);
     void swapSlots(int a, int b);
     void addDisplay(int slot, IDisplayValue display);
 

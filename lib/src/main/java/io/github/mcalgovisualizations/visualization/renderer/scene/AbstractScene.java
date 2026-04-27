@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractScene implements ISceneOps {
 
@@ -69,7 +70,12 @@ public abstract class AbstractScene implements ISceneOps {
     public void moveSlotTo(int slot, Pos pos) {
         var display = requireDisplay(slot);
         display.teleport(pos);
+    }
 
+    @Override
+    public CompletableFuture<Void> walkSlotTo(int slot, Pos pos) {
+        var display = requireDisplay(slot);
+        return display.walkTo(pos);
     }
 
     @Override

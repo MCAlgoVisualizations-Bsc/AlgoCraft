@@ -26,7 +26,7 @@ public class SelectionScene extends AbstractScene {
         golemTracker = new EntityCreatureDisplay(origin, EntityType.COPPER_GOLEM, "Golem");
 
 
-        golemTracker.goTo(displaysBySlot.get(0).getPos());
+        golemTracker.walkTo(displaysBySlot.get(0).getPos());
     }
 
 
