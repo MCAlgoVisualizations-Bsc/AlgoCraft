@@ -1,6 +1,9 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.commands.*;
+import io.github.mcalgovisualizations.commands.Accept;
+import io.github.mcalgovisualizations.commands.Invite;
+import io.github.mcalgovisualizations.commands.PendingInvites;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.events.Message;
 import net.kyori.adventure.text.Component;
@@ -91,9 +94,13 @@ public final class Main {
 
 
     static void registerCommands(CommandManager cm, AlgoCraft algo) {
-        cm.register(new Greet());
-        cm.register(new Teleport());
-        cm.register(new Gamemode());
-        cm.register(new Spawn(algo));
+        cm.register(new Greet(),
+            new Teleport(),
+            new Gamemode(),
+            new Spawn(algo),
+            new Invite(algo),
+            new Accept(algo),
+            new PendingInvites(algo)
+        );
     }
 }

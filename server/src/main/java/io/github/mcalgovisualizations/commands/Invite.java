@@ -1,13 +1,11 @@
-package io.github.mcalgovisualizations.visualization.commands;
+package io.github.mcalgovisualizations.commands;
 
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
-import io.github.mcalgovisualizations.visualization.instance.AlgorithmInstance;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
-import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
 import net.minestom.server.entity.Player;
-
-import java.time.Duration;
 
 public class Invite extends Command {
 
@@ -22,6 +20,11 @@ public class Invite extends Command {
             var targets = context.get(targetArg).find(sender);
             if (targets.isEmpty()) {
                 player.sendMessage("No player found with username: " + context.getInput());
+                return;
+            }
+
+            if(player == targets.getFirst()) {
+                player.sendMessage(Component.text("You cannot invite yourself", NamedTextColor.RED));
                 return;
             }
 

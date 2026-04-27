@@ -1,8 +1,5 @@
 package io.github.mcalgovisualizations.visualization.instance;
 
-import io.github.mcalgovisualizations.visualization.commands.Accept;
-import io.github.mcalgovisualizations.visualization.commands.Invite;
-import io.github.mcalgovisualizations.visualization.commands.PendingInvites;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
@@ -84,9 +81,7 @@ public class AlgoCraft {
 
     public void addListener(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
-        MinecraftServer.getCommandManager().register(new Invite(this));
-        MinecraftServer.getCommandManager().register(new Accept(this));
-        MinecraftServer.getCommandManager().register(new PendingInvites(this));
+
 //        handler.addListener(InventoryPreClickEvent.class, this::onInventoryPreClick);
 //        handler.addListener(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
     }
@@ -185,10 +180,6 @@ public class AlgoCraft {
 
     public void invitePlayer(Player inviter, Player target, long expiresIn) {
         final var inviterInstance = requireInstance(inviter);
-        if(inviter == target) {
-            target.sendMessage(Component.text("You cannot invite yourself", NamedTextColor.RED));
-            return;
-        }
 
         if(inviter.getInstance().equals(defaultInstance) || inviterInstance == null) {
             target.sendMessage(Component.text("You have to be in a visualization before inviting others", NamedTextColor.RED));
