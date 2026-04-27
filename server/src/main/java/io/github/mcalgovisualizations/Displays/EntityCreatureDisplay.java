@@ -44,10 +44,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
         entity.setNoGravity(setNoGravity);
     }
 
-    public Collection<EntityAIGroup> getGoalSelector() {
-        return entity.getAIGroups();
-    }
-
     @Override
     public Pos getPos() {
         return this.pos;

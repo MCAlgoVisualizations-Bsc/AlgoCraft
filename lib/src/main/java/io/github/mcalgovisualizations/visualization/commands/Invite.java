@@ -20,38 +20,14 @@ public class Invite extends Command {
             if (!(sender instanceof Player player)) return;
 
             var targets = context.get(targetArg).find(sender);
-            if (targets.isEmpty()) return;
+            if (targets.isEmpty()) {
+                player.sendMessage("No player found with username: " + context.getInput());
+                return;
+            }
 
             Player target = (Player) targets.getFirst();
-
-            // cannot invite yourself
-            if (target == player) {
-                player.sendMessage("You cannot invite yourself.");
-                return;
-            }
-
-            // must be in an instance
-            AlgorithmInstance<?, ?, ?> instance;
-            try {
-                instance = algoCraft.requireInstance(player);
-            } catch (Exception e) {
-                player.sendMessage("You are not in an instance.");
-                return;
-            }
-
-            // create invite (30s expiry)
-            algoCraft.getPendingInvites().put(
-                    target.getUuid(),
-                    new AlgoCraft.PendingInvite(
-                            player.getUuid(),
-                            instance,
-                            System.currentTimeMillis() + Duration.ofSeconds(30).toMillis()
-                    )
-            );
-
-            player.sendMessage("Invited " + target.getUsername());
-            target.sendMessage(player.getUsername() + " invited you. Type /accept to join.");
-
+            long ttl = System.currentTimeMillis() + 1000 * 60 * 60;
+            algoCraft.invitePlayer(player, target, ttl);
         }, targetArg);
 
         setDefaultExecutor((sender, context) -> {

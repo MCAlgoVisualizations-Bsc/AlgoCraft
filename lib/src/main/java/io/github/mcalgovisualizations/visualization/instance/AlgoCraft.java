@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations.visualization.instance;
 
 import io.github.mcalgovisualizations.visualization.commands.Accept;
 import io.github.mcalgovisualizations.visualization.commands.Invite;
+import io.github.mcalgovisualizations.visualization.commands.PendingInvites;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
@@ -18,12 +19,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -65,7 +61,8 @@ public class AlgoCraft {
     public void removePlayerFromInstance(Player... players) {
         for(var player : players) {
             var instance = requireInstance(player);
-            instance.removePlayer(defaultInstance, player);
+            instance.removePlayer(defaultInstance, player)
+                    .thenRun(() -> ui.applyDefaultLayout(player));
         }
     }
 
@@ -89,6 +86,7 @@ public class AlgoCraft {
         handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
         MinecraftServer.getCommandManager().register(new Invite(this));
         MinecraftServer.getCommandManager().register(new Accept(this));
+        MinecraftServer.getCommandManager().register(new PendingInvites(this));
 //        handler.addListener(InventoryPreClickEvent.class, this::onInventoryPreClick);
 //        handler.addListener(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
     }
@@ -170,22 +168,61 @@ public class AlgoCraft {
         player.openInventory(inventory);
     }
 
-    private final Map<UUID, PendingInvite> pendingInvites = new HashMap<>();
+    private final Map<UUID, Set<PendingInvite>> pendingInvites = new HashMap<>();
 
-    public static class PendingInvite {
-        public final UUID inviter;
-        public final AlgorithmInstance<?, ?, ?> instance;
-        public final long expiresAt;
-
-        public PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
-            this.inviter = inviter;
-            this.instance = instance;
-            this.expiresAt = expiresAt;
+    public record PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
+        public boolean isExpired() {
+                return System.currentTimeMillis() > expiresAt;
         }
     }
 
-    public Map<UUID, PendingInvite> getPendingInvites() {
-        return pendingInvites;
+    public Set<PendingInvite> getPendingInvites(Player player) {
+        var invites = pendingInvites.getOrDefault(player.getUuid(), new HashSet<>());
+
+        invites.removeIf(PendingInvite::isExpired);
+        return Set.copyOf(invites);
+    }
+
+    public void invitePlayer(Player inviter, Player target, long expiresIn) {
+        final var inviterInstance = requireInstance(inviter);
+        if(inviter == target) {
+            target.sendMessage(Component.text("You cannot invite yourself", NamedTextColor.RED));
+            return;
+        }
+
+        if(inviter.getInstance().equals(defaultInstance) || inviterInstance == null) {
+            target.sendMessage(Component.text("You have to be in a visualization before inviting others", NamedTextColor.RED));
+            return;
+        }
+
+        if(inviter.getInstance().equals(target.getInstance())) {
+            target.sendMessage(Component.text("You cannot invite players from the same instance", NamedTextColor.RED));
+            return;
+        }
+
+
+        target.sendMessage(Component.text("You have been invited to join: ", NamedTextColor.GREEN));
+        final var invites = pendingInvites.computeIfAbsent(target.getUuid(), _ -> new HashSet<>());
+        invites.add(new PendingInvite(inviter.getUuid(), inviterInstance, expiresIn));
+    }
+
+    public boolean acceptInvite(Player invited, Player inviter) {
+        var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
+        inviteList.removeIf(PendingInvite::isExpired);
+
+        if(inviteList.stream().noneMatch(invite -> invite.inviter().equals(inviter.getUuid())))
+            invited.sendMessage(Component.text("You have no active invite sent to you from: " + inviter.getUsername(), NamedTextColor.RED));
+
+        for(var invite : inviteList) {
+            if(!invite.inviter().equals(inviter.getUuid()))
+                continue;
+            var instance = requireInstance(inviter);
+            instance.addPlayer(invited);
+            inviteList.remove(invite);
+            return true;
+        }
+
+        return false;
     }
 
     public Instance getDefaultInstance() {
