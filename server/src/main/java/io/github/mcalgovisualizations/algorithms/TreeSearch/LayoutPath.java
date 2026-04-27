@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 
-public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
+public class LayoutPath implements ILayout<Node> {
 
     private static final int SCALE = 2;
     private static final int SPACING = 10 * SCALE;
@@ -22,7 +22,7 @@ public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
     public LayoutPath() {}
 
     @Override
-    public LayoutResult[] compute(Node<V> model, Pos origin, Instance instance) {
+    public LayoutResult[] compute(Node model, Pos origin, Instance instance) {
         if (model == null) return new LayoutResult[0];
 
         int maxId = findMaxId(model, new HashSet<>());
@@ -39,17 +39,17 @@ public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
         return results;
     }
 
-    private int findMaxId(Node<V> node, Set<Integer> visited) {
+    private int findMaxId(Node node, Set<Integer> visited) {
         if (node == null || visited.contains(node.id())) return -1;
         visited.add(node.id());
         int max = node.id();
-        for (Node<V> neighbor : node.neighbors()) {
+        for (Node neighbor : node.neighbors()) {
             max = Math.max(max, findMaxId(neighbor, visited));
         }
         return max;
     }
 
-    private void renderGraph(Node<V> node, Pos origin, Instance instance, int xIdx, int zIdx,
+    private void renderGraph(Node node, Pos origin, Instance instance, int xIdx, int zIdx,
                              LayoutResult[] results, Set<Integer> visited, Set<GridPos> occupiedCells) {
 
         if (node == null || visited.contains(node.id())) return;
@@ -59,10 +59,10 @@ public class LayoutPath<V extends Comparable<V>> implements ILayout<Node<V>> {
         Pos currentPos = origin.add(xIdx * SPACING, 0, zIdx * SPACING);
         instance.setBlock(currentPos, Block.WHITE_WOOL);
 
-        results[node.id()] = new LayoutResult(node.value(), currentPos, new NodeDisplay(node.value().toString(), currentPos));
+        results[node.id()] = new LayoutResult(node.value(), currentPos, new NodeDisplay(String.valueOf(node.value()), currentPos));
 
         int attemptDir = 0;
-        for (Node<V> neighbor : node.neighbors()) {
+        for (Node neighbor : node.neighbors()) {
             if (!visited.contains(neighbor.id())) {
                 int nextX = xIdx;
                 int nextZ = zIdx;

@@ -37,22 +37,22 @@ public class RegisterAlgo {
                 .collect(Collectors.toList());
         
         // Build a simple graph for the demonstration
-        Node<Integer> root = new Node<>(0, l.get(0));
-        List<Node<Integer>> nodes = new ArrayList<>();
+        Node root = new Node(0, l.get(0));
+        List<Node> nodes = new ArrayList<>();
         nodes.add(root);
         for (int i = 1; i < l.size(); i++) {
-            Node<Integer> node = new Node<>(i, l.get(i));
+            Node node = new Node(i, l.get(i));
             nodes.add(node);
             // Connect to a previous node to ensure connectivity
             nodes.get(ThreadLocalRandom.current().nextInt(i)).addNeighbor(node);
         }
 
-        var graphCollection = new NodeContext<>(root);
+        var graphCollection = new NodeContext(root);
 
         algo.registerAlgorithm(
-                Algorithm.<Node<Integer>, NodeContext<Integer>, GraphScene>builder(graphCollection)
-                        .withIdentity("graph search", PlayerGraphSearch<Integer>::new)
-                        .positioning(new LayoutPath<Integer>())
+                Algorithm.builder(graphCollection)
+                        .withIdentity("graph search", PlayerGraphSearch::new)
+                        .positioning(new LayoutPath())
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Graph Search (BFS)",

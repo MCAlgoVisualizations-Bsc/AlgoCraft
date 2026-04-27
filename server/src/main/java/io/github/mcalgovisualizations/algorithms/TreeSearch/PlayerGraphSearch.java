@@ -5,38 +5,38 @@ import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 import java.util.*;
 
-public final class PlayerGraphSearch<I extends Comparable<I>> implements IPlayerSort<NodeContext<I>> {
+public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
 
     @Override
-    public void run(NodeContext<I> context) {
-        Node<I> root = context.values;
+    public void run(NodeContext context) {
+        Node root = context.values;
         if (root == null) return;
 
-        I targetValue = findDeepValue(root);
+        int targetValue = findDeepValue(root);
 
-        Queue<Node<I>> queue = new LinkedList<>();
+        Queue<Node> queue = new LinkedList<>();
         Set<Integer> visited = new HashSet<>();
-        Map<Integer, Node<I>> parents = new HashMap<>();
+        Map<Integer, Node> parents = new HashMap<>();
 
         queue.add(root);
         visited.add(root.id());
 
-        Node<I> lastVisited = root;
+        Node lastVisited = root;
 
         System.out.println("--- Starting BFS Visualization ---");
         System.out.println("Target Value: " + targetValue);
 
         while (!queue.isEmpty()) {
-            Node<I> cursor = queue.poll();
+            Node cursor = queue.poll();
 
             // Calculate the path from the last position to the current BFS node
-            List<Node<I>> path = findPathBetween(lastVisited, cursor, parents);
+            List<Node> path = findPathBetween(lastVisited, cursor, parents);
 
             if (path.size() > 1) {
                 // The first element is where he is, the last is where he's going
                 System.out.println("[Movement] Walking from Node ID: " + lastVisited.id() + " to Node ID: " + cursor.id());
 
-                for (Node<I> pathNode : path) {
+                for (Node pathNode : path) {
                     if (pathNode.id() == lastVisited.id()) continue;
 
                     // Small debug print for every step on the path
@@ -51,12 +51,12 @@ public final class PlayerGraphSearch<I extends Comparable<I>> implements IPlayer
 
             lastVisited = cursor;
 
-            if (targetValue.equals(cursor.value())) {
+            if (targetValue == cursor.value()) {
                 System.out.println("--- Target Found! Stopping search. ---");
                 return;
             }
 
-            for (Node<I> neighbor : cursor.neighbors()) {
+            for (Node neighbor : cursor.neighbors()) {
                 if (!visited.contains(neighbor.id())) {
                     visited.add(neighbor.id());
                     parents.put(neighbor.id(), cursor);
@@ -66,24 +66,24 @@ public final class PlayerGraphSearch<I extends Comparable<I>> implements IPlayer
         }
     }
 
-    private List<Node<I>> findPathBetween(Node<I> start, Node<I> end, Map<Integer, Node<I>> parents) {
+    private List<Node> findPathBetween(Node start, Node end, Map<Integer, Node> parents) {
         if (start.id() == end.id()) return Collections.singletonList(start);
 
-        List<Node<I>> startToRoot = new ArrayList<>();
-        Node<I> curr = start;
+        List<Node> startToRoot = new ArrayList<>();
+        Node curr = start;
         while (curr != null) {
             startToRoot.add(curr);
             curr = parents.get(curr.id());
         }
 
-        List<Node<I>> endToRoot = new ArrayList<>();
+        List<Node> endToRoot = new ArrayList<>();
         curr = end;
         while (curr != null) {
             endToRoot.add(curr);
             curr = parents.get(curr.id());
         }
 
-        Node<I> lca = null;
+        Node lca = null;
         int i = startToRoot.size() - 1;
         int j = endToRoot.size() - 1;
         while (i >= 0 && j >= 0 && startToRoot.get(i).id() == endToRoot.get(j).id()) {
@@ -92,7 +92,7 @@ public final class PlayerGraphSearch<I extends Comparable<I>> implements IPlayer
             j--;
         }
 
-        List<Node<I>> fullPath = new ArrayList<>();
+        List<Node> fullPath = new ArrayList<>();
         // Walk up from start to LCA
         for (int k = 0; k <= startToRoot.indexOf(lca); k++) {
             fullPath.add(startToRoot.get(k));
@@ -104,9 +104,9 @@ public final class PlayerGraphSearch<I extends Comparable<I>> implements IPlayer
         return fullPath;
     }
 
-    private I findDeepValue(Node<I> root) {
+    private int findDeepValue(Node root) {
         if (!root.neighbors().isEmpty()) {
-            Node<I> child = root.neighbors().get(0);
+            Node child = root.neighbors().get(0);
             if (!child.neighbors().isEmpty()) return child.neighbors().get(0).value();
             return child.value();
         }

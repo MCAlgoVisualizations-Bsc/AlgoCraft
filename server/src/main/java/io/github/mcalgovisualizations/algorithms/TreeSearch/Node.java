@@ -3,16 +3,16 @@ package io.github.mcalgovisualizations.algorithms.TreeSearch;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Node<V extends Comparable<V>> (
+public record Node (
     int id,
-    V value,
-    List<Node<V>> neighbors
+    int value,
+    List<Node> neighbors
 ) {
-    public Node(int id, V value) {
+    public Node(int id, int value) {
         this(id, value, new ArrayList<>());
     }
 
-    public void addNeighbor(Node<V> neighbor) {
+    public void addNeighbor(Node neighbor) {
         neighbors.add(neighbor);
     }
 }
