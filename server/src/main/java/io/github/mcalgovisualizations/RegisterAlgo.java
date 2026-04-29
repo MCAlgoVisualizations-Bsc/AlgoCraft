@@ -5,7 +5,7 @@ import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
-import io.github.mcalgovisualizations.algorithms.sort.insertion.CircleScene;
+import io.github.mcalgovisualizations.algorithms.sort.insertion.InsertionScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
 import io.github.mcalgovisualizations.algorithms.sort.selection.PlayerSelectionSort;
 import io.github.mcalgovisualizations.algorithms.sort.selection.SelectionScene;
@@ -99,7 +99,7 @@ public class RegisterAlgo {
                 Algorithm.builder(circleCollection1)
                         .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
                         .positioning(new ArcLayout())
-                        .withScene(CircleScene::new)
+                        .withScene(InsertionScene::new)
                         .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
                         .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
                         .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
@@ -111,10 +111,10 @@ public class RegisterAlgo {
                         ))
                         .onCompletion(ctx -> {
                             final int size = ctx.values.size();
-                            var plan = AnimationPlan.<CircleScene>builder()
-                                    .step(CircleScene::resetAllDisplaysToHome)
-                                    .step(CircleScene::clearTrackers)
-                                    .step(CircleScene::clearGlowing)
+                            var plan = AnimationPlan.<InsertionScene>builder()
+                                    .step(InsertionScene::resetAllDisplaysToHome)
+                                    .step(InsertionScene::clearTrackers)
+                                    .step(InsertionScene::clearGlowing)
                                     .step(circleScene -> circleScene.sendMessage(Component.text(
                                             "Final sorted array: " + ctx.values.toString(), NamedTextColor.GREEN)));
 

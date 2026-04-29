@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class CircleScene extends AbstractScene {
+public class InsertionScene extends AbstractScene {
 
     private final Map<Integer, Pos> homePositions = new HashMap<>();
 
@@ -31,7 +31,7 @@ public class CircleScene extends AbstractScene {
 
     private StagedCompare stagedCompare;
 
-    public CircleScene(@NotNull SceneContext context) {
+    public InsertionScene(@NotNull SceneContext context) {
         super(context);
     }
 

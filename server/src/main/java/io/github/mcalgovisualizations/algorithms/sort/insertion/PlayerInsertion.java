@@ -46,8 +46,8 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
 
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
-        public AnimationPlan<CircleScene> handle(TrackI event) {
-            return AnimationPlan.<CircleScene>builder()
+        public AnimationPlan<InsertionScene> handle(TrackI event) {
+            return AnimationPlan.<InsertionScene>builder()
                     .step(scene -> {
                         scene.finishInnerLoopVisuals();
                         scene.clearJTracker();
@@ -68,8 +68,8 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
     public static class TrackJHandler implements IAnimationHandler<TrackJ> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<CircleScene> handle(TrackJ event) {
-            return AnimationPlan.<CircleScene>builder()
+        public AnimationPlan<InsertionScene> handle(TrackJ event) {
+            return AnimationPlan.<InsertionScene>builder()
                     .step(scene -> {
                         scene.setHighlighted(event.idx(), true);
                         scene.sendActionBar(Component.text(
@@ -84,8 +84,8 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
     public static class CompareHandler implements IAnimationHandler<Compare> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<CircleScene> handle(Compare event) {
-            return AnimationPlan.<CircleScene>builder()
+        public AnimationPlan<InsertionScene> handle(Compare event) {
+            return AnimationPlan.<InsertionScene>builder()
                     .step(scene -> scene.sendActionBar(Component.text(
                             "Comparing [" + event.xValue() + "] with [" + event.yValue() + "]",
                             NamedTextColor.YELLOW)))
@@ -108,8 +108,8 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
     public static class SwapHandler implements IAnimationHandler<Swap> {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationPlan<CircleScene> handle(Swap event) {
-            return AnimationPlan.<CircleScene>builder()
+        public AnimationPlan<InsertionScene> handle(Swap event) {
+            return AnimationPlan.<InsertionScene>builder()
                     .step(scene -> {
                         scene.sendActionBar(Component.text(
                                 event.yValue() + " is smaller than " + event.xValue(),
