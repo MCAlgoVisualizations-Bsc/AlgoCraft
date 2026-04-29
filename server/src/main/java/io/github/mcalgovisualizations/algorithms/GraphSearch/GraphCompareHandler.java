@@ -53,11 +53,12 @@ public final class GraphCompareHandler implements IAnimationHandler<Compare> {
                                     // Make the bread unpickable by setting a very long pickup delay
                                     breadEntity.setPickupDelay(Duration.ofDays(365));
                                     
-                                    // Register the bread entity for cleanup
-                                    sceneOps.addItemEntity(breadEntity);
-                                    
                                     // Cast sceneOps to GraphScene to access the instance
-                                    breadEntity.setInstance(sceneOps.getInstance(), targetDisplay.getPos().add(0, 0.5, 0));
+                                    GraphScene graphScene = (GraphScene) sceneOps;
+                                    breadEntity.setInstance(graphScene.getInstance(), targetDisplay.getPos().add(0, 0.5, 0));
+                                    
+                                    // Register the bread entity for cleanup
+                                    graphScene.addItemEntity(breadEntity);
                                 });
                     }
                 })

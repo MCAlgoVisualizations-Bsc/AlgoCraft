@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 public class NodeUtils {
-    public static final float GRID_SCALE = 0.5f;
+    public static final float GRID_SCALE = 1f;
     public static final int GRID_ROWS = (int) (4 * GRID_SCALE);
     public static final int GRID_COLS = (int) (6 * GRID_SCALE);
 

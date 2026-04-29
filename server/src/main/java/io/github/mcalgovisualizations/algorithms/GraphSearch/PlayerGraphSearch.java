@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.events.PathFound; // Changed import to existing PathFound event
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 import java.util.*;
@@ -20,6 +21,8 @@ public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
 
         queue.add(root);
         visited.add(root.id());
+        // The root node has no parent in the context of the search path
+        parents.put(root.id(), null); 
 
         Node lastVisited = root;
 
@@ -30,13 +33,14 @@ public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
             Node cursor = queue.poll();
 
             // Calculate the path from the last position to the current BFS node
-            List<Node> path = findPathBetween(lastVisited, cursor, parents);
+            // This path is for visualization movement, not the final search path
+            List<Node> movementPath = findPathBetween(lastVisited, cursor, parents);
 
-            if (path.size() > 1) {
+            if (movementPath.size() > 1) {
                 // The first element is where he is, the last is where he's going
                 System.out.println("[Movement] Walking from Node ID: " + lastVisited.id() + " to Node ID: " + cursor.id());
 
-                for (Node pathNode : path) {
+                for (Node pathNode : movementPath) {
                     if (pathNode.id() == lastVisited.id()) continue;
 
                     // Small debug print for every step on the path
@@ -53,6 +57,19 @@ public final class PlayerGraphSearch implements IPlayerSort<NodeContext> {
 
             if (targetValue == cursor.value()) {
                 System.out.println("--- Target Found! Stopping search. ---");
+                
+                // Reconstruct the final path
+                List<Node> finalPath = new ArrayList<>();
+                Node pathCursor = cursor;
+                while (pathCursor != null) {
+                    finalPath.add(pathCursor);
+                    pathCursor = parents.get(pathCursor.id());
+                }
+                Collections.reverse(finalPath);
+
+                // Emit the existing PathFound event
+                context.emit(new PathFound(finalPath));
+
                 return;
             }
 

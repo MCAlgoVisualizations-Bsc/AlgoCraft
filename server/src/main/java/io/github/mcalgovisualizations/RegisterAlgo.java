@@ -41,6 +41,7 @@ public class RegisterAlgo {
                         .withIdentity("graph search", PlayerGraphSearch::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
+                        .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
                         .withPresentation(new AlgorithmPresentation(
                                 "Graph Search (BFS)",
                                 Material.SPYGLASS,
@@ -55,6 +56,7 @@ public class RegisterAlgo {
                         .withIdentity("graph dfs", PlayerDFS::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
+                        .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
                         .withPresentation(new AlgorithmPresentation(
                                 "Graph Search (DFS)",
                                 Material.SPYGLASS,

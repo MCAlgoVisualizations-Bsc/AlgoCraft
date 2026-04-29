@@ -10,6 +10,7 @@ import static io.github.mcalgovisualizations.DataTypes.NodeUtils.RandomizeNode;
 public class NodeContext extends AbstractContext<Node> {
 
     private final Random random = new Random();
+    private List<Node> finalPath = new ArrayList<>();
 
     public NodeContext(Node values) {
         super(values);
@@ -17,7 +18,9 @@ public class NodeContext extends AbstractContext<Node> {
 
     @Override
     public NodeContext copy() {
-        return new NodeContext(values);
+        NodeContext copy = new NodeContext(values);
+        copy.setFinalPath(new ArrayList<>(finalPath));
+        return copy;
     }
 
     @Override
@@ -31,6 +34,15 @@ public class NodeContext extends AbstractContext<Node> {
     @Override
     public Node randomizeData() {
         this.values = RandomizeNode();
+        this.finalPath = new ArrayList<>();
         return this.values;
+    }
+
+    public List<Node> getFinalPath() {
+        return finalPath;
+    }
+
+    public void setFinalPath(List<Node> finalPath) {
+        this.finalPath = finalPath;
     }
 }

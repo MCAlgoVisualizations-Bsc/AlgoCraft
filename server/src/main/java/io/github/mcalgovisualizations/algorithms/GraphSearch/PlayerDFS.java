@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.events.PathFound; // Changed import
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
 import java.util.*;
@@ -20,6 +21,7 @@ public final class PlayerDFS implements IPlayerSort<NodeContext> {
 
         stack.push(root);
         visited.add(root.id());
+        parents.put(root.id(), null);
 
         Node lastVisited = root;
 
@@ -30,13 +32,13 @@ public final class PlayerDFS implements IPlayerSort<NodeContext> {
             Node cursor = stack.pop();
 
             // Calculate the path from the last position to the current DFS node
-            List<Node> path = findPathBetween(lastVisited, cursor, parents);
+            List<Node> movementPath = findPathBetween(lastVisited, cursor, parents);
 
-            if (path.size() > 1) {
+            if (movementPath.size() > 1) {
                 // The first element is where he is, the last is where he's going
                 System.out.println("[Movement] Walking from Node ID: " + lastVisited.id() + " to Node ID: " + cursor.id());
 
-                for (Node pathNode : path) {
+                for (Node pathNode : movementPath) {
                     if (pathNode.id() == lastVisited.id()) continue;
 
                     // Small debug print for every step on the path
@@ -53,13 +55,23 @@ public final class PlayerDFS implements IPlayerSort<NodeContext> {
 
             if (targetValue == cursor.value()) {
                 System.out.println("--- Target Found! Stopping search. ---");
+                
+                // Reconstruct the final path
+                List<Node> finalPath = new ArrayList<>();
+                Node pathCursor = cursor;
+                while (pathCursor != null) {
+                    finalPath.add(pathCursor);
+                    pathCursor = parents.get(pathCursor.id());
+                }
+                Collections.reverse(finalPath);
+
+                // Emit the existing PathFound event
+                context.emit(new PathFound(finalPath));
+                
                 return;
             }
 
             // Push unvisited neighbors onto the stack
-            // Note: For consistent visualization, we might want to sort neighbors
-            // or process them in a specific order (e.g., reverse order of desired traversal)
-            // Here, we'll just iterate as they come from the neighbors list.
             for (Node neighbor : cursor.neighbors()) {
                 if (!visited.contains(neighbor.id())) {
                     visited.add(neighbor.id());
@@ -110,7 +122,6 @@ public final class PlayerDFS implements IPlayerSort<NodeContext> {
 
     private int findDeepValue(Node root) {
         // Find a node that is relatively far from the root using a quick BFS
-        // This is reused from PlayerGraphSearch to ensure consistent target finding
         Queue<Node> queue = new LinkedList<>();
         Set<Integer> visited = new HashSet<>();
         
