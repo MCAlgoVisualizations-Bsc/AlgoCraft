@@ -39,7 +39,6 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
         }
     }
 
-
     public record TrackI(int slot, Integer value) implements IAlgorithmEvent { }
 
     public record TrackMinIndex(int slot, Integer value) implements IAlgorithmEvent { }
@@ -49,7 +48,10 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
         public AnimationPlan<SelectionScene> handle(TrackI event) {
             var plan = AnimationPlan.<SelectionScene>builder();
 
-            plan.step(1, scene -> scene.trackI(event.slot()));
+            plan.step(1, scene -> {
+                scene.playSound("minecraft:block.note_block.hat", 0.6f, 1.0f);
+                scene.trackI(event.slot());
+            });
 
             return plan.build();
         }
@@ -61,14 +63,15 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
             var plan = AnimationPlan.<SelectionScene>builder();
 
             plan.step(3, scene -> {
+                scene.playSound("minecraft:block.note_block.pling", 0.8f, 1.5f);
+
                 final var message = Component.text("Found new min-value: ", NamedTextColor.GRAY)
-                                .append(Component.text(event.value(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+                        .append(Component.text(event.value(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+
                 scene.sendActionBar(message);
             });
 
-            plan.step(1, scene -> {
-                scene.trackMinIndex(event.slot());
-            });
+            plan.step(1, scene -> scene.trackMinIndex(event.slot()));
 
             return plan.build();
         }
@@ -82,6 +85,7 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
             plan.step(scene -> {
                         scene.resetLook();
                         scene.compare(event.x(), event.y());
+                        scene.playSound("minecraft:block.note_block.xylophone", 0.6f, 1.2f);
                     })
                     .step(2, scene -> scene.trackJ(event.x()))
                     .step(1, scene -> {
@@ -107,11 +111,15 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
             plan.step(1, scene -> {
                 Component message;
 
-                if (((Integer) event.xValue()).equals(event.yValue())) {
+                if (event.x() == event.y()) {
+                    scene.playSound("minecraft:block.note_block.bell", 0.7f, 1.3f);
+
                     message = Component.text("✔ ", NamedTextColor.GREEN, TextDecoration.BOLD)
                             .append(Component.text("Already in place: ", NamedTextColor.GRAY))
                             .append(Component.text((int) event.xValue(), NamedTextColor.GREEN, TextDecoration.BOLD));
                 } else {
+                    scene.playSound("minecraft:entity.item.pickup", 0.8f, 1.0f);
+
                     message = Component.text("⇄ ", NamedTextColor.GOLD, TextDecoration.BOLD)
                             .append(Component.text("Swap ", NamedTextColor.GRAY))
                             .append(Component.text((int) event.xValue(), NamedTextColor.YELLOW, TextDecoration.BOLD))
@@ -123,7 +131,6 @@ public class PlayerSelectionSort implements IPlayerSort<SortingContext<Integer>>
             });
 
             plan.step(5, scene -> {
-                //scene.clearGlowing();
                 scene.swap(event.x(), event.y());
                 scene.markSorted(event.x());
             });

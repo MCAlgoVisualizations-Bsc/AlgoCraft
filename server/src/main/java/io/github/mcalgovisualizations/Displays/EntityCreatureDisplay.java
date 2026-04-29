@@ -18,7 +18,10 @@ import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.entity.metadata.villager.VillagerMeta;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.scoreboard.Team;
+import net.minestom.server.utils.PacketSendingUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.Collection;
@@ -66,6 +69,7 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
     @Override
     public void setInstance(Instance instance, Pos pos) {
+        this.pos = pos;
         entity.setInstance(instance, pos);
         textEntity.setInstance(instance, getTextOffset(entity.getPosition()));
     }
@@ -104,16 +108,25 @@ public class EntityCreatureDisplay implements IDisplayValue {
         textEntity.remove();
     }
 
-    public void jump() {
-        if(!entity.isOnGround()) {
-            System.err.println(entity.getEntityType().name() + " is not on ground!");
-            return;
-        }
-        this.entity.teleport(this.entity.getPosition().add(0, 1, 0));
-    }
-
     public void goTo(Pos pos) {
         entity.getNavigator().setPathTo(pos);
+    }
+
+    public void spawnParticleAura(Particle particle) {
+        Instance instance = entity.getInstance();
+        if (instance == null) return;
+
+        var center = entity.getPosition().add(0, entity.getEyeHeight() * 0.5, 0);
+
+        var packet = new ParticlePacket(
+                particle,
+                center,
+                new Vec(0.4, 0.6, 0.4), // random spread around entity
+                0.01f,                  // particle speed
+                20                      // amount
+        );
+
+        PacketSendingUtils.sendGroupedPacket(instance.getPlayers(), packet);
     }
 
     public void kill() {

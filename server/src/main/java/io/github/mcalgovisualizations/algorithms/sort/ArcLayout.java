@@ -144,7 +144,7 @@ public record ArcLayout(
                     "panda",
                     "parched",
                     "parrot",
-                    "phantom",
+                    //"phantom",
                     "pig",
                     "piglin",
                     "piglin_brute",

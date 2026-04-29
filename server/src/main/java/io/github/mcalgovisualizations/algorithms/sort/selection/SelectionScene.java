@@ -4,7 +4,11 @@ import io.github.mcalgovisualizations.Displays.EntityCreatureDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.timer.Task;
+import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -14,8 +18,8 @@ public class SelectionScene extends AbstractScene {
     private final Set<Integer> sortedSlots = new HashSet<>();
 
     private Integer currentMinIndex = null;
-
     private EntityCreatureDisplay slimeTracker = null;
+    private Task frozenParticleTask = null;
 
     public SelectionScene(@NotNull SceneContext context) {
         super(context);
@@ -27,7 +31,7 @@ public class SelectionScene extends AbstractScene {
             final var display = (EntityCreatureDisplay) layoutResults[i].displayValue();
 
             displaysBySlot.put(i, display);
-            display.setInstance(instance, display.getPos().add(0, -1, 0));
+            display.setInstance(instance, display.getPos().add(0, -2, 0));
             display.lookAt(origin);
 
             setHighlighted(i, false);
@@ -36,19 +40,25 @@ public class SelectionScene extends AbstractScene {
         clearGlowing();
     }
 
-    public void compare(int slot1, int slot2) {
-        final var display1 = (EntityCreatureDisplay) requireDisplay(slot1);
-        final var display2 = (EntityCreatureDisplay) requireDisplay(slot2);
+    public void spawnParticleAuraBySlot(int slot, Particle particle) {
+        ((EntityCreatureDisplay) requireDisplay(slot)).spawnParticleAura(particle);
+    }
 
-        display1.lookAt(display2);
+    public void compare(int slot1, int slot2) {
+        if (slimeTracker == null) return;
+
+        final var display1 = (EntityCreatureDisplay) requireDisplay(slot1);
+
+        slimeTracker.lookAt(display1);
+        display1.lookAt(slimeTracker);
     }
 
     public void trackI(int slot) {
-        var dv = ((EntityCreatureDisplay) requireDisplay(slot));
-        var offset = dv.getEyeHeight() + 2;
-        var pos = dv.getPos().add(0, offset, 0);
+        var display = (EntityCreatureDisplay) requireDisplay(slot);
+        var offset = display.getEyeHeight() + 2;
+        var pos = display.getPos().add(0, offset, 0);
 
-        if(slimeTracker == null) {
+        if (slimeTracker == null) {
             slimeTracker = new EntityCreatureDisplay(pos, EntityType.SLIME, "Current I-index", true);
             slimeTracker.setInstance(instance);
         }
@@ -58,7 +68,7 @@ public class SelectionScene extends AbstractScene {
     }
 
     public void resetLook() {
-        displaysBySlot.values().forEach(dv -> ((EntityCreatureDisplay) dv).lookAt(origin));
+        displaysBySlot.values().forEach(display -> ((EntityCreatureDisplay) display).lookAt(origin));
     }
 
     public void trackJ(int slot) {
@@ -69,7 +79,7 @@ public class SelectionScene extends AbstractScene {
         }
 
         restoreCurrentMin();
-        restoreSortedHighlights();
+        //restoreSortedHighlights();
     }
 
     public void trackMinIndex(int slot) {
@@ -80,8 +90,6 @@ public class SelectionScene extends AbstractScene {
         if (!isSorted(slot)) {
             setHighlighted(slot, true);
         }
-
-        restoreSortedHighlights();
     }
 
     public void swap(int slot1, int slot2) {
@@ -90,8 +98,6 @@ public class SelectionScene extends AbstractScene {
         super.swapSlots(slot1, slot2);
 
         currentMinIndex = null;
-
-        restoreSortedHighlights();
     }
 
     public void markSorted(int slot) {
@@ -100,33 +106,48 @@ public class SelectionScene extends AbstractScene {
         clearGlowing();
         currentMinIndex = null;
 
-        setHighlighted(slot, true);
-        restoreSortedHighlights();
+        spawnParticleAuraBySlot(slot, Particle.SNOWFLAKE);
+        startFrozenParticles();
     }
 
     public boolean isSorted(int slot) {
         return sortedSlots.contains(slot);
     }
 
+    private void startFrozenParticles() {
+        if (frozenParticleTask != null) return;
+
+        frozenParticleTask = MinecraftServer.getSchedulerManager()
+                .buildTask(() -> {
+                    for (Integer slot : sortedSlots) {
+                        spawnParticleAuraBySlot(slot, Particle.SNOWFLAKE);
+                    }
+                })
+                .repeat(10, TimeUnit.SERVER_TICK)
+                .schedule();
+    }
+
     @Override
     public void cleanUp() {
         super.cleanUp();
+
+        if (frozenParticleTask != null) {
+            frozenParticleTask.cancel();
+            frozenParticleTask = null;
+        }
+
         sortedSlots.clear();
         currentMinIndex = null;
-        if(slimeTracker != null)
+
+        if (slimeTracker != null) {
             slimeTracker.kill();
-        slimeTracker = null;
+            slimeTracker = null;
+        }
     }
 
     private void restoreCurrentMin() {
         if (currentMinIndex != null && !isSorted(currentMinIndex)) {
             setHighlighted(currentMinIndex, true);
-        }
-    }
-
-    private void restoreSortedHighlights() {
-        for (Integer slot : sortedSlots) {
-            setHighlighted(slot, true);
         }
     }
 }

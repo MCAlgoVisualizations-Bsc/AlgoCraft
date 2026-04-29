@@ -73,7 +73,7 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
 
     public void setInstance(Instance instance, Pos pos) {
         this.instance = instance;
-        base.setInstance(instance, pos);
+        base.setInstance(instance, base.getPos());
         restartTaskIfNeeded();
     }
 
