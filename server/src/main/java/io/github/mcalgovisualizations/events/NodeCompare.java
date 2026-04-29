@@ -7,6 +7,6 @@ import org.jetbrains.annotations.NotNull;
 public record NodeCompare<V extends Comparable<V>>(Node x, Node y) implements IAlgorithmEvent {
     @Override
     public @NotNull String toString() {
-        return "Compare(" + x.value() + " , " + y.value() + ")";
+        return "Compare(" + x.getValue() + " , " + y.getValue() + ")";
     }
 }

@@ -1,9 +1,9 @@
 package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.DataTypes.NodeUtils;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
-import io.github.mcalgovisualizations.algorithms.GraphSearch.PlayerDFS;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.VillagerDFS;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
@@ -26,9 +26,6 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
@@ -38,7 +35,7 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
-                        .withIdentity("graph search", PlayerGraphSearch::new)
+                        .withIdentity("graph search", VillagerBFS::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
@@ -53,7 +50,7 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
-                        .withIdentity("graph dfs", PlayerDFS::new)
+                        .withIdentity("graph dfs", VillagerDFS::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event

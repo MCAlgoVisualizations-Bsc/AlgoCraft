@@ -1,6 +1,4 @@
-package io.github.mcalgovisualizations.DataTypes;
-
-import io.github.mcalgovisualizations.algorithms.GraphSearch.Node;
+package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +18,21 @@ public class NodeUtils {
         int idCounter = 0;
         for (int r = 0; r < GRID_ROWS; r++) {
             for (int c = 0; c < GRID_COLS; c++) {
-                // value is a random number, id is unique
                 Node node = new Node(idCounter++, random.nextInt(90) + 10);
                 grid[r][c] = node;
                 allNodes.add(node);
             }
         }
 
-        // 2. Connect only Orthogonally (No j + 1 skips!)
+        // 2. Connect Orthogonally
         for (int r = 0; r < GRID_ROWS; r++) {
             for (int c = 0; c < GRID_COLS; c++) {
                 Node current = grid[r][c];
-
-                // Potential Horizontal connection (Right)
                 if (c + 1 < GRID_COLS && random.nextDouble() < 0.6) {
                     Node right = grid[r][c + 1];
                     current.addNeighbor(right);
                     right.addNeighbor(current);
                 }
-
-                // Potential Vertical connection (Down)
                 if (r + 1 < GRID_ROWS && random.nextDouble() < 0.6) {
                     Node down = grid[r + 1][c];
                     current.addNeighbor(down);
@@ -48,17 +41,34 @@ public class NodeUtils {
             }
         }
 
-        // 3. Guarantee a path exists (No isolated islands)
-        // Connect every node to at least one neighbor to ensure it's a single graph
+        // 3. Guarantee every node has at least one neighbor
         ensureConnectivity(grid);
 
-        return allNodes.getFirst();
+        // 4. Randomly Assign Start and End
+        if (allNodes.size() >= 2) {
+            // Pick a random Start node
+            Node startNode = allNodes.get(random.nextInt(allNodes.size()));
+            startNode.setStatus(Node.NodeTarget.Start);
+
+            // Pick a random End node, ensuring it is not the Start node
+            Node endNode;
+            do {
+                endNode = allNodes.get(random.nextInt(allNodes.size()));
+            } while (endNode.equals(startNode));
+
+            endNode.setStatus(Node.NodeTarget.End);
+
+            // Return the startNode so the algorithm knows where to begin
+            return startNode;
+        }
+
+        return allNodes.isEmpty() ? null : allNodes.getFirst();
     }
 
     private static void ensureConnectivity(Node[][] grid) {
         for (int r = 0; r < NodeUtils.GRID_ROWS; r++) {
             for (int c = 0; c < NodeUtils.GRID_COLS; c++) {
-                if (grid[r][c].neighbors().isEmpty()) {
+                if (grid[r][c].getNeighbors().isEmpty()) {
                     if (c + 1 < NodeUtils.GRID_COLS) {
                         grid[r][c].addNeighbor(grid[r][c+1]);
                         grid[r][c+1].addNeighbor(grid[r][c]);

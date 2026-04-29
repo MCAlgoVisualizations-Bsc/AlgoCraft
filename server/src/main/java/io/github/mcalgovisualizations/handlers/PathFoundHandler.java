@@ -16,7 +16,7 @@ public class PathFoundHandler implements IAnimationHandler<PathFound> {
         return AnimationPlan.<GraphScene>builder()
                 .step(sceneOps -> {
                     String pathString = event.path().stream()
-                            .map(node -> String.valueOf(node.value()))
+                            .map(node -> String.valueOf(node.getValue()))
                             .collect(Collectors.joining(" -> "));
 
                     sceneOps.sendMessage(Component.text("Path found: " + pathString, NamedTextColor.GREEN));

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static io.github.mcalgovisualizations.DataTypes.NodeUtils.RandomizeNode;
+import static io.github.mcalgovisualizations.algorithms.GraphSearch.NodeUtils.RandomizeNode;
 
 public class NodeContext extends AbstractContext<Node> {
 
@@ -28,7 +28,7 @@ public class NodeContext extends AbstractContext<Node> {
         if (values == null) return null;
         // Basic copy of the root. Note: In a graph, true deep copying
         // usually requires a Map to handle cycles.
-        return new Node(values.id(), values.value(), new ArrayList<>(values.neighbors()));
+        return new Node(values.getID(), values.getValue(), new ArrayList<>(values.getNeighbors()));
     }
 
     @Override

@@ -6,13 +6,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public record Node (
-    int id,
-    int value,
-    List<Node> neighbors
-) {
+public class Node {
+    private final int id;
+    private final int value;
+    private List<Node> neighbors = new ArrayList<>();
+    private @NonNull NodeTarget status = NodeTarget.None;
+
+    public Node(int id, int value, @NonNull NodeTarget status) {
+        this.id = id;
+        this.value = value;
+        this.status = status;
+    }
+
+    public Node(int id, int value, List<Node> neighbors) {
+        this.id = id;
+        this.value = value;
+        this.neighbors = neighbors;
+    }
+
     public Node(int id, int value) {
-        this(id, value, new ArrayList<>());
+        this.id = id;
+        this.value = value;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public List<Node> getNeighbors() {
+        return neighbors;
+    }
+
+    public @NonNull NodeTarget getStatus() {
+        return status;
+    }
+
+    public void setStatus(@NonNull NodeTarget target) {
+        status = target;
     }
 
     public void addNeighbor(Node neighbor) {
@@ -35,5 +69,11 @@ public record Node (
     @Override
     public @NonNull String toString() {
         return "Node{id=" + id + ", value=" + value + "}";
+    }
+
+    public enum NodeTarget {
+        Start,
+        End,
+        None
     }
 }
