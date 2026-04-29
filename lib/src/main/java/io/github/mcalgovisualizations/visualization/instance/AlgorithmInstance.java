@@ -44,8 +44,8 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         });
 
         instance.setChunkSupplier(LightingChunk::new);
-
-        //container.setChunkLoader(new AnvilLoader(worldPath));
+        instance.setTimeRate(0);
+        instance.setTime(6000);
 
         final var algorithmCtx = algorithm.model();
         final var a = algorithm.ctor().get();
