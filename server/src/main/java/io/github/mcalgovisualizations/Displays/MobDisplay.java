@@ -87,6 +87,12 @@ public class MobDisplay implements IDisplayValue {
     }
 
     @Override
+    public void setInstance(Instance instance, Pos pos) {
+        mobEntity.setInstance(instance, pos);
+        textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
+    }
+
+    @Override
     public void addViewer(Player player) {
         mobEntity.addViewer(player);
         textEntity.addViewer(player);

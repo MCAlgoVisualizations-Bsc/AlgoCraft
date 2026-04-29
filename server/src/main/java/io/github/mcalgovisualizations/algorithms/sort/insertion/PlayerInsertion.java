@@ -72,7 +72,6 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
             return AnimationPlan.<CircleScene>builder()
                     .step(scene -> {
                         scene.setHighlighted(event.idx(), true);
-                        scene.trackJ(event.idx());
                         scene.sendActionBar(Component.text(
                                 "j : [" + event.value() + "]",
                                 NamedTextColor.GREEN

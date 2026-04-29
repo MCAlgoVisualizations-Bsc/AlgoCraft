@@ -7,6 +7,8 @@ import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.CircleScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
+import io.github.mcalgovisualizations.algorithms.sort.selection.PlayerSelectionSort;
+import io.github.mcalgovisualizations.algorithms.sort.selection.SelectionScene;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
@@ -63,6 +65,35 @@ public class RegisterAlgo {
         var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
         var stringCollection1 = new SortingContext<>(new ArrayList<>(List.of("a", "b", "k", "x", "d", "h", "a", "b", "e")));
         var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Circle Layout selection sort", PlayerSelectionSort::new)
+                        .positioning(new ArcLayout())
+                        .withScene(SelectionScene::new)
+                        .onEvent(Compare.class, new PlayerSelectionSort.CompareHandler())
+                        .onEvent(Swap.class, new PlayerSelectionSort.SwapHandler())
+                        .onEvent(PlayerSelectionSort.TrackI.class, new PlayerSelectionSort.TrackIHandler())
+                        .onEvent(PlayerSelectionSort.TrackMinIndex.class, new PlayerSelectionSort.TrackMinIndexHandler())
+                        .onCompletion(ctx -> {
+                            final var size = ctx.getData().size();
+                            final var plan = AnimationPlan.<SelectionScene>builder();
+                            final var message = Component.text("Algorithm is complete! Final sorted array: " + ctx.getData(), NamedTextColor.YELLOW);
+                            plan.step(scene -> scene.sendMessage(message));
+                            for(int i = 0; i < size; i++) {
+                                final var finalI = i;
+                                plan.step(scene -> scene.hoverDisplay(finalI, true));
+                            }
+
+                            for(int i = 0; i<size; i++) {
+                                final var finalI = i;
+                                plan.step(scene -> scene.hoverDisplay(finalI, false));
+                            }
+
+                            return plan.build();
+                        })
+                        .create()
+        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(circleCollection1)

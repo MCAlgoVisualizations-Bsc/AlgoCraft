@@ -32,6 +32,8 @@ public interface IDisplayValue {
      */
     void setInstance(Instance instance);
 
+    void setInstance(Instance instance, Pos pos);
+
     // TODO : Remove
     void addViewer(Player player);
     /**

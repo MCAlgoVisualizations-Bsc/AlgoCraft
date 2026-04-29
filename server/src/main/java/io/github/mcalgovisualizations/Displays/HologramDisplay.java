@@ -48,6 +48,11 @@ public final class HologramDisplay implements IDisplayValue {
         textEntity.setInstance(instance, pos);
     }
 
+    @Override
+    public void setInstance(Instance instance, Pos pos) {
+        textEntity.setInstance(instance, pos);
+    }
+
     public void addViewer(Player player) {
         textEntity.addViewer(player);
     }
