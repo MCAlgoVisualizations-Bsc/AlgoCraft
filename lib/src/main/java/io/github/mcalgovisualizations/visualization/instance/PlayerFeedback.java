@@ -5,6 +5,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -25,11 +26,6 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         this.supplier = supplier;
     }
 
-    @Override
-    public void sendActionBar(@NotNull final Component message) {
-        audience().sendActionBar(message);
-    }
-
     /**
      * Plays a sound to the aggregated audience.
      *
@@ -42,6 +38,21 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         audience().playSound(Sound.sound(Key.key(key), Sound.Source.MASTER, volume, pitch));
     }
 
+    @Override
+    public void sendActionBar(@NotNull final Component message) {
+        audience().sendActionBar(message);
+    }
+
+    @Override
+    public void sendActionBar(@NotNull final String message) {
+        audience().sendActionBar(Component.text(message));
+    }
+
+    @Override
+    public void sendActionBar(@NotNull final String message, NamedTextColor color) {
+        audience().sendActionBar(Component.text(message).color(color));
+    }
+
     /**
      * Sends a message to the aggregated audience.
      *
@@ -50,6 +61,16 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
     @Override
     public void sendMessage(@NotNull final Component message) {
         audience().sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(@NotNull String message) {
+        audience().sendMessage(Component.text(message));
+    }
+
+    @Override
+    public void sendMessage(@NotNull final String message, NamedTextColor color) {
+        audience().sendMessage(Component.text(message).color(color));
     }
 
     /**

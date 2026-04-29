@@ -1,11 +1,12 @@
 package io.github.mcalgovisualizations.visualization.renderer.scene;
 
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 
-public interface ISceneOps {
+public interface ISceneOps extends AudienceChannel {
 
     void setLayout(LayoutResult[] model);
 

@@ -47,15 +47,6 @@ public class AlgoCraft {
         return instance;
     }
 
-    public void addPlayerToInstance(UUID instanceId, Player... players) {
-        final var instance = playerInstance.get(instanceId);
-
-        if (instance == null) {
-            //createInstance(instanceId, players);
-        }
-        instance.addPlayer(players);
-    }
-
     public void removePlayerFromInstance(Player... players) {
         for(var player : players) {
             var instance = requireInstance(player);
@@ -119,6 +110,11 @@ public class AlgoCraft {
             case SET_SPEED -> controller.changeSpeed();
             default -> {
                 controller.clear();
+                instance.removePlayer(defaultInstance, player)
+                        .thenRun(() -> MinecraftServer.getInstanceManager().unregisterInstance(instance.getInstance()))
+                        .thenRun(() -> playerInventory.remove(player.getUuid()))
+                        .thenRun(() -> playerInstance.remove(player.getUuid()))
+                        .thenRun(() -> instance.removePlayer(defaultInstance, player));
                 ui.applyDefaultLayout(player);
             }
         }
@@ -211,7 +207,6 @@ public class AlgoCraft {
     public boolean acceptInvite(Player invited, Player inviter) {
         var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
         inviteList.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
-
 
         if(inviteList.stream().noneMatch(invite -> invite.inviter().equals(inviter.getUuid())))
             invited.sendMessage(Component.text("You have no active invite sent to you from: " + inviter.getUsername(), NamedTextColor.RED));

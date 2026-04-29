@@ -71,6 +71,12 @@ public abstract class AbstractParticleDisplay implements IDisplayValue {
         restartTaskIfNeeded();
     }
 
+    public void setInstance(Instance instance, Pos pos) {
+        this.instance = instance;
+        base.setInstance(instance, pos);
+        restartTaskIfNeeded();
+    }
+
     @Override
     public void addViewer(Player player) {
         base.addViewer(player);

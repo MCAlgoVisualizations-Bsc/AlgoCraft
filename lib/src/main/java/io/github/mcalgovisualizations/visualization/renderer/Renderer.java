@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class Renderer<I, O extends ISceneOps> {
     private final O scene;
-    private Instance instance;
+    private final Instance instance;
     private final Dispatcher<O> dispatcher;
     private final Executor<O> executor;
     private final AnimationPlan<O> complete;
@@ -95,18 +95,11 @@ public final class Renderer<I, O extends ISceneOps> {
 
         final var futures = Arrays.stream(layoutResults)
                 .filter(Objects::nonNull)
-                .map(ChunkKey::new)
-                .map(key -> instance.loadChunk(key.x(), key.z()))
+                .map(key -> instance.loadChunk(key.pos().chunkX(), key.pos().chunkX()))
                 .toArray(CompletableFuture<?>[]::new);
 
         return CompletableFuture.allOf(futures)
                 .thenRun(() -> scene.setLayout(layoutResults));
-    }
-
-    private record ChunkKey(LayoutResult layoutResult, int x, int z) {
-        public ChunkKey(LayoutResult layoutResult) {
-            this(layoutResult, layoutResult.pos().chunkX(), layoutResult.pos().chunkZ());
-        }
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {

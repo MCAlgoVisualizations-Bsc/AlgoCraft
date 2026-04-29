@@ -74,10 +74,12 @@ public class RegisterAlgo {
                         .onEvent(Compare.class, new PlayerSelectionSort.CompareHandler())
                         .onEvent(Swap.class, new PlayerSelectionSort.SwapHandler())
                         .onEvent(PlayerSelectionSort.TrackI.class, new PlayerSelectionSort.TrackIHandler())
-                        .onEvent(PlayerSelectionSort.TrackJ.class, new PlayerSelectionSort.TrackJHandler())
+                        .onEvent(PlayerSelectionSort.TrackMinIndex.class, new PlayerSelectionSort.TrackMinIndexHandler())
                         .onCompletion(ctx -> {
                             final var size = ctx.getData().size();
                             final var plan = AnimationPlan.<SelectionScene>builder();
+                            final var message = Component.text("Algorithm is complete! Final sorted array: " + ctx.getData(), NamedTextColor.YELLOW);
+                            plan.step(scene -> scene.sendMessage(message));
                             for(int i = 0; i < size; i++) {
                                 final var finalI = i;
                                 plan.step(scene -> scene.hoverDisplay(finalI, true));
@@ -88,8 +90,6 @@ public class RegisterAlgo {
                                 plan.step(scene -> scene.hoverDisplay(finalI, false));
                             }
 
-                            final var message = Component.text("Algorithm is complete! Final sorted array: " + ctx.getData(), NamedTextColor.YELLOW);
-                            plan.step(scene -> scene.sendMessage(message));
                             return plan.build();
                         })
                         .create()
