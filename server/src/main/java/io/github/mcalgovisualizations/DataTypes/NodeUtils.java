@@ -5,28 +5,11 @@ import io.github.mcalgovisualizations.algorithms.GraphSearch.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class NodeUtils {
-    public static final int GRID_SCALE = 1;
-    public static final int GRID_ROWS = 4 * GRID_SCALE;
-    public static final int GRID_COLS = 6 * GRID_SCALE;
-
-    public static Node fromList(List<Integer> list) {
-        if (list == null || list.isEmpty()) return null;
-
-        Node root = new Node(0, list.getFirst());
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(root);
-
-        for (int i = 1; i < list.size(); i++) {
-            Node node = new Node(i, list.get(i));
-            nodes.add(node);
-            // Connect to a previous node to ensure connectivity (simulating a simple graph)
-            nodes.get(ThreadLocalRandom.current().nextInt(i)).addNeighbor(node);
-        }
-        return root;
-    }
+    public static final float GRID_SCALE = 0.5f;
+    public static final int GRID_ROWS = (int) (4 * GRID_SCALE);
+    public static final int GRID_COLS = (int) (6 * GRID_SCALE);
 
     public static Node RandomizeNode() {
         Random random = new Random();
@@ -67,20 +50,19 @@ public class NodeUtils {
 
         // 3. Guarantee a path exists (No isolated islands)
         // Connect every node to at least one neighbor to ensure it's a single graph
-        ensureConnectivity(grid, GRID_ROWS, GRID_COLS);
+        ensureConnectivity(grid);
 
         return allNodes.getFirst();
     }
 
-    private static void ensureConnectivity(Node[][] grid, int rows, int cols) {
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+    private static void ensureConnectivity(Node[][] grid) {
+        for (int r = 0; r < NodeUtils.GRID_ROWS; r++) {
+            for (int c = 0; c < NodeUtils.GRID_COLS; c++) {
                 if (grid[r][c].neighbors().isEmpty()) {
-                    // Connect to any valid neighbor to break the isolation
-                    if (c + 1 < cols) {
+                    if (c + 1 < NodeUtils.GRID_COLS) {
                         grid[r][c].addNeighbor(grid[r][c+1]);
                         grid[r][c+1].addNeighbor(grid[r][c]);
-                    } else if (r + 1 < rows) {
+                    } else if (r + 1 < NodeUtils.GRID_ROWS) {
                         grid[r][c].addNeighbor(grid[r+1][c]);
                         grid[r+1][c].addNeighbor(grid[r][c]);
                     }
