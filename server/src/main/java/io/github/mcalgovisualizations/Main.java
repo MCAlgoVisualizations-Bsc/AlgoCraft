@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.commands.Accept;
 import io.github.mcalgovisualizations.commands.Invite;
 import io.github.mcalgovisualizations.commands.PendingInvites;
+import io.github.mcalgovisualizations.pov.PovManager;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.events.Message;
 import net.kyori.adventure.text.Component;
@@ -40,6 +41,7 @@ public final class Main {
 
         //algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListener(MinecraftServer.getGlobalEventHandler());
+        PovManager.setup(algo, instance);
 
         // Register visualization control listeners (item interactions)
         registerListeners(instance);

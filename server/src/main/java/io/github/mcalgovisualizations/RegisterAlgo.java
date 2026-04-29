@@ -4,17 +4,20 @@ import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
+import io.github.mcalgovisualizations.algorithms.PlayerAStar3DTunnel;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.CircleScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
+import io.github.mcalgovisualizations.CaveTunnelScene;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.instance.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.ui.VillagerPovAlgorithmUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.Material;
@@ -243,6 +246,7 @@ public class RegisterAlgo {
                         .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
@@ -252,6 +256,7 @@ public class RegisterAlgo {
                                 "4-way A* on a fixed 2D obstacle map"
                         ))
                         .withScene(GridScene::new)
+                        .withRunningLayout(new VillagerPovAlgorithmUI())
                         .create()
         );
 
@@ -260,6 +265,7 @@ public class RegisterAlgo {
                         .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
@@ -269,6 +275,7 @@ public class RegisterAlgo {
                                 "4-way BFS explores breadth-first"
                         ))
                         .withScene(GridScene::new)
+                        .withRunningLayout(new VillagerPovAlgorithmUI())
                         .create()
         );
 
@@ -277,6 +284,7 @@ public class RegisterAlgo {
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
@@ -286,6 +294,7 @@ public class RegisterAlgo {
                                 "4-way DFS explores depth-first"
                         ))
                         .withScene(GridScene::new)
+                        .withRunningLayout(new VillagerPovAlgorithmUI())
                         .create()
         );
 
@@ -294,6 +303,7 @@ public class RegisterAlgo {
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
@@ -301,8 +311,58 @@ public class RegisterAlgo {
                                 "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
                         ))
                         .withScene(GridScene::new)
+                        .withRunningLayout(new VillagerPovAlgorithmUI())
                         .create()
         );
+
+        final int caveColumns = 8;
+        final int caveLayers = 6;
+        final int caveDepth = 8;
+        GridContext<Integer> caveGrid = buildCaveGrid(caveColumns, caveLayers, caveDepth);
+
+        algo.registerAlgorithm(
+                Algorithm.builder(caveGrid)
+                        .withIdentity("a* cave pathfinding (3d)", () -> new PlayerAStar3DTunnel(caveColumns, caveLayers, caveDepth))
+                        .positioning(new CaveTunnel3DLayout(caveColumns, caveLayers, caveDepth))
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(CaveVillagerMove.class, new CaveVillagerMoveHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "A* Cave Pathfinding (3D)",
+                                Material.COPPER_BULB,
+                                "Time: O(E log V) | Space: O(V)",
+                                "3D tunnel traversal with vertical movement and villager POV.",
+                                "Heuristic pathfinding in a deterministic cave maze"
+                        ))
+                        .withScene(ctx -> new CaveTunnelScene(ctx, caveColumns, caveLayers, caveDepth))
+                        .withRunningLayout(new VillagerPovAlgorithmUI())
+                        .create()
+        );
+    }
+
+    private static GridContext<Integer> buildCaveGrid(int columns, int layers, int depth) {
+        ArrayList<Integer> grid = new ArrayList<>(columns * layers * depth);
+
+        for (int z = 0; z < depth; z++) {
+            for (int y = 0; y < layers; y++) {
+                for (int x = 0; x < columns; x++) {
+                    int value;
+                    if (x == 0 && y == 0 && z == 0) {
+                        value = 2;
+                    } else if (x == columns - 1 && y == layers - 1 && z == depth - 1) {
+                        value = 3;
+                    } else if (x == 0 || y == 0 || z == depth - 1 || x == y || y == z) {
+                        value = 0;
+                    } else {
+                        int noise = Math.floorMod((x * 31) + (y * 17) + (z * 13) + (x * y * 7) + (y * z * 5), 100);
+                        value = noise < 22 ? 1 : 0;
+                    }
+                    grid.add(value);
+                }
+            }
+        }
+
+        return new GridContext<>(grid);
     }
 
     private static GridContext<Integer> buildPathGrid(int xSize, int ySize) {

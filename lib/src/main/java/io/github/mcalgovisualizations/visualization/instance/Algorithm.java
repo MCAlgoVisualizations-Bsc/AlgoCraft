@@ -9,6 +9,8 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
+import io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +30,8 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlerRegistry,
         @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
         @Nullable AlgorithmPresentation presentation,
-        @NotNull Function<SceneContext, O> scene
+        @NotNull Function<SceneContext, O> scene,
+        @NotNull IAlgorithmUI runningLayout
 ) {
     public Algorithm {
         Objects.requireNonNull(id, "id");
@@ -38,6 +41,7 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         Objects.requireNonNull(handlerRegistry, "handlerRegistry");
         Objects.requireNonNull(onComplete, "onComplete");
         Objects.requireNonNull(scene, "scene");
+        Objects.requireNonNull(runningLayout, "runningLayout");
         handlerRegistry = Map.copyOf(handlerRegistry);
     }
 
@@ -57,6 +61,7 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         private Function<C, ? extends AnimationPlan<O>> onComplete;
         private @Nullable AlgorithmPresentation presentation;
         private Function<SceneContext, O> scene;
+        private IAlgorithmUI runningLayout = new AlgorithmUI();
 
         private Builder(@NotNull C model) {
             this.model = Objects.requireNonNull(model, "model");
@@ -112,6 +117,11 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        public @NotNull Builder<T, C, O> withRunningLayout(@NotNull IAlgorithmUI runningLayout) {
+            this.runningLayout = Objects.requireNonNull(runningLayout, "runningLayout");
+            return this;
+        }
+
         public @NotNull Algorithm<T, C, O> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing at least 1 event handler");
@@ -125,7 +135,8 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
                     handlers,
                     onComplete == null ? defaultOnComplete() : onComplete,
                     presentation,
-                    Objects.requireNonNull(scene, "scene")
+                    Objects.requireNonNull(scene, "scene"),
+                    Objects.requireNonNull(runningLayout, "runningLayout")
             );
         }
 

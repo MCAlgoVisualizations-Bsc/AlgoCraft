@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.instance;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -62,6 +63,14 @@ public class AlgoCraft {
             instance.removePlayer(defaultInstance, player)
                     .thenRun(() -> ui.applyDefaultLayout(player));
         }
+    }
+
+    public Optional<ISceneOps> sceneFor(Player player) {
+        var instance = playerInstance.get(player.getUuid());
+        if (instance == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable((ISceneOps) instance.getScene());
     }
 
     public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
@@ -154,7 +163,7 @@ public class AlgoCraft {
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
                 })
-                .thenRun(() -> ui.applyRunningLayout(player));
+                .thenRun(() -> entry.runningLayout().applyRunningLayout(player));
         });
 
         player.openInventory(inventory);

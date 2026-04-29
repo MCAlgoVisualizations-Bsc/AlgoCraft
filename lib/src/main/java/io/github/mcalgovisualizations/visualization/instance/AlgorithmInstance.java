@@ -25,6 +25,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     private final AlgorithmPresentation presentation;
     private final PartyService partyService;
     private final VisualizationController<T, C> controller;
+    private final O scene;
     public static final Pos INSTANCE_ORIGIN = new Pos(0, 40, 0);
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
@@ -54,7 +55,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
         final var audience = new PlayerFeedback(partyService::audience);
         final var sceneCtx = new SceneContext(instance, audience, INSTANCE_ORIGIN);
-        final var scene = algorithm.scene().apply(sceneCtx);
+        this.scene = algorithm.scene().apply(sceneCtx);
 
         final var renderer = new Renderer<>(
                 instance,
@@ -63,7 +64,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
                 audience,
                 algorithm.handlerRegistry(),
                 onCompletePlan,
-                scene
+                this.scene
         );
 
         final var traceBuilder = new AlgorithmTraceBuilder<>(
@@ -100,5 +101,9 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
     public PlayerControls getController() {
         return this.controller;
+    }
+
+    public O getScene() {
+        return scene;
     }
 }
