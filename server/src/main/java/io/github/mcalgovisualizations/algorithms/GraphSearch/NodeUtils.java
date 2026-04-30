@@ -1,11 +1,9 @@
 package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class NodeUtils {
-    public static final float GRID_SCALE = 1f;
+    public static final float GRID_SCALE = .75f;
     public static final int GRID_ROWS = (int) (4 * GRID_SCALE);
     public static final int GRID_COLS = (int) (6 * GRID_SCALE);
 
@@ -13,12 +11,17 @@ public class NodeUtils {
         Random random = new Random();
         Node[][] grid = new Node[GRID_ROWS][GRID_COLS];
         List<Node> allNodes = new ArrayList<>();
-
+        Set<Integer> numbers = new HashSet<>();
         // 1. Create nodes and assign them to a grid
         int idCounter = 0;
         for (int r = 0; r < GRID_ROWS; r++) {
             for (int c = 0; c < GRID_COLS; c++) {
-                Node node = new Node(idCounter++, random.nextInt(90) + 10);
+                int n;
+                do {
+                    n = random.nextInt(90) + 10;
+                } while (numbers.contains(n));
+                numbers.add(n);
+                Node node = new Node(idCounter++, n);
                 grid[r][c] = node;
                 allNodes.add(node);
             }

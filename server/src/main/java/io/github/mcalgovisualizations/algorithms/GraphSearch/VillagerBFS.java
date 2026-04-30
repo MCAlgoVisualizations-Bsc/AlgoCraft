@@ -8,6 +8,8 @@ import java.util.*;
 
 public final class VillagerBFS implements IPlayerSort<NodeContext> {
 
+    private Node villagerPosition = null;
+
     @Override
     public void run(NodeContext context) {
         Node root = context.values;
@@ -21,36 +23,131 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
         queue.add(root);
         visited.add(root.getID());
         parents.put(root.getID(), null);
-System.out.println("--- Starting BFS: Targeting 'End' Node ---");
+        villagerPosition = root;
+
+        System.out.println("--- Starting BFS: Targeting 'End' Node ---");
+
+        // Initial position visualization
+        context.emit(new Compare(root.getID(), -1, root.getValue(), -1));
+
+        // Check if root is the target
+        if (root.getStatus() == Node.NodeTarget.End) {
+            emitFinalPath(root, parents, context);
+            return;
+        }
 
         while (!queue.isEmpty()) {
             // 1. Pull the next node from the frontier
             Node cursor = queue.poll();
 
-            // 2. Visualize: Highlight the node being currently processed
-            // We use -1 for the target value since we are looking for a Status
-            context.emit(new Compare(cursor.getID(), -1, cursor.getValue(), -1));
-
-            // 3. Check for Victory Condition (End Status)
-            if (cursor.getStatus() == Node.NodeTarget.End) {
-                System.out.println("--- Goal Reached! Reconstructing Path ---");
-                emitFinalPath(cursor, parents, context);
-                return;
+            // Determine if this is a redundant visit to a leaf node
+            boolean skipMoveToCursor = false;
+            if (villagerPosition != null && parents.containsKey(cursor.getID()) && parents.get(cursor.getID()) != null) {
+                Node parentOfCursor = parents.get(cursor.getID());
+                if (villagerPosition.equals(parentOfCursor)) {
+                    // Check if cursor has any unvisited neighbors
+                    boolean hasUnvisitedNeighbors = false;
+                    for (Node neighbor : cursor.getNeighbors()) {
+                        if (!visited.contains(neighbor.getID())) {
+                            hasUnvisitedNeighbors = true;
+                            break;
+                        }
+                    }
+                    if (!hasUnvisitedNeighbors) {
+                        // If cursor is a leaf (no unvisited neighbors) and we are currently at its parent,
+                        // then moving to cursor now would be the "second visit" to this leaf.
+                        skipMoveToCursor = true;
+                    }
+                }
             }
 
-            // 4. Explore Neighbors
+            if (!skipMoveToCursor) {
+                // Move villager to the node being currently processed.
+                // moveTo handles emitting path steps if needed.
+                moveTo(cursor, parents, context);
+            }
+
+            // 2. Explore Neighbors
             for (Node neighbor : cursor.getNeighbors()) {
                 if (!visited.contains(neighbor.getID())) {
                     visited.add(neighbor.getID());
                     parents.put(neighbor.getID(), cursor);
                     queue.add(neighbor);
 
-                    // 5. Visual "Ripple": Highlight discovered neighbors immediately
-                    // This shows the BFS frontier expanding outward layer-by-layer
-                    context.emit(new Compare(neighbor.getID(), -1, neighbor.getValue(), -1));
+                    // 3. Physical Exploration: Move to neighbor
+                    moveTo(neighbor, parents, context);
+
+                    // Check for Victory Condition immediately upon discovery
+                    if (neighbor.getStatus() == Node.NodeTarget.End) {
+                        System.out.println("--- Goal Reached! Reconstructing Path ---");
+                        emitFinalPath(neighbor, parents, context);
+                        return;
+                    }
+
+                    // 4. Move back to cursor to continue exploration ONLY if there are more unvisited neighbors
+                    boolean hasMoreUnvisitedNeighborsFromCursor = false;
+                    for (Node otherNeighbor : cursor.getNeighbors()) {
+                        if (!visited.contains(otherNeighbor.getID())) { // Check if it's unvisited
+                            // If it's not the current neighbor we just processed, then it's another unvisited neighbor
+                            if (!otherNeighbor.equals(neighbor)) {
+                                hasMoreUnvisitedNeighborsFromCursor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasMoreUnvisitedNeighborsFromCursor) {
+                        moveTo(cursor, parents, context);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Moves the villager from the current position to the target node
+     * by following the path in the BFS tree.
+     */
+    private void moveTo(Node target, Map<Integer, Node> parents, NodeContext context) {
+        if (villagerPosition == null || villagerPosition.equals(target)) return;
+
+        // 1. Get path from root to villagerPosition
+        List<Node> pathFromRootToCurrent = getPathFromRoot(villagerPosition, parents);
+        // 2. Get path from root to target
+        List<Node> pathFromRootToTarget = getPathFromRoot(target, parents);
+
+        // 3. Find Lowest Common Ancestor (LCA)
+        int lcaIndex = 0;
+        int minSize = Math.min(pathFromRootToCurrent.size(), pathFromRootToTarget.size());
+        while (lcaIndex < minSize && pathFromRootToCurrent.get(lcaIndex).equals(pathFromRootToTarget.get(lcaIndex))) {
+            lcaIndex++;
+        }
+        lcaIndex--; // Last common element
+
+        // 4. Move up from current position to LCA
+        for (int i = pathFromRootToCurrent.size() - 2; i >= lcaIndex; i--) {
+            Node step = pathFromRootToCurrent.get(i);
+            context.emit(new Compare(step.getID(), -1, step.getValue(), -1));
+        }
+
+        // 5. Move down from LCA to target
+        for (int i = lcaIndex + 1; i < pathFromRootToTarget.size(); i++) {
+            Node step = pathFromRootToTarget.get(i);
+            context.emit(new Compare(step.getID(), -1, step.getValue(), -1));
+        }
+
+        villagerPosition = target;
+    }
+
+    private List<Node> getPathFromRoot(Node node, Map<Integer, Node> parents) {
+        List<Node> path = new ArrayList<>();
+        Node curr = node;
+        while (curr != null) {
+            path.add(curr);
+            curr = parents.get(curr.getID());
+        }
+        Collections.reverse(path);
+        return path;
     }
 
     /**

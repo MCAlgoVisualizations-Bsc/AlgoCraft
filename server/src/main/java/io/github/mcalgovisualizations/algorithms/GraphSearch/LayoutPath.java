@@ -80,7 +80,10 @@ public class LayoutPath implements ILayout<Node> {
         // --- NEW LOGIC: Block Selection based on Status ---
         Block nodeBlock;
         switch (node.getStatus()) {
-            case Start -> nodeBlock = Block.LIME_WOOL;  // Green for Start
+            case Start -> {
+                    nodeBlock = Block.LIME_WOOL;
+                    instance.setBlock(currentPos.add(0,10,0),Block.LIME_WOOL);
+            }  // Green for Start
             case End   -> {
                 nodeBlock = Block.RED_WOOL;   // Red for End
                 buildSmallHouse(currentPos, instance);
