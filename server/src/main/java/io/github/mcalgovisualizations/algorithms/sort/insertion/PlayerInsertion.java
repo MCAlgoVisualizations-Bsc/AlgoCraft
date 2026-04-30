@@ -58,7 +58,6 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                         scene.finishInnerLoopVisuals();
                         scene.clearGlowing();
                         scene.revealInitialPrefixIfNeeded();
-                        scene.trackI(event.idx());
                     })
                     .step(4, scene -> {
                         scene.revealInitialPrefixIfNeeded();
@@ -69,7 +68,6 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                     })
                     .step(4, scene -> {
                         scene.revealSlot(event.idx());
-                        scene.trackI(event.idx());
                         scene.sendActionBar(Component.text(
                                 "Insert [" + event.value() + "] into sorted prefix",
                                 NamedTextColor.AQUA
@@ -116,7 +114,7 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         public AnimationPlan<InsertionScene> handle(Swap event) {
             return AnimationPlan.<InsertionScene>builder()
                     .step(4, scene -> {
-                        scene.playSound("entity.slime.squish", 0.9f, 0.8f);
+                        scene.playSound("block.piston.extend", 0.7f, 1.2f);
                         scene.sendActionBar(Component.text(
                                 "Shift [" + event.xValue() + "] right",
                                 NamedTextColor.GOLD

@@ -100,12 +100,6 @@ public class InsertionScene extends AbstractScene {
         coversBySlot.put(slot, cover);
     }
 
-    public void trackI(int slot) {
-        revealSlot(slot);
-
-        trackedISlot = slot;
-        refreshITracker();
-    }
 
     public void markJ(int slot) {
         if (!revealedSlots.contains(slot)) return;
@@ -131,7 +125,6 @@ public class InsertionScene extends AbstractScene {
         spawnParticleAuraBySlot(leftSlot, Particle.HAPPY_VILLAGER);
         spawnParticleAuraBySlot(rightSlot, Particle.HAPPY_VILLAGER);
 
-        refreshITracker();
     }
 
     public void danceSwap(int leftSlot, int rightSlot) {
@@ -158,7 +151,6 @@ public class InsertionScene extends AbstractScene {
         spawnParticleAuraAt(leftDance, Particle.CRIT);
         spawnParticleAuraAt(rightDance, Particle.CRIT);
 
-        refreshITracker();
     }
 
     public void commitSwap(int leftSlot, int rightSlot) {
@@ -180,7 +172,6 @@ public class InsertionScene extends AbstractScene {
         displaysBySlot.put(leftSlot, right);
         displaysBySlot.put(rightSlot, left);
 
-        refreshITracker();
     }
 
     public void finishInnerLoopVisuals() {
@@ -194,7 +185,6 @@ public class InsertionScene extends AbstractScene {
             lookAtOrigin(display);
         }
 
-        refreshITracker();
     }
 
     public void clearITracker() {
@@ -212,28 +202,6 @@ public class InsertionScene extends AbstractScene {
         }
 
         coversBySlot.clear();
-    }
-
-    private void refreshITracker() {
-        if (trackedISlot == null) return;
-        if (!revealedSlots.contains(trackedISlot)) return;
-
-        var tracked = requireDisplay(trackedISlot);
-        var base = tracked.getPos();
-        var trackerPos = base.add(0, tracked.getEyeHeight() + 2, 0);
-
-        if (iTracker == null) {
-            iTracker = new EntityCreatureDisplay(
-                    trackerPos,
-                    EntityType.SLIME,
-                    "I",
-                    true
-            );
-            iTracker.setInstance(instance);
-        }
-
-        iTracker.teleport(trackerPos);
-        iTracker.lookAt(base.add(0, tracked.getEyeHeight(), 0));
     }
 
     public EntityCreatureDisplay requireDisplay(int slot) {
