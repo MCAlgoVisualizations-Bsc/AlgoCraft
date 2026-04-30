@@ -99,6 +99,13 @@ public record ArcLayout(
         return entities;
     }
 
+    private static final Set<String> blackList = new HashSet<>(Stream.of(
+            "breeze",
+            "phantom",
+            "wither",
+            "warden"
+    ).map(String::toLowerCase).toList());
+
     /**
      * Sorted by height.
      */
@@ -109,6 +116,7 @@ public record ArcLayout(
                     "bat",
                     "bee",
                     "bogged",
+                    "breeze",
                     "camel",
                     "camel_husk",
                     "cat",
@@ -144,7 +152,7 @@ public record ArcLayout(
                     "panda",
                     "parched",
                     "parrot",
-                    //"phantom",
+                    "phantom",
                     "pig",
                     "piglin",
                     "piglin_brute",
@@ -174,7 +182,9 @@ public record ArcLayout(
                     "villager",
                     "vindicator",
                     "wandering_trader",
+                    "warden",
                     "witch",
+                    "wither",
                     "wither_skeleton",
                     "wolf",
                     "zoglin",
@@ -185,7 +195,7 @@ public record ArcLayout(
                     "zombified_piglin"
             )
             .map(EntityType::fromKey)
-            .filter(Objects::nonNull)
+            .filter(p -> Objects.nonNull(p) && blackList.contains(p.name().toLowerCase()))
             .sorted(Comparator.comparingDouble(EntityType::height)) // sort by height
             .toArray(EntityType[]::new);
 }
