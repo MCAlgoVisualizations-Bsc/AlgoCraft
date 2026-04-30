@@ -10,12 +10,6 @@ import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
-import net.minestom.server.entity.ai.EntityAI;
-import net.minestom.server.entity.ai.EntityAIGroup;
-import net.minestom.server.entity.metadata.EntityMeta;
-import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
-import net.minestom.server.entity.metadata.display.TextDisplayMeta;
-import net.minestom.server.entity.metadata.villager.VillagerMeta;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
@@ -65,15 +59,20 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
     @Override
     public void setInstance(Instance instance) {
-        entity.setInstance(instance, initialPos);
-        textEntity.setInstance(instance, getTextOffset(entity.getPosition()));
+        Pos spawnPos = getPos();
+        entity.setInstance(instance, spawnPos).thenRun(() -> {
+            if (textEntity.isRemoved()) return;
+            textEntity.setInstance(instance, spawnPos).thenRun(() -> {
+                if (entity.isRemoved()) return;
+                entity.addPassenger(textEntity);
+            });
+        });
     }
 
     @Override
     public void setInstance(Instance instance, Pos pos) {
         this.initialPos = pos;
-        entity.setInstance(instance, pos);
-        textEntity.setInstance(instance, getTextOffset(entity.getPosition()));
+        setInstance(instance);
     }
 
     @Override

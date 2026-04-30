@@ -13,6 +13,8 @@ import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.instance.Instance;
 
+import java.util.concurrent.CompletableFuture;
+
 public class NodeDisplay implements IDisplayValue {
     private final Entity textEntity;
     private Pos pos;
@@ -55,6 +57,7 @@ public class NodeDisplay implements IDisplayValue {
         this.pos = translatePos(pos);
         textEntity.teleport(this.pos);
     }
+
 
     @Override
     public void setGlowing(boolean highlighted) {

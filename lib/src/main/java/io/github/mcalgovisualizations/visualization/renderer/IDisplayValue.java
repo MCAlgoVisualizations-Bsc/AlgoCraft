@@ -3,6 +3,7 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.component.AttributeList;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -59,8 +60,7 @@ public interface IDisplayValue {
      * @return a future that completes when the target is reached
      */
     default CompletableFuture<Void> walkTo(Pos pos) {
-        teleport(pos);
-        return CompletableFuture.completedFuture(null);
+        throw new RuntimeException("Not implemented");
     }
 
     /**
