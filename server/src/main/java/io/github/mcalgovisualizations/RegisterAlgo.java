@@ -1,7 +1,11 @@
 package io.github.mcalgovisualizations;
 
+import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeUtils;
 import io.github.mcalgovisualizations.algorithms.*;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.VillagerDFS;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
+import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
@@ -27,6 +31,7 @@ import java.util.List;
 
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
+ 
         showcaseAlgo(algo);
         //registerTreeSearchAlgo(algo);
         //registerPathFindingAlgo(algo);
@@ -34,6 +39,41 @@ public class RegisterAlgo {
     }
 
     private static void showcaseAlgo(AlgoCraft algo) {
+        var node = NodeUtils.RandomizeNode();
+
+        var graphCollection = new NodeContext(node);
+
+        algo.registerAlgorithm(
+                Algorithm.builder(graphCollection)
+                        .withIdentity("graph search", VillagerBFS::new)
+                        .positioning(new LayoutPath(NodeUtils.GRID_COLS))
+                        .onEvent(Compare.class, new GraphCompareHandler())
+                        .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Graph Search (BFS)",
+                                Material.SPYGLASS,
+                                "Searches a graph using Breadth-First Search.", "Visit nodes level by level.", "Demonstrates pathfinding on a dynamic graph."
+                        ))
+                        .withScene(GraphScene::new)
+                        .create()
+        );
+        
+        algo.registerAlgorithm(
+                Algorithm.builder(graphCollection)
+                        .withIdentity("graph dfs", VillagerDFS::new)
+                        .positioning(new LayoutPath(NodeUtils.GRID_COLS))
+                        .onEvent(Compare.class, new GraphCompareHandler())
+                        .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
+                        .withPresentation(new AlgorithmPresentation(
+                                "Graph Search (DFS)",
+                                Material.SPYGLASS,
+                                "Searches a graph using Depth-First Search.", "Explores as far as possible along each branch.", "Demonstrates pathfinding on a dynamic graph."
+                        ))
+                        .withScene(GraphScene::new)
+                        .create()
+        );
+
         // Sorting
         var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
 
@@ -215,27 +255,27 @@ public class RegisterAlgo {
     private static void registerTreeSearchAlgo(AlgoCraft algo) {
         var bstCollection = new GridContext<>(Arrays.asList("a", "b", "k", "x", "d", "h", "a", "b", "e", "h", "s", "j", "s", "v", "k"));
 
-        algo.registerAlgorithm(
-                Algorithm.builder(bstCollection)
-                        .withIdentity("bst search", PlayerBSTSearch::new)
-                        //.withData(bstCollection)
-                        .positioning(new BSTNodeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Binary Search Tree (Search)",
-                                Material.SPYGLASS,
-                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
-                        ))
-                        .withScene(DefaultScene::new)
-                        .create()
-        );
+//        algo.registerAlgorithm(
+//                Algorithm.builder(bstCollection)
+//                        .withIdentity("bst search", PlayerBSTSearch::new)
+//                        //.withData(bstCollection)
+//                        .positioning(new BSTNodeLayout<>())
+//                        .onEvent(Compare.class, new BstCompareHandler())
+//                        .withPresentation(new AlgorithmPresentation(
+//                                "Binary Search Tree (Search)",
+//                                Material.SPYGLASS,
+//                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
+//                        ))
+//                        .withScene(DefaultScene::new)
+//                        .create()
+//        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(bstCollection)
                         .withIdentity("unordered_tree_search", PlayerUnorderedTree::new)
                         // Use the new Unordered Layout to ensure Root is at index 0 (the top)
                         .positioning(new UnorderedTreeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Compare.class, new GraphCompareHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Unordered Binary Tree (Linear Search)",
                                 Material.DARK_OAK_LOG,
@@ -250,7 +290,7 @@ public class RegisterAlgo {
                         .withIdentity("tst search", PlayerTSTSearch::new)
                         //.withData(stringCollection1)
                         .positioning(new TSTNodeLayout<>())
-                        .onEvent(Compare.class, new BstCompareHandler())
+                        .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Ternary Search Tree (Search)",
@@ -301,6 +341,7 @@ public class RegisterAlgo {
                         .create()
         );
 
+        /*
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
@@ -317,7 +358,7 @@ public class RegisterAlgo {
                         .withScene(GridScene::new)
                         .create()
         );
-
+*/
         algo.registerAlgorithm(
                 Algorithm.builder(aStarGrid)
                         .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))

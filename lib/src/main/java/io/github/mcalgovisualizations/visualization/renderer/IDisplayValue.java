@@ -3,6 +3,9 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.component.AttributeList;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a visual element in the world that can be positioned, displayed,
@@ -49,6 +52,16 @@ public interface IDisplayValue {
      * @param pos the target position
      */
     void teleport(Pos pos);
+
+    /**
+     * Requests the display to move to a new position, potentially using pathfinding.
+     *
+     * @param pos the target position
+     * @return a future that completes when the target is reached
+     */
+    default CompletableFuture<Void> walkTo(Pos pos) {
+        throw new RuntimeException("Not implemented");
+    }
 
     /**
      * Sets whether this display is visually highlighted (e.g. glowing).

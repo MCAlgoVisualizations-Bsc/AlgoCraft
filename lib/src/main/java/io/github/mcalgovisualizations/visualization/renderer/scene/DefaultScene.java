@@ -1,6 +1,8 @@
 package io.github.mcalgovisualizations.visualization.renderer.scene;
 
+import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultScene extends AbstractScene {
     public DefaultScene(SceneContext context) {
@@ -14,6 +16,11 @@ public class DefaultScene extends AbstractScene {
             this.addDisplay(i, dv);
             dv.setInstance(instance);
         }
+    }
+
+    @Override
+    public @Nullable IDisplayValue getDisplay(int slot) {
+        return null;
     }
 }
 
