@@ -45,8 +45,17 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
             // moveTo handles emitting path steps if needed.
             moveTo(cursor, parents, context);
 
-            if (cursor.getNeighbors().isEmpty()) {
-                context.emit(new Message("No neighbors", Message.MessageType.INFO));
+            if (cursor.getNeighbors().size() <= 1) {
+                boolean hasUnvisited = false;
+                for (Node n : cursor.getNeighbors()) {
+                    if (!n.visited) {
+                        hasUnvisited = true;
+                        break;
+                    }
+                }
+                if (!hasUnvisited) {
+                    context.emit(new Message("No unvisited neighbors", Message.MessageType.INFO));
+                }
             }
             // 2. Explore Neighbors
             for (Node neighbor : cursor.getNeighbors()) {
