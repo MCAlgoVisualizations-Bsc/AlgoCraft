@@ -25,8 +25,6 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
         parents.put(root.getID(), null);
         villagerPosition = root;
 
-        System.out.println("--- Starting BFS: Targeting 'End' Node ---");
-
         // Initial position visualization
         context.emit(new Compare(root.getID(), -1, root.getValue(), -1));
 
@@ -69,7 +67,6 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
 
                 // Check for Victory Condition immediately upon discovery
                 if (neighbor.getStatus() == Node.NodeTarget.End) {
-                    System.out.println("--- Goal Reached! Reconstructing Path ---");
                     emitFinalPath(neighbor, parents, context);
                     return;
                 }
