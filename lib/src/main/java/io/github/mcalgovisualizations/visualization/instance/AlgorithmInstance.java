@@ -47,10 +47,11 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         instance.setTimeRate(0);
         instance.setTime(6000);
 
-        final var algorithmCtx = algorithm.model();
-        final var a = algorithm.ctor().get();
-        a.run(algorithmCtx);
-        final AnimationPlan<O> onCompletePlan = algorithm.onComplete().apply(algorithmCtx);
+        //container.setChunkLoader(new AnvilLoader(worldPath));
+        final var onCompleteCtx = ((C) algorithm.model().copy());
+        final var completeAlgorithm = algorithm.ctor().get();
+        completeAlgorithm.run(onCompleteCtx);
+        final AnimationPlan<O> onCompletePlan = algorithm.onComplete().apply(onCompleteCtx);
 
         final var audience = new PlayerFeedback(partyService::audience);
         final var sceneCtx = new SceneContext(instance, audience, INSTANCE_ORIGIN);
@@ -67,7 +68,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
         );
 
         final var traceBuilder = new AlgorithmTraceBuilder<>(
-                a,
+                algorithm.ctor().get(),
                 algorithm.model()
         );
 
