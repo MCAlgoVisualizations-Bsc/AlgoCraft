@@ -124,11 +124,13 @@ public record ArcLayout(
     }
 
     private static final Set<String> BLACKLIST = new HashSet<>(Stream.of(
-            "breeze",
-            "phantom",
-            "wither",
-            "warden"
-    ).map(String::toLowerCase).toList());
+            "breeze", // too noisy
+            "phantom", // when looking at a pos, it looks downwards (assumes it's flying i think)
+            "wither", // too noisy visually and audio
+            "warden", // too noisy
+            "pufferfish", // the height assumes is already puffed pufferfish
+            "shulker" // already use shulkers for Selection Sort
+    ).map(s -> s.toLowerCase().replace("_", "")).toList());
 
     private static final EntityType[] SORTED_ENTITIES = Stream.of(
                     "allay",
