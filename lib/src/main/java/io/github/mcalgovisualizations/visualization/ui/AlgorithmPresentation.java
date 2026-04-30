@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Represents a visual representation of an algorithm.
+ * @param algorithmId the algorithm's unique identifier
+ * @param icon the algorithm's icon
+ * @param complexity the algorithm's complexity
+ * @param description a description of the algorithm
+ */
 public record AlgorithmPresentation(
         @NotNull String algorithmId,
         Material icon,

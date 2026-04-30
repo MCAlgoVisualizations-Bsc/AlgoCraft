@@ -31,7 +31,7 @@ public class SelectionScene extends AbstractScene {
             final var display = (EntityCreatureDisplay) layoutResults[i].displayValue();
 
             displaysBySlot.put(i, display);
-            display.setInstance(instance, display.getPos().add(0, -2, 0));
+            display.setInstance(instance, display.getPos());
             display.lookAt(origin);
 
             setHighlighted(i, false);

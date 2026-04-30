@@ -24,6 +24,7 @@ public record ArcLayout(
 
     @Override
     public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
+        origin = origin.add(0, -2, 0);
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
@@ -81,13 +82,13 @@ public record ArcLayout(
                 entityIndex = 0;
             } else {
                 entityIndex = (int) Math.round(
-                        rank * (sortedEntities.length - 1.0) / (values.length - 1.0)
+                        rank * (SORTED_ENTITIES.length - 1.0) / (values.length - 1.0)
                 );
             }
 
-            EntityType type = sortedEntities.length == 0
+            EntityType type = SORTED_ENTITIES.length == 0
                     ? EntityType.VILLAGER
-                    : sortedEntities[entityIndex];
+                    : SORTED_ENTITIES[entityIndex];
 
             entities[i] = new LayoutResult(
                     value,
@@ -99,7 +100,7 @@ public record ArcLayout(
         return entities;
     }
 
-    private static final Set<String> blackList = new HashSet<>(Stream.of(
+    private static final Set<String> BLACKLIST = new HashSet<>(Stream.of(
             "breeze",
             "phantom",
             "wither",
@@ -109,7 +110,7 @@ public record ArcLayout(
     /**
      * Sorted by height.
      */
-    private static final EntityType[] sortedEntities = Stream.of(
+    private static final EntityType[] SORTED_ENTITIES = Stream.of(
                     "allay",
                     "armadillo",
                     "axolotl",
@@ -194,8 +195,16 @@ public record ArcLayout(
                     "zombie_villager",
                     "zombified_piglin"
             )
+            .filter(ArcLayout::isAllowedEntity)
             .map(EntityType::fromKey)
-            .filter(p -> Objects.nonNull(p) && blackList.contains(p.name().toLowerCase()))
+            .filter(Objects::nonNull)
             .sorted(Comparator.comparingDouble(EntityType::height)) // sort by height
             .toArray(EntityType[]::new);
+
+
+
+    private static boolean isAllowedEntity(String entityName) {
+        return !BLACKLIST.contains(entityName);
+    }
 }
+
