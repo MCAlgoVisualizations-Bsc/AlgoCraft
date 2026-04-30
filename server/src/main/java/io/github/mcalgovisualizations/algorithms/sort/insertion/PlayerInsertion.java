@@ -40,7 +40,7 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
                 j--;
             }
 
-            ctx.emit(new Placed(j, values.get(j)));
+            ctx.emit(new Inserted(j, values.get(j)));
         }
     }
 
@@ -48,24 +48,32 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
 
     public record TrackJ(int idx, Object value) implements IAlgorithmEvent { }
 
-    public record Placed(int idx, Object value) implements IAlgorithmEvent { }
+    public record Inserted(int idx, Object value) implements IAlgorithmEvent { }
 
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
         public AnimationPlan<InsertionScene> handle(TrackI event) {
             return AnimationPlan.<InsertionScene>builder()
+                    .step(scene -> {
+                        scene.finishInnerLoopVisuals();
+                        scene.clearGlowing();
+                        scene.revealInitialPrefixIfNeeded();
+                        scene.trackI(event.idx());
+                    })
                     .step(4, scene -> {
+                        scene.revealInitialPrefixIfNeeded();
+                        scene.sendActionBar(Component.text(
+                                "Sorted prefix starts here",
+                                NamedTextColor.GRAY
+                        ));
+                    })
+                    .step(4, scene -> {
+                        scene.revealSlot(event.idx());
+                        scene.trackI(event.idx());
                         scene.sendActionBar(Component.text(
                                 "Insert [" + event.value() + "] into sorted prefix",
                                 NamedTextColor.AQUA
                         ));
-                    })
-                    .step(scene -> {
-                        scene.finishInnerLoopVisuals();
-                        scene.clearGlowing();
-                    })
-                    .step(scene -> {
-                        scene.trackI(event.idx());
                     })
                     .build();
         }
@@ -75,12 +83,10 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         @Override
         public AnimationPlan<InsertionScene> handle(TrackJ event) {
             return AnimationPlan.<InsertionScene>builder()
-                    .step(4, scene -> {
-                        scene.sendActionBar(Component.text(
-                                "Scan left → [" + event.value() + "]",
-                                NamedTextColor.GREEN
-                        ));
-                    })
+                    .step(4, scene -> scene.sendActionBar(Component.text(
+                            "Scan left → [" + event.value() + "]",
+                            NamedTextColor.GREEN
+                    )))
                     .step(scene -> {
                         scene.markJ(event.idx());
                         scene.setHighlighted(event.idx(), true);
@@ -93,7 +99,7 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         @Override
         public AnimationPlan<InsertionScene> handle(Compare event) {
             return AnimationPlan.<InsertionScene>builder()
-                    .step(4,scene -> {
+                    .step(4, scene -> {
                         scene.playSound("block.note_block.hat", 0.6f, 1.8f);
                         scene.sendActionBar(Component.text(
                                 "Is " + event.xValue() + " > " + event.yValue() + " ?",
@@ -122,14 +128,14 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
         }
     }
 
-    public static class PlacedHandler implements IAnimationHandler<Placed> {
+    public static class InsertedHandler implements IAnimationHandler<Inserted> {
         @Override
-        public AnimationPlan<InsertionScene> handle(Placed event) {
+        public AnimationPlan<InsertionScene> handle(Inserted event) {
             return AnimationPlan.<InsertionScene>builder()
                     .step(4, scene -> {
-                        scene.markPlaced(event.idx());
+                        scene.markInserted(event.idx());
                         scene.sendActionBar(Component.text(
-                                "Placed [" + event.value() + "]",
+                                "Inserted [" + event.value() + "]",
                                 NamedTextColor.GRAY
                         ));
                     })

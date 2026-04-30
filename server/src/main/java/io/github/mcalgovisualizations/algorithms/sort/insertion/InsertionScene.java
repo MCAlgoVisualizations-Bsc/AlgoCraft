@@ -13,14 +13,20 @@ import net.minestom.server.particle.Particle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class InsertionScene extends AbstractScene {
 
     private final Map<Integer, Pos> homePositions = new HashMap<>();
+    private final Map<Integer, EntityCreatureDisplay> coversBySlot = new HashMap<>();
+    private final Set<Integer> revealedSlots = new HashSet<>();
 
     private EntityCreatureDisplay iTracker;
     private Integer trackedISlot;
+
+    private boolean initialPrefixRevealed = false;
 
     public InsertionScene(@NotNull SceneContext context) {
         super(context);
@@ -29,9 +35,12 @@ public class InsertionScene extends AbstractScene {
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
         clearITracker();
+        clearCovers();
 
         displaysBySlot.clear();
         homePositions.clear();
+        revealedSlots.clear();
+        initialPrefixRevealed = false;
 
         for (int i = 0; i < layoutResults.length; i++) {
             var result = layoutResults[i];
@@ -40,29 +49,79 @@ public class InsertionScene extends AbstractScene {
             var display = (EntityCreatureDisplay) result.displayValue();
             var pos = result.pos();
 
-            display.setInstance(instance, pos);
-            display.lookAt(origin);
-
             displaysBySlot.put(i, display);
             homePositions.put(i, pos);
+
+            coverSlot(i);
         }
     }
 
+    public void revealInitialPrefixIfNeeded() {
+        if (initialPrefixRevealed) return;
+
+        revealSlot(0);
+        initialPrefixRevealed = true;
+    }
+
+    public void revealSlot(int slot) {
+        if (revealedSlots.contains(slot)) return;
+
+        var display = requireDisplay(slot);
+        var home = requireHomePosition(slot);
+
+        var cover = coversBySlot.remove(slot);
+        if (cover != null) {
+            cover.remove();
+        }
+
+        display.setInstance(instance, home);
+        display.lookAt(origin);
+
+        revealedSlots.add(slot);
+
+        spawnParticleAuraBySlot(slot, Particle.END_ROD);
+        playSound("block.amethyst_block.chime", 0.5f, 1.4f);
+    }
+
+    private void coverSlot(int slot) {
+        var home = requireHomePosition(slot);
+        var coverPos = home.add(0, 0.4, 0);
+
+        var cover = new EntityCreatureDisplay(
+                coverPos,
+                EntityType.SHULKER,
+                "X",
+                true
+        );
+
+        cover.setInstance(instance);
+        cover.lookAt(origin);
+
+        coversBySlot.put(slot, cover);
+    }
+
     public void trackI(int slot) {
+        revealSlot(slot);
+
         trackedISlot = slot;
-        markVisitedBoundary(slot);
         refreshITracker();
     }
 
     public void markJ(int slot) {
+        if (!revealedSlots.contains(slot)) return;
         spawnParticleAuraBySlot(slot, Particle.COMPOSTER);
     }
 
-    public void markPlaced(int slot) {
+    public void markInserted(int slot) {
+        if (!revealedSlots.contains(slot)) return;
         spawnParticleAuraBySlot(slot, Particle.END_ROD);
     }
 
     public void comparePulse(int leftSlot, int rightSlot) {
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) {
+            return;
+        }
+
         var left = requireDisplay(leftSlot);
         var right = requireDisplay(rightSlot);
 
@@ -77,6 +136,7 @@ public class InsertionScene extends AbstractScene {
 
     public void danceSwap(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) return;
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) return;
 
         var left = requireDisplay(leftSlot);
         var right = requireDisplay(rightSlot);
@@ -103,6 +163,7 @@ public class InsertionScene extends AbstractScene {
 
     public void commitSwap(int leftSlot, int rightSlot) {
         if (leftSlot == rightSlot) return;
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) return;
 
         var left = requireDisplay(leftSlot);
         var right = requireDisplay(rightSlot);
@@ -123,40 +184,17 @@ public class InsertionScene extends AbstractScene {
     }
 
     public void finishInnerLoopVisuals() {
-        resetAllDisplaysToHome();
+        resetRevealedDisplaysToHome();
     }
 
-    public void resetAllDisplaysToHome() {
-        for (var entry : homePositions.entrySet()) {
-            int slot = entry.getKey();
+    public void resetRevealedDisplaysToHome() {
+        for (int slot : revealedSlots) {
             var display = requireDisplay(slot);
-
-            display.teleport(entry.getValue());
+            display.teleport(requireHomePosition(slot));
             lookAtOrigin(display);
         }
 
         refreshITracker();
-    }
-
-    public void markVisitedBoundary(int slot) {
-        if (slot < 0 || slot >= homePositions.size()) return;
-
-        var currentHome = requireHomePosition(slot);
-        var currentDisplay = requireDisplay(slot);
-
-        spawnParticleAuraAt(
-                currentHome.add(0, currentDisplay.getEyeHeight() + 0.9, 0),
-                Particle.END_ROD
-        );
-
-        if (slot + 1 < homePositions.size()) {
-            var nextHome = requireHomePosition(slot + 1);
-
-            spawnParticleAuraAt(
-                    nextHome.add(0, 0.4, 0),
-                    Particle.SMOKE
-            );
-        }
     }
 
     public void clearITracker() {
@@ -168,15 +206,29 @@ public class InsertionScene extends AbstractScene {
         }
     }
 
+    private void clearCovers() {
+        for (var cover : coversBySlot.values()) {
+            cover.remove();
+        }
+
+        coversBySlot.clear();
+    }
+
     private void refreshITracker() {
         if (trackedISlot == null) return;
+        if (!revealedSlots.contains(trackedISlot)) return;
 
-        var base = requireDisplay(trackedISlot).getPos();
         var tracked = requireDisplay(trackedISlot);
+        var base = tracked.getPos();
         var trackerPos = base.add(0, tracked.getEyeHeight() + 2, 0);
 
         if (iTracker == null) {
-            iTracker = new EntityCreatureDisplay(trackerPos, EntityType.SLIME, "I", true);
+            iTracker = new EntityCreatureDisplay(
+                    trackerPos,
+                    EntityType.SLIME,
+                    "I",
+                    true
+            );
             iTracker.setInstance(instance);
         }
 
@@ -216,7 +268,10 @@ public class InsertionScene extends AbstractScene {
 
     public void spawnParticleAuraBySlot(int slot, Particle particle) {
         var display = requireDisplay(slot);
-        spawnParticleAuraAt(display.getPos().add(0, display.getEyeHeight(), 0), particle);
+        spawnParticleAuraAt(
+                display.getPos().add(0, display.getEyeHeight(), 0),
+                particle
+        );
     }
 
     private void spawnParticleAuraAt(Pos center, Particle particle) {
@@ -256,7 +311,10 @@ public class InsertionScene extends AbstractScene {
     @Override
     public void cleanUp() {
         clearITracker();
+        clearCovers();
         super.cleanUp();
+
         homePositions.clear();
+        revealedSlots.clear();
     }
 }

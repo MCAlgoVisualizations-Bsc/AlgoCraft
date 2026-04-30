@@ -70,7 +70,7 @@ public class RegisterAlgo {
                         .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
                         .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
                         .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
-                        .onEvent(PlayerInsertion.Placed.class, new PlayerInsertion.PlacedHandler())
+                        .onEvent(PlayerInsertion.Inserted.class, new PlayerInsertion.InsertedHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Insertion sort circular sorting",
                                 Material.GOLDEN_APPLE,
@@ -79,7 +79,6 @@ public class RegisterAlgo {
                         .onCompletion(ctx -> {
                             final int size = ctx.values.size();
                             var plan = AnimationPlan.<InsertionScene>builder()
-                                    .step(InsertionScene::resetAllDisplaysToHome)
                                     .step(InsertionScene::clearGlowing)
                                     .step(circleScene -> circleScene.sendMessage(Component.text(
                                             "Final sorted array: " + ctx.values.toString(), NamedTextColor.GREEN)));
