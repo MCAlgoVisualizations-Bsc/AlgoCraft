@@ -49,6 +49,7 @@ public class RegisterAlgo {
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
+                        .onEvent(Message.class, new MessageHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Graph Search (BFS)",
                                 Material.SPYGLASS,

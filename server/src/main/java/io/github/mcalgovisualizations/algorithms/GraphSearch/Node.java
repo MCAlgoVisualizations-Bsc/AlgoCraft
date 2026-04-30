@@ -11,6 +11,7 @@ public class Node {
     private final int value;
     private List<Node> neighbors = new ArrayList<>();
     private @NonNull NodeTarget status = NodeTarget.None;
+    public boolean visited = false;
 
     public Node(int id, int value, @NonNull NodeTarget status) {
         this.id = id;

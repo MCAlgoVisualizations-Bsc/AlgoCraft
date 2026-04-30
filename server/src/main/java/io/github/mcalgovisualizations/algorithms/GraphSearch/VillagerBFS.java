@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
 import io.github.mcalgovisualizations.events.Compare;
+import io.github.mcalgovisualizations.events.Message;
 import io.github.mcalgovisualizations.events.PathFound;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 
@@ -16,12 +17,11 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
         if (root == null) return;
 
         Queue<Node> queue = new LinkedList<>();
-        Set<Integer> visited = new HashSet<>();
         Map<Integer, Node> parents = new HashMap<>();
 
         // Initialize BFS
         queue.add(root);
-        visited.add(root.getID());
+        root.visited = true;
         parents.put(root.getID(), null);
         villagerPosition = root;
 
@@ -40,65 +40,46 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
             // 1. Pull the next node from the frontier
             Node cursor = queue.poll();
 
-            // Determine if this is a redundant visit to a leaf node
-            boolean skipMoveToCursor = false;
-            if (villagerPosition != null && parents.containsKey(cursor.getID()) && parents.get(cursor.getID()) != null) {
-                Node parentOfCursor = parents.get(cursor.getID());
-                if (villagerPosition.equals(parentOfCursor)) {
-                    // Check if cursor has any unvisited neighbors
-                    boolean hasUnvisitedNeighbors = false;
-                    for (Node neighbor : cursor.getNeighbors()) {
-                        if (!visited.contains(neighbor.getID())) {
-                            hasUnvisitedNeighbors = true;
+
+            // Move villager to the node being currently processed.
+            // moveTo handles emitting path steps if needed.
+            moveTo(cursor, parents, context);
+
+            if (cursor.getNeighbors().isEmpty()) {
+                context.emit(new Message("No neighbors", Message.MessageType.INFO));
+            }
+            // 2. Explore Neighbors
+            for (Node neighbor : cursor.getNeighbors()) {
+                if (neighbor.visited) continue;
+                neighbor.visited = true;
+                parents.put(neighbor.getID(), cursor);
+                queue.add(neighbor);
+
+                // 3. Physical Exploration: Move to neighbor
+                moveTo(neighbor, parents, context);
+
+                // Check for Victory Condition immediately upon discovery
+                if (neighbor.getStatus() == Node.NodeTarget.End) {
+                    System.out.println("--- Goal Reached! Reconstructing Path ---");
+                    emitFinalPath(neighbor, parents, context);
+                    return;
+                }
+
+
+                // 4. Move back to cursor to continue exploration ONLY if there are more unvisited neighbors
+                boolean hasMoreUnvisitedNeighborsFromCursor = false;
+                for (Node otherNeighbor : cursor.getNeighbors()) {
+                    if (!otherNeighbor.visited) { // Check if it's unvisited
+                        // If it's not the current neighbor we just processed, then it's another unvisited neighbor
+                        if (!otherNeighbor.equals(neighbor)) {
+                            hasMoreUnvisitedNeighborsFromCursor = true;
                             break;
                         }
                     }
-                    if (!hasUnvisitedNeighbors) {
-                        // If cursor is a leaf (no unvisited neighbors) and we are currently at its parent,
-                        // then moving to cursor now would be the "second visit" to this leaf.
-                        skipMoveToCursor = true;
-                    }
                 }
-            }
 
-            if (!skipMoveToCursor) {
-                // Move villager to the node being currently processed.
-                // moveTo handles emitting path steps if needed.
-                moveTo(cursor, parents, context);
-            }
-
-            // 2. Explore Neighbors
-            for (Node neighbor : cursor.getNeighbors()) {
-                if (!visited.contains(neighbor.getID())) {
-                    visited.add(neighbor.getID());
-                    parents.put(neighbor.getID(), cursor);
-                    queue.add(neighbor);
-
-                    // 3. Physical Exploration: Move to neighbor
-                    moveTo(neighbor, parents, context);
-
-                    // Check for Victory Condition immediately upon discovery
-                    if (neighbor.getStatus() == Node.NodeTarget.End) {
-                        System.out.println("--- Goal Reached! Reconstructing Path ---");
-                        emitFinalPath(neighbor, parents, context);
-                        return;
-                    }
-
-                    // 4. Move back to cursor to continue exploration ONLY if there are more unvisited neighbors
-                    boolean hasMoreUnvisitedNeighborsFromCursor = false;
-                    for (Node otherNeighbor : cursor.getNeighbors()) {
-                        if (!visited.contains(otherNeighbor.getID())) { // Check if it's unvisited
-                            // If it's not the current neighbor we just processed, then it's another unvisited neighbor
-                            if (!otherNeighbor.equals(neighbor)) {
-                                hasMoreUnvisitedNeighborsFromCursor = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (hasMoreUnvisitedNeighborsFromCursor) {
-                        moveTo(cursor, parents, context);
-                    }
+                if (hasMoreUnvisitedNeighborsFromCursor) {
+                    moveTo(cursor, parents, context);
                 }
             }
         }
