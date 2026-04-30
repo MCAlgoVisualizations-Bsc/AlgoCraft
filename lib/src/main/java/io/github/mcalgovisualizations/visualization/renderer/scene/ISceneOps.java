@@ -1,5 +1,6 @@
 package io.github.mcalgovisualizations.visualization.renderer.scene;
 
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.kyori.adventure.text.Component;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ISceneOps {
+public interface ISceneOps extends AudienceChannel {
 
     void setLayout(LayoutResult[] model);
 

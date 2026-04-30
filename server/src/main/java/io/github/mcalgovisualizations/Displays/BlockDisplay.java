@@ -97,6 +97,14 @@ public class BlockDisplay implements IBlockStateDisplay {
     }
 
     @Override
+    public void setInstance(Instance instance, Pos pos) {
+        blockEntity.setInstance(instance, pos);
+        if (textEntity != null) {
+            textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
+        }
+    }
+
+    @Override
     public void addViewer(Player player) {
         this.blockEntity.addViewer(player);
         if (textEntity != null) {

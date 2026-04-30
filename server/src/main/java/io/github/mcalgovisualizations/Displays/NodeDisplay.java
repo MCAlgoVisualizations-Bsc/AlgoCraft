@@ -35,6 +35,12 @@ public class NodeDisplay implements IDisplayValue {
     }
 
     @Override
+    public void setInstance(Instance instance, Pos pos) {
+        this.pos = pos;
+        textEntity.setInstance(instance, pos);
+    }
+
+    @Override
     public void addViewer(Player player) {
         textEntity.addViewer(player);
     }

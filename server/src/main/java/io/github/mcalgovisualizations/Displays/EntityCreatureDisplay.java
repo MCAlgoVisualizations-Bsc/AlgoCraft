@@ -10,7 +10,18 @@ import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
+import net.minestom.server.entity.ai.EntityAI;
+import net.minestom.server.entity.ai.EntityAIGroup;
+import net.minestom.server.entity.metadata.EntityMeta;
+import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
+import net.minestom.server.entity.metadata.display.TextDisplayMeta;
+import net.minestom.server.entity.metadata.villager.VillagerMeta;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.scoreboard.Team;
+import net.minestom.server.utils.PacketSendingUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +30,7 @@ public class EntityCreatureDisplay implements IDisplayValue {
     private Pos initialPos;
     private final EntityCreature entity;
     private final Entity textEntity;
+    private boolean gravity;
 
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
         this(pos, entityType, displayText, false);
@@ -27,6 +39,7 @@ public class EntityCreatureDisplay implements IDisplayValue {
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText, boolean setNoGravity) {
         this.initialPos = pos;
         this.entity = new EntityCreature(entityType);
+        this.gravity = setNoGravity;
         this.entity.setNoGravity(setNoGravity);
         
         // Increase movement speed for better visualization
@@ -34,6 +47,11 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
         this.textEntity = new Entity(EntityType.TEXT_DISPLAY);
         setupText(displayText);
+
+        this.entity.eventNode().addListener(EntityEvent.class, e -> {
+           if(entity.equals(e.getEntity()))
+               System.out.println("Entity Event " + entityType.name());
+        });
     }
 
     public void setNoGravity(boolean setNoGravity) {
@@ -47,14 +65,15 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
     @Override
     public void setInstance(Instance instance) {
-        Pos spawnPos = getPos();
-        entity.setInstance(instance, spawnPos).thenRun(() -> {
-            if (textEntity.isRemoved()) return;
-            textEntity.setInstance(instance, spawnPos).thenRun(() -> {
-                if (entity.isRemoved()) return;
-                entity.addPassenger(textEntity);
-            });
-        });
+        entity.setInstance(instance, initialPos);
+        textEntity.setInstance(instance, getTextOffset(entity.getPosition()));
+    }
+
+    @Override
+    public void setInstance(Instance instance, Pos pos) {
+        this.initialPos = pos;
+        entity.setInstance(instance, pos);
+        textEntity.setInstance(instance, getTextOffset(entity.getPosition()));
     }
 
     @Override
@@ -84,6 +103,10 @@ public class EntityCreatureDisplay implements IDisplayValue {
         }
     }
 
+    private Pos getTextOffset(Pos pos) {
+        return pos.add(0, entity.getEyeHeight() + 1, 0);
+    }
+
     public double getEyeHeight() {
         return entity.getEyeHeight();
     }
@@ -98,10 +121,31 @@ public class EntityCreatureDisplay implements IDisplayValue {
         entity.lookAt(pos);
     }
 
+    public void lookAt(EntityCreatureDisplay o) {
+        entity.lookAt(o.entity);
+    }
+
     @Override
     public void remove() {
         entity.remove();
         textEntity.remove();
+    }
+
+    public void spawnParticleAura(Particle particle) {
+        Instance instance = entity.getInstance();
+        if (instance == null) return;
+
+        var center = entity.getPosition().add(0, entity.getEyeHeight() * 0.5, 0);
+
+        var packet = new ParticlePacket(
+                particle,
+                center,
+                new Vec(0.4, 0.6, 0.4), // random spread around entity
+                0.01f,                  // particle speed
+                20                      // amount
+        );
+
+        PacketSendingUtils.sendGroupedPacket(instance.getPlayers(), packet);
     }
 
     public void kill() {
@@ -136,5 +180,13 @@ public class EntityCreatureDisplay implements IDisplayValue {
         meta.setTransformationInterpolationStartDelta(0);
         // Offset the text display upwards using translation instead of manual teleportation
         meta.setTranslation(new Vec(0, entity.getEyeHeight() + 0.5, 0));
+    }
+
+    public void setTeam(Team team) {
+        entity.setTeam(team);
+    }
+
+    public void clearTeam() {
+        entity.setTeam(null);
     }
 }

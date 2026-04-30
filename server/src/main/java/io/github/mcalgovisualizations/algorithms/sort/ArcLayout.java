@@ -18,29 +18,37 @@ public record ArcLayout(
         boolean closed
 ) implements ILayout<List<Integer>> {
 
+    private static final Random RANDOM = new Random();
+
     public ArcLayout() {
         this(6.0, 2.0, -Math.PI / 2, 3 * Math.PI / 2, false);
     }
 
     @Override
     public LayoutResult[] compute(List<Integer> model, Pos origin, Instance instance) {
+        origin = origin.add(0, -2, 0);
+
         if (model == null || model.isEmpty()) {
             return new LayoutResult[0];
         }
+
         int size = model.size();
         double y = origin.y() + yOffset;
 
         if (size == 1) {
             double x = origin.x() + Math.cos(startAngle) * radius;
             double z = origin.z() + Math.sin(startAngle) * radius;
-            Pos pos = new Pos(x, y, z);
-            return getEntities(new Pos[] {pos}, new int[] {model.getFirst()});
+
+            return getEntities(
+                    new Pos[]{new Pos(x, y, z)},
+                    new int[]{model.getFirst()}
+            );
         }
 
         int divisor = closed ? size : size - 1;
         double step = sweepAngle / divisor;
 
-        Pos[] pos = new Pos[size];
+        Pos[] positions = new Pos[size];
         int[] values = new int[size];
 
         for (int i = 0; i < size; i++) {
@@ -48,19 +56,19 @@ public record ArcLayout(
             double x = origin.x() + Math.cos(angle) * radius;
             double z = origin.z() + Math.sin(angle) * radius;
 
-            pos[i] = new Pos(x, y, z);
+            positions[i] = new Pos(x, y, z);
             values[i] = model.get(i);
         }
 
-        return getEntities(pos, values);
+        return getEntities(positions, values);
     }
 
-    private LayoutResult[] getEntities(Pos[] pos, int[] values) {
-        if (pos.length != values.length) {
-            throw new IllegalArgumentException("pos and values must be the same length!");
+    private LayoutResult[] getEntities(Pos[] positions, int[] values) {
+        if (positions.length != values.length) {
+            throw new IllegalArgumentException("positions and values must be the same length!");
         }
 
-        LayoutResult[] entities = new LayoutResult[pos.length];
+        LayoutResult[] results = new LayoutResult[positions.length];
 
         int[] sorted = Arrays.stream(values)
                 .sorted()
@@ -71,38 +79,58 @@ public record ArcLayout(
             rankByValue.putIfAbsent(sorted[i], i);
         }
 
-        for (int i = 0; i < pos.length; i++) {
+        for (int i = 0; i < positions.length; i++) {
             int value = values[i];
             int rank = rankByValue.get(value);
 
-            int entityIndex;
+            int entityIndex = values.length == 1
+                    ? 0
+                    : (int) Math.round(
+                    rank * (SORTED_ENTITIES.length - 1.0) / (values.length - 1.0)
+            );
 
-            if (values.length == 1) {
-                entityIndex = 0;
-            } else {
-                entityIndex = (int) Math.round(
-                        rank * (sortedEntities.length - 1.0) / (values.length - 1.0)
-                );
-            }
+            EntityType type = pickRandomNearbyEntity(entityIndex, values.length);
 
-            EntityType type = sortedEntities.length == 0
-                    ? EntityType.VILLAGER
-                    : sortedEntities[entityIndex];
-
-            entities[i] = new LayoutResult(
+            results[i] = new LayoutResult(
                     value,
-                    pos[i],
-                    new EntityCreatureDisplay(pos[i], type, Integer.toString(value))
+                    positions[i],
+                    new EntityCreatureDisplay(
+                            positions[i],
+                            type,
+                            Integer.toString(value)
+                    )
             );
         }
 
-        return entities;
+        return results;
     }
 
-    /**
-     * Sorted by height.
-     */
-    private static final EntityType[] sortedEntities = Stream.of(
+    private EntityType pickRandomNearbyEntity(int entityIndex, int valueCount) {
+        if (SORTED_ENTITIES.length == 0) {
+            return EntityType.VILLAGER;
+        }
+
+        if (valueCount <= 1) {
+            return SORTED_ENTITIES[0];
+        }
+
+        int bandSize = Math.max(2, SORTED_ENTITIES.length / valueCount);
+        int halfBand = Math.max(1, bandSize / 2);
+
+        int from = Math.max(0, entityIndex - halfBand);
+        int to = Math.min(SORTED_ENTITIES.length - 1, entityIndex + halfBand);
+
+        return SORTED_ENTITIES[from + RANDOM.nextInt(to - from + 1)];
+    }
+
+    private static final Set<String> BLACKLIST = new HashSet<>(Stream.of(
+            "breeze",
+            "phantom",
+            "wither",
+            "warden"
+    ).map(String::toLowerCase).toList());
+
+    private static final EntityType[] SORTED_ENTITIES = Stream.of(
                     "allay",
                     "armadillo",
                     "axolotl",
@@ -187,8 +215,13 @@ public record ArcLayout(
                     "zombie_villager",
                     "zombified_piglin"
             )
+            .filter(ArcLayout::isAllowedEntity)
             .map(EntityType::fromKey)
             .filter(Objects::nonNull)
-            .sorted(Comparator.comparingDouble(EntityType::height)) // sort by height
+            .sorted(Comparator.comparingDouble(EntityType::height))
             .toArray(EntityType[]::new);
+
+    private static boolean isAllowedEntity(String entityName) {
+        return !BLACKLIST.contains(entityName.toLowerCase());
+    }
 }

@@ -9,8 +9,10 @@ import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.algorithms.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
-import io.github.mcalgovisualizations.algorithms.sort.insertion.CircleScene;
+import io.github.mcalgovisualizations.algorithms.sort.insertion.InsertionScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
+import io.github.mcalgovisualizations.algorithms.sort.selection.PlayerSelectionSort;
+import io.github.mcalgovisualizations.algorithms.sort.selection.SelectionScene;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
@@ -29,6 +31,14 @@ import java.util.List;
 
 public class RegisterAlgo {
     public static void registerAlgo(AlgoCraft algo) {
+ 
+        showcaseAlgo(algo);
+        //registerTreeSearchAlgo(algo);
+        //registerPathFindingAlgo(algo);
+        //registerFlowAlgo(algo);
+    }
+
+    private static void showcaseAlgo(AlgoCraft algo) {
         var node = NodeUtils.RandomizeNode();
 
         var graphCollection = new NodeContext(node);
@@ -47,7 +57,7 @@ public class RegisterAlgo {
                         .withScene(GraphScene::new)
                         .create()
         );
-
+        
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
                         .withIdentity("graph dfs", VillagerDFS::new)
@@ -62,9 +72,69 @@ public class RegisterAlgo {
                         .withScene(GraphScene::new)
                         .create()
         );
-//        registerSortingAlgo(algo);
-//        registerTreeSearchAlgo(algo);
-//        registerPathFindingAlgo(algo);
+
+        // Sorting
+        var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Selection sort", PlayerSelectionSort::new)
+                        .positioning(new ArcLayout())
+                        .withScene(SelectionScene::new)
+                        .onEvent(Compare.class, new PlayerSelectionSort.CompareHandler())
+                        .onEvent(Swap.class, new PlayerSelectionSort.SwapHandler())
+                        .onEvent(PlayerSelectionSort.TrackI.class, new PlayerSelectionSort.TrackIHandler())
+                        .onEvent(PlayerSelectionSort.TrackMinIndex.class, new PlayerSelectionSort.TrackMinIndexHandler())
+                        .onCompletion(ctx -> {
+                            final var size = ctx.getData().size();
+                            final var plan = AnimationPlan.<SelectionScene>builder();
+                            final var message = Component.text("Algorithm is complete! Final sorted array: " + ctx.getData(), NamedTextColor.YELLOW);
+                            plan.step(scene -> scene.sendMessage(message));
+                            for(int i = 0; i < size; i++) {
+                                final var finalI = i;
+                                plan.step(scene -> scene.hoverDisplay(finalI, true));
+                            }
+
+                            return plan.build();
+                        })
+                        .create()
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
+                        .positioning(new ArcLayout())
+                        .withScene(InsertionScene::new)
+                        .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
+                        .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
+                        .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
+                        .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
+                        .onEvent(PlayerInsertion.Inserted.class, new PlayerInsertion.InsertedHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Insertion sort circular sorting",
+                                Material.GOLDEN_APPLE,
+                                "Time: O(n^2) | Space: O(1)"
+                        ))
+                        .onCompletion(ctx -> {
+                            final int size = ctx.values.size();
+                            var plan = AnimationPlan.<InsertionScene>builder()
+                                    .step(InsertionScene::clearGlowing)
+                                    .step(circleScene -> circleScene.sendMessage(Component.text(
+                                            "Final sorted array: " + ctx.values.toString(), NamedTextColor.GREEN)));
+
+                            for(int i = 0; i<size; i++) {
+                                int finalI = i;
+                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, true));
+                            }
+                            for(int i = 0; i<size; i++) {
+                                int finalI = i;
+                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, false));
+                            }
+
+                            return plan.build();
+                        })
+                        .create()
+        );
     }
 
     private static void registerFlowAlgo(AlgoCraft algo) {
@@ -98,44 +168,6 @@ public class RegisterAlgo {
     private static void registerSortingAlgo(AlgoCraft algo) {
         var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
         var stringCollection1 = new SortingContext<>(new ArrayList<>(List.of("a", "b", "k", "x", "d", "h", "a", "b", "e")));
-        var circleCollection1 = new SortingContext<>(new ArrayList<>(List.of(6,5,4,8,10,9,19,20,2)));
-
-        algo.registerAlgorithm(
-                Algorithm.builder(circleCollection1)
-                        .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
-                        .positioning(new ArcLayout())
-                        .withScene(CircleScene::new)
-                        .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
-                        .onEvent(Swap.class, new PlayerInsertion.SwapHandler())
-                        .onEvent(PlayerInsertion.TrackI.class, new PlayerInsertion.TrackIHandler())
-                        .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Insertion sort circular sorting",
-                                Material.GOLDEN_APPLE,
-                                "Time: O(n^2) | Space: O(1)"
-                        ))
-                        .onCompletion(ctx -> {
-                            final int size = ctx.values.size();
-                            var plan = AnimationPlan.<CircleScene>builder()
-                                    .step(CircleScene::resetAllDisplaysToHome)
-                                    .step(CircleScene::clearTrackers)
-                                    .step(CircleScene::clearGlowing)
-                                    .step(circleScene -> circleScene.sendMessage(Component.text(
-                                            "Final sorted array: " + ctx.values.toString(), NamedTextColor.GREEN)));
-
-                            for(int i = 0; i<size; i++) {
-                                int finalI = i;
-                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, true));
-                            }
-                            for(int i = 0; i<size; i++) {
-                                int finalI = i;
-                                plan.step(0, circleScene -> circleScene.hoverDisplay(finalI, false));
-                            }
-
-                            return plan.build();
-                        })
-                        .create()
-        );
 
         algo.registerAlgorithm(
                 Algorithm.builder(integerCollection1)

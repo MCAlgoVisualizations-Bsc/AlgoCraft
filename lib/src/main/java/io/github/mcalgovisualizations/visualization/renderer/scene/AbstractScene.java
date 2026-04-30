@@ -5,6 +5,7 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -133,16 +134,34 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
+    public void sendMessage(@NotNull final String message) {
+        audience.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(@NotNull final String message, final NamedTextColor color) {
+        audience.sendMessage(message, color);
+    }
+
+
+    @Override
     public void sendActionBar(@NotNull Component message) {
         this.audience.sendActionBar(message);
     }
 
     @Override
-    public void cleanUp() {
-        for (var display : displaysBySlot.values()) {
-            safeRemove(display);
-        }
+    public void sendActionBar(@NotNull final String message) {
+        audience.sendActionBar(message);
+    }
 
+    @Override
+    public void sendActionBar(@NotNull final String message, final NamedTextColor color) {
+        audience.sendActionBar(message, color);
+    }
+
+    @Override
+    public void cleanUp() {
+        displaysBySlot.values().forEach(this::safeRemove);
         clearGlowing();
         displaysBySlot.clear();
     }

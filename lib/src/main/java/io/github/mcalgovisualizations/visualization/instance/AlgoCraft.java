@@ -18,6 +18,7 @@ import net.minestom.server.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -45,15 +46,6 @@ public class AlgoCraft {
             playerInstance.put(player.getUuid(), instance);
         });
         return instance;
-    }
-
-    public void addPlayerToInstance(UUID instanceId, Player... players) {
-        final var instance = playerInstance.get(instanceId);
-
-        if (instance == null) {
-            //createInstance(instanceId, players);
-        }
-        instance.addPlayer(players);
     }
 
     public void removePlayerFromInstance(Player... players) {
@@ -102,8 +94,10 @@ public class AlgoCraft {
                 return;
 
             if(instance != null) {
-                instance.removePlayer(defaultInstance, player);
+                instance.removePlayer(defaultInstance, player).thenRun(() -> MinecraftServer.getInstanceManager().unregisterInstance(instance.getInstance()));
+
             }
+
             return;
         }
 
@@ -117,6 +111,11 @@ public class AlgoCraft {
             case SET_SPEED -> controller.changeSpeed();
             default -> {
                 controller.clear();
+                instance.removePlayer(defaultInstance, player)
+                        .thenRun(() -> MinecraftServer.getInstanceManager().unregisterInstance(instance.getInstance()))
+                        .thenRun(() -> playerInventory.remove(player.getUuid()))
+                        .thenRun(() -> playerInstance.remove(player.getUuid()))
+                        .thenRun(() -> instance.removePlayer(defaultInstance, player));
                 ui.applyDefaultLayout(player);
             }
         }
@@ -151,6 +150,7 @@ public class AlgoCraft {
                 .thenCompose(_ -> session.addPlayer(player))
                 .exceptionally(throwable -> {
                     throwable.printStackTrace();
+                    ui.applyDefaultLayout(player);
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
                 })
@@ -208,7 +208,7 @@ public class AlgoCraft {
 
     public boolean acceptInvite(Player invited, Player inviter) {
         var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
-        inviteList.removeIf(PendingInvite::isExpired);
+        inviteList.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
 
         if(inviteList.stream().noneMatch(invite -> invite.inviter().equals(inviter.getUuid())))
             invited.sendMessage(Component.text("You have no active invite sent to you from: " + inviter.getUsername(), NamedTextColor.RED));
