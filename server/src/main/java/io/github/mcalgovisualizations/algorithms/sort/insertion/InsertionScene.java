@@ -13,23 +13,20 @@ import net.minestom.server.particle.Particle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 public class InsertionScene extends AbstractScene {
 
     private final Map<Integer, Pos> homePositions = new HashMap<>();
+    private final Map<Integer, EntityCreatureDisplay> coversBySlot = new HashMap<>();
+    private final Set<Integer> revealedSlots = new HashSet<>();
 
     private EntityCreatureDisplay iTracker;
-    private EntityCreatureDisplay jTracker;
-
     private Integer trackedISlot;
-    private Integer trackedJSlot;
 
-    private EntityCreatureDisplay trackedIDisplay;
-    private EntityCreatureDisplay trackedJDisplay;
-
-    private StagedCompare stagedCompare;
+    private boolean initialPrefixRevealed = false;
 
     public InsertionScene(@NotNull SceneContext context) {
         super(context);
@@ -37,47 +34,161 @@ public class InsertionScene extends AbstractScene {
 
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
-        clearCompareState();
-        clearTrackers();
+        clearITracker();
+        clearCovers();
 
         displaysBySlot.clear();
         homePositions.clear();
+        revealedSlots.clear();
+        initialPrefixRevealed = false;
 
         for (int i = 0; i < layoutResults.length; i++) {
             var result = layoutResults[i];
             if (result == null) continue;
 
             var display = (EntityCreatureDisplay) result.displayValue();
-            display.setNoGravity(true);
             var pos = result.pos();
 
             displaysBySlot.put(i, display);
             homePositions.put(i, pos);
 
-            display.setInstance(instance);
-            display.teleport(pos);
-            lookAtOrigin(display);
+            coverSlot(i);
         }
     }
 
-    public void trackI(int slot) {
-        trackedISlot = slot;
-        trackedIDisplay = null;
-        refreshITracker();
+    public void revealInitialPrefixIfNeeded() {
+        if (initialPrefixRevealed) return;
+
+        revealSlot(0);
+        initialPrefixRevealed = true;
     }
 
-    public void trackJ(int slot) {
-        trackedJSlot = slot;
-        trackedJDisplay = null;
-        refreshJTracker();
+    public void revealSlot(int slot) {
+        if (revealedSlots.contains(slot)) return;
+
+        var display = requireDisplay(slot);
+        var home = requireHomePosition(slot);
+
+        var cover = coversBySlot.remove(slot);
+        if (cover != null) {
+            cover.remove();
+        }
+
+        display.setInstance(instance, home);
+        display.lookAt(origin);
+
+        revealedSlots.add(slot);
+
+        spawnParticleAuraBySlot(slot, Particle.END_ROD);
+        playSound("block.amethyst_block.chime", 0.5f, 1.4f);
     }
 
-    /**
-     * Clears the tracker for the currently tracked display for the I loop.
-     */
+    private void coverSlot(int slot) {
+        var home = requireHomePosition(slot);
+        var coverPos = home.add(0, 0.4, 0);
+
+        var cover = new EntityCreatureDisplay(
+                coverPos,
+                EntityType.SHULKER,
+                "X",
+                true
+        );
+
+        cover.setInstance(instance);
+        cover.lookAt(origin);
+
+        coversBySlot.put(slot, cover);
+    }
+
+
+    public void markJ(int slot) {
+        if (!revealedSlots.contains(slot)) return;
+        spawnParticleAuraBySlot(slot, Particle.COMPOSTER);
+    }
+
+    public void markInserted(int slot) {
+        if (!revealedSlots.contains(slot)) return;
+        spawnParticleAuraBySlot(slot, Particle.END_ROD);
+    }
+
+    public void comparePulse(int leftSlot, int rightSlot) {
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) {
+            return;
+        }
+
+        var left = requireDisplay(leftSlot);
+        var right = requireDisplay(rightSlot);
+
+        left.lookAt(right.getPos().add(0, right.getEyeHeight(), 0));
+        right.lookAt(left.getPos().add(0, left.getEyeHeight(), 0));
+
+        spawnParticleAuraBySlot(leftSlot, Particle.HAPPY_VILLAGER);
+        spawnParticleAuraBySlot(rightSlot, Particle.HAPPY_VILLAGER);
+
+    }
+
+    public void danceSwap(int leftSlot, int rightSlot) {
+        if (leftSlot == rightSlot) return;
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) return;
+
+        var left = requireDisplay(leftSlot);
+        var right = requireDisplay(rightSlot);
+
+        var leftHome = requireHomePosition(leftSlot);
+        var rightHome = requireHomePosition(rightSlot);
+
+        var middle = midpoint(leftHome, rightHome);
+
+        var leftDance = middle.add(0, 1.2, -0.8);
+        var rightDance = middle.add(0, 1.2, 0.8);
+
+        left.teleport(leftDance);
+        right.teleport(rightDance);
+
+        left.lookAt(right.getPos().add(0, right.getEyeHeight(), 0));
+        right.lookAt(left.getPos().add(0, left.getEyeHeight(), 0));
+
+        spawnParticleAuraAt(leftDance, Particle.CRIT);
+        spawnParticleAuraAt(rightDance, Particle.CRIT);
+
+    }
+
+    public void commitSwap(int leftSlot, int rightSlot) {
+        if (leftSlot == rightSlot) return;
+        if (!revealedSlots.contains(leftSlot) || !revealedSlots.contains(rightSlot)) return;
+
+        var left = requireDisplay(leftSlot);
+        var right = requireDisplay(rightSlot);
+
+        var leftHome = requireHomePosition(leftSlot);
+        var rightHome = requireHomePosition(rightSlot);
+
+        left.teleport(rightHome);
+        right.teleport(leftHome);
+
+        lookAtOrigin(left);
+        lookAtOrigin(right);
+
+        displaysBySlot.put(leftSlot, right);
+        displaysBySlot.put(rightSlot, left);
+
+    }
+
+    public void finishInnerLoopVisuals() {
+        resetRevealedDisplaysToHome();
+    }
+
+    public void resetRevealedDisplaysToHome() {
+        for (int slot : revealedSlots) {
+            var display = requireDisplay(slot);
+            display.teleport(requireHomePosition(slot));
+            lookAtOrigin(display);
+        }
+
+    }
+
     public void clearITracker() {
         trackedISlot = null;
-        trackedIDisplay = null;
 
         if (iTracker != null) {
             iTracker.remove();
@@ -85,294 +196,12 @@ public class InsertionScene extends AbstractScene {
         }
     }
 
-    /**
-     * Clears the tracker for the currently tracked display for the J loop.
-     */
-    public void clearJTracker() {
-        trackedJSlot = null;
-        trackedJDisplay = null;
-
-        if (jTracker != null) {
-            jTracker.kill();
-            jTracker = null;
-        }
-    }
-
-    /**
-     * Clears all trackers for the I and J loops.
-     */
-    public void clearTrackers() {
-        clearITracker();
-        clearJTracker();
-    }
-
-    public void shakeHead(int slot) {
-        var dv = requireDisplay(slot);
-        dv.shakeHead();
-    }
-
-    /**
-     * Stages a compare pair for the given slots.
-     * @param leftSlot 1st display slot
-     * @param rightSlot 2nd display slot
-     */
-    public void stageCompare(int leftSlot, int rightSlot) {
-        if (leftSlot == rightSlot) {
-            throw new IllegalArgumentException("Cannot compare the same slot twice: " + leftSlot);
-        }
-        if (hasStagedCompare()) {
-            throw new IllegalStateException("A compare pair is already staged.");
+    private void clearCovers() {
+        for (var cover : coversBySlot.values()) {
+            cover.remove();
         }
 
-        var leftDisplay = requireDisplay(leftSlot);
-        var rightDisplay = requireDisplay(rightSlot);
-
-        var leftHome = requireHomePosition(leftSlot);
-        var rightHome = requireHomePosition(rightSlot);
-
-        var leftComparePos = getLeftComparePosition();
-        var rightComparePos = getRightComparePosition();
-        var middle = getCompareMiddle();
-
-        leftDisplay.teleport(leftComparePos);
-        rightDisplay.teleport(rightComparePos);
-
-        lookAtOrigin(leftDisplay);
-        lookAtOrigin(rightDisplay);
-        leftDisplay.lookAt(rightDisplay.getPos().add(0, 1, 0));
-        rightDisplay.lookAt(leftDisplay.getPos());
-
-
-        stagedCompare = new StagedCompare(
-                leftSlot,
-                rightSlot,
-                leftDisplay,
-                rightDisplay,
-                leftHome,
-                rightHome,
-                leftComparePos,
-                rightComparePos
-        );
-
-        emitLines(leftHome, middle);
-        emitLines(rightHome, middle);
-        refreshTrackers();
-    }
-
-    public void restoreStagedCompare() {
-        if (!hasStagedCompare()) {
-            return;
-        }
-
-        stagedCompare.leftDisplay.teleport(stagedCompare.leftHome);
-        stagedCompare.rightDisplay.teleport(stagedCompare.rightHome);
-
-        lookAtOrigin(stagedCompare.leftDisplay);
-        lookAtOrigin(stagedCompare.rightDisplay);
-
-        clearCompareState();
-        refreshTrackers();
-    }
-
-    public void swapStagedComparePositions() {
-        if (!hasStagedCompare()) {
-            throw new IllegalStateException("No staged compare to swap in middle.");
-        }
-
-        stagedCompare.leftDisplay.teleport(stagedCompare.rightComparePos);
-        stagedCompare.rightDisplay.teleport(stagedCompare.leftComparePos);
-
-        lookAtOrigin(stagedCompare.leftDisplay);
-        lookAtOrigin(stagedCompare.rightDisplay);
-
-        refreshTrackers();
-    }
-
-    public void commitStagedSwap() {
-        if (!hasStagedCompare()) {
-            throw new IllegalStateException("No staged compare to commit.");
-        }
-
-        int leftSlot = stagedCompare.leftSlot;
-        int rightSlot = stagedCompare.rightSlot;
-
-        var leftDisplay = stagedCompare.leftDisplay;
-        var rightDisplay = stagedCompare.rightDisplay;
-
-        var leftHome = stagedCompare.leftHome;
-        var rightHome = stagedCompare.rightHome;
-
-        leftDisplay.teleport(rightHome);
-        rightDisplay.teleport(leftHome);
-
-        lookAtOrigin(leftDisplay);
-        lookAtOrigin(rightDisplay);
-
-        displaysBySlot.put(leftSlot, rightDisplay);
-        displaysBySlot.put(rightSlot, leftDisplay);
-
-        clearCompareState();
-        refreshTrackers();
-    }
-
-    /**
-     * Finishes the inner loop visuals by restoring the original positions of the displays.
-     */
-    public void finishInnerLoopVisuals() {
-        if (hasStagedCompare()) {
-            restoreStagedCompare();
-        }
-    }
-
-    /**
-     * Swaps the positions of two displays without moving them to the home position.
-     * @param leftSlot 1st display slot
-     * @param rightSlot 2nd display slot
-     */
-    public void swapDirect(int leftSlot, int rightSlot) {
-        if (leftSlot == rightSlot) {
-            return;
-        }
-
-        var leftDisplay = requireDisplay(leftSlot);
-        var rightDisplay = requireDisplay(rightSlot);
-
-        var leftHome = requireHomePosition(leftSlot);
-        var rightHome = requireHomePosition(rightSlot);
-
-        leftDisplay.teleport(rightHome);
-        rightDisplay.teleport(leftHome);
-
-        lookAtOrigin(leftDisplay);
-        lookAtOrigin(rightDisplay);
-
-        displaysBySlot.put(leftSlot, rightDisplay);
-        displaysBySlot.put(rightSlot, leftDisplay);
-
-        clearCompareState();
-        refreshTrackers();
-    }
-
-    /**
-     * Moves all displays to their home positions.
-     */
-    public void resetAllDisplaysToHome() {
-        clearCompareState();
-
-        for (var entry : homePositions.entrySet()) {
-            int slot = entry.getKey();
-            Pos home = entry.getValue();
-
-            var display = requireDisplay(slot);
-            display.teleport(home);
-            lookAtOrigin(display);
-        }
-
-        refreshTrackers();
-    }
-
-    public boolean hasStagedCompare() {
-        return stagedCompare != null;
-    }
-
-    public boolean isStagedPair(int a, int b) {
-        if (!hasStagedCompare()) {
-            return false;
-        }
-
-        return (stagedCompare.leftSlot == a && stagedCompare.rightSlot == b)
-                || (stagedCompare.leftSlot == b && stagedCompare.rightSlot == a);
-    }
-
-    public EntityCreatureDisplay getStagedRightDisplay() {
-        if (!hasStagedCompare()) {
-            throw new IllegalStateException("No staged compare.");
-        }
-        return stagedCompare.rightDisplay;
-    }
-
-    public void clearCompareState() {
-        stagedCompare = null;
-    }
-
-    public Pos getHomePosition(int slot) {
-        return requireHomePosition(slot);
-    }
-
-    private void refreshTrackers() {
-        refreshITracker();
-        refreshJTracker();
-    }
-
-    private void refreshITracker() {
-        Pos base = resolveITrackerBase();
-        if (base == null) {
-            return;
-        }
-
-        Pos trackerPos = getITrackerPosition(base);
-
-
-        if (iTracker == null) {
-            iTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "I", true);
-            iTracker.setInstance(instance);
-        }
-
-        iTracker.teleport(trackerPos);
-        iTracker.lookAt(base.add(0, requireDisplay(trackedISlot).getEyeHeight() + 2, 0));
-    }
-
-    private void refreshJTracker() {
-        Pos base = resolveJTrackerBase();
-        if (base == null) {
-            return;
-        }
-
-        Pos trackerPos = getJTrackerPosition(base);
-
-        if (jTracker == null) {
-            jTracker = new EntityCreatureDisplay(trackerPos, EntityType.CHICKEN, "J", true);
-            jTracker.setInstance(instance);
-        }
-
-        jTracker.teleport(trackerPos);
-        jTracker.lookAt(base.add(0, requireDisplay(trackedJSlot).getEyeHeight() + 2, 0));
-    }
-
-    private EntityCreatureDisplay resolveTrackedDisplay(EntityCreatureDisplay explicitDisplay, Integer slot) {
-        if (explicitDisplay != null) {
-            return explicitDisplay;
-        }
-
-        if (slot != null) {
-            return requireDisplay(slot);
-        }
-
-        return null;
-    }
-
-    private Pos resolveITrackerBase() {
-        if (trackedIDisplay != null) {
-            return trackedIDisplay.getPos();
-        }
-
-        if (trackedISlot != null) {
-            return requireHomePosition(trackedISlot);
-        }
-
-        return null;
-    }
-
-    private Pos resolveJTrackerBase() {
-        if (trackedJDisplay != null) {
-            return trackedJDisplay.getPos();
-        }
-
-        if (trackedJSlot != null) {
-            return requireDisplay(trackedJSlot).getPos();
-        }
-
-        return null;
+        coversBySlot.clear();
     }
 
     public EntityCreatureDisplay requireDisplay(int slot) {
@@ -381,32 +210,22 @@ public class InsertionScene extends AbstractScene {
 
     private Pos requireHomePosition(int slot) {
         var pos = homePositions.get(slot);
+
         if (pos == null) {
             throw new IllegalArgumentException("No home position for slot " + slot);
         }
+
         return pos;
     }
 
-    private Pos getLeftComparePosition() {
-        return origin.add(-2.0, 5.0, 0.0);
-    }
-
-    private Pos getRightComparePosition() {
-        return origin.add(2.0, 5.0, 0.0);
-    }
-
-    private Pos getCompareMiddle() {
-        return origin.add(0.0, 5.0, 0.0);
-    }
-
-    private Pos getITrackerPosition(Pos base) {
-        var tracked = requireDisplay(trackedISlot);
-        return base.add(-0.8, tracked.getEyeHeight() + 2, 0.0);
-    }
-
-    private Pos getJTrackerPosition(Pos base) {
-        var tracked = requireDisplay(trackedJSlot);
-        return base.add(0.8, tracked.getEyeHeight() + 2, 0.0);
+    private Pos midpoint(Pos a, Pos b) {
+        return new Pos(
+                (a.x() + b.x()) / 2.0,
+                (a.y() + b.y()) / 2.0,
+                (a.z() + b.z()) / 2.0,
+                0f,
+                0f
+        );
     }
 
     private void lookAtOrigin(IDisplayValue display) {
@@ -415,83 +234,55 @@ public class InsertionScene extends AbstractScene {
         }
     }
 
+    public void spawnParticleAuraBySlot(int slot, Particle particle) {
+        var display = requireDisplay(slot);
+        spawnParticleAuraAt(
+                display.getPos().add(0, display.getEyeHeight(), 0),
+                particle
+        );
+    }
+
+    private void spawnParticleAuraAt(Pos center, Particle particle) {
+        if (instance == null) return;
+
+        for (int i = 0; i < 10; i++) {
+            double angle = (Math.PI * 2.0 * i) / 10.0;
+
+            var point = center.add(
+                    Math.cos(angle) * 0.7,
+                    0.2,
+                    Math.sin(angle) * 0.7
+            );
+
+            spawnParticleAt(point, particle, 1);
+        }
+    }
+
+    private void spawnParticleAt(Pos pos, Particle particle, int count) {
+        if (instance == null) return;
+
+        var packet = new ParticlePacket(
+                particle,
+                true,
+                true,
+                pos,
+                Vec.ZERO,
+                0f,
+                count
+        );
+
+        for (var player : instance.getPlayers()) {
+            player.sendPacket(packet);
+        }
+    }
+
     @Override
     public void cleanUp() {
-        clearCompareState();
-        clearTrackers();
+        clearITracker();
+        clearCovers();
         super.cleanUp();
+
         homePositions.clear();
-    }
-
-    public void emitLines(Pos from, Pos to) {
-        if (from == null || to == null || instance == null) {
-            return;
-        }
-
-        double dx = to.x() - from.x();
-        double dy = to.y() - from.y();
-        double dz = to.z() - from.z();
-        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        int steps = Math.max(2, (int) Math.ceil(distance * 6.0));
-
-        for (int i = 1; i < steps; i++) {
-            double t = (double) i / steps;
-
-            Pos point = new Pos(
-                    from.x() + (dx * t),
-                    from.y() + (dy * t),
-                    from.z() + (dz * t),
-                    0f,
-                    0f
-            );
-
-            ParticlePacket packet = new ParticlePacket(
-                    Particle.CRIT,
-                    true,
-                    true,
-                    point,
-                    Vec.ZERO,
-                    0f,
-                    1
-            );
-
-            for (var viewer : instance.getPlayers()) {
-                viewer.sendPacket(packet);
-            }
-        }
-    }
-
-    private static final class StagedCompare {
-        private final int leftSlot;
-        private final int rightSlot;
-
-        private final EntityCreatureDisplay leftDisplay;
-        private final EntityCreatureDisplay rightDisplay;
-
-        private final Pos leftHome;
-        private final Pos rightHome;
-
-        private final Pos leftComparePos;
-        private final Pos rightComparePos;
-
-        private StagedCompare(
-                int leftSlot,
-                int rightSlot,
-                IDisplayValue leftDisplay,
-                IDisplayValue rightDisplay,
-                Pos leftHome,
-                Pos rightHome,
-                Pos leftComparePos,
-                Pos rightComparePos
-        ) {
-            this.leftSlot = leftSlot;
-            this.rightSlot = rightSlot;
-            this.leftDisplay = (EntityCreatureDisplay) Objects.requireNonNull(leftDisplay);
-            this.rightDisplay = (EntityCreatureDisplay) Objects.requireNonNull(rightDisplay);
-            this.leftHome = Objects.requireNonNull(leftHome);
-            this.rightHome = Objects.requireNonNull(rightHome);
-            this.leftComparePos = Objects.requireNonNull(leftComparePos);
-            this.rightComparePos = Objects.requireNonNull(rightComparePos);
-        }
+        revealedSlots.clear();
     }
 }

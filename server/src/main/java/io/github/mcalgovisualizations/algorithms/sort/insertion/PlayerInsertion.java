@@ -15,34 +15,40 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
     @Override
     public void run(SortingContext<T> ctx) {
         var values = ctx.getData();
-        int n = values.size();
 
-        for (int i = 1; i < n; i++) {
+        for (int i = 1; i < values.size(); i++) {
             int j = i;
 
             ctx.emit(new TrackI(i, values.get(i)));
 
             while (j > 0) {
-                var x = values.get(j);
-                var y = values.get(j - 1);
+                var current = values.get(j);
+                var previous = values.get(j - 1);
 
-                ctx.emit(new TrackJ(j, values.get(j)), new Compare(j, j - 1, y, x));
+                ctx.emit(
+                        new TrackJ(j, current),
+                        new Compare(j, j - 1, previous, current)
+                );
 
-                if (x.compareTo(y) >= 0) {
+                if (current.compareTo(previous) >= 0) {
                     break;
                 }
 
-                ctx.emit(new Swap(j, j - 1, y, x));
+                ctx.emit(new Swap(j, j - 1, previous, current));
                 ctx.swap(j, j - 1);
+
                 j--;
             }
 
-            ctx.emit(new TrackJ(j, values.get(j)));
+            ctx.emit(new Inserted(j, values.get(j)));
         }
     }
 
     public record TrackI(int idx, Object value) implements IAlgorithmEvent { }
+
     public record TrackJ(int idx, Object value) implements IAlgorithmEvent { }
+
+    public record Inserted(int idx, Object value) implements IAlgorithmEvent { }
 
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
@@ -50,14 +56,20 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
             return AnimationPlan.<InsertionScene>builder()
                     .step(scene -> {
                         scene.finishInnerLoopVisuals();
-                        scene.clearJTracker();
-                        scene.playSound("entity.chicken.death",1f, 1f);
                         scene.clearGlowing();
+                        scene.revealInitialPrefixIfNeeded();
                     })
-                    .step(scene -> {
-                        scene.trackI(event.idx());
+                    .step(4, scene -> {
+                        scene.revealInitialPrefixIfNeeded();
                         scene.sendActionBar(Component.text(
-                                "i : [" + event.value() + "]",
+                                "Sorted prefix starts here",
+                                NamedTextColor.GRAY
+                        ));
+                    })
+                    .step(4, scene -> {
+                        scene.revealSlot(event.idx());
+                        scene.sendActionBar(Component.text(
+                                "Insert [" + event.value() + "] into sorted prefix",
                                 NamedTextColor.AQUA
                         ));
                     })
@@ -67,15 +79,15 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
 
     public static class TrackJHandler implements IAnimationHandler<TrackJ> {
         @Override
-        @SuppressWarnings("unchecked")
         public AnimationPlan<InsertionScene> handle(TrackJ event) {
             return AnimationPlan.<InsertionScene>builder()
+                    .step(4, scene -> scene.sendActionBar(Component.text(
+                            "Scan left → [" + event.value() + "]",
+                            NamedTextColor.GREEN
+                    )))
                     .step(scene -> {
+                        scene.markJ(event.idx());
                         scene.setHighlighted(event.idx(), true);
-                        scene.sendActionBar(Component.text(
-                                "j : [" + event.value() + "]",
-                                NamedTextColor.GREEN
-                        ));
                     })
                     .build();
         }
@@ -83,64 +95,49 @@ public class PlayerInsertion<T extends Comparable<T>> implements IPlayerSort<Sor
 
     public static class CompareHandler implements IAnimationHandler<Compare> {
         @Override
-        @SuppressWarnings("unchecked")
         public AnimationPlan<InsertionScene> handle(Compare event) {
             return AnimationPlan.<InsertionScene>builder()
-                    .step(scene -> scene.sendActionBar(Component.text(
-                            "Comparing [" + event.xValue() + "] with [" + event.yValue() + "]",
-                            NamedTextColor.YELLOW)))
-                    .step(scene -> scene.playSound("entity.villager.trade",1f, 1f))
-                    .step(scene -> {
-                        int left = event.x();
-                        int right = event.y();
-                        if (scene.hasStagedCompare()) {
-                            if (scene.isStagedPair(left, right)) {
-                                return;
-                            }
-                            scene.restoreStagedCompare();
-                        }
-                        scene.stageCompare(right, left);
+                    .step(4, scene -> {
+                        scene.playSound("block.note_block.hat", 0.6f, 1.8f);
+                        scene.sendActionBar(Component.text(
+                                "Is " + event.xValue() + " > " + event.yValue() + " ?",
+                                NamedTextColor.YELLOW
+                        ));
                     })
+                    .step(scene -> scene.comparePulse(event.x(), event.y()))
                     .build();
         }
     }
 
     public static class SwapHandler implements IAnimationHandler<Swap> {
         @Override
-        @SuppressWarnings("unchecked")
         public AnimationPlan<InsertionScene> handle(Swap event) {
             return AnimationPlan.<InsertionScene>builder()
-                    .step(scene -> {
+                    .step(4, scene -> {
+                        scene.playSound("block.piston.extend", 0.7f, 1.2f);
                         scene.sendActionBar(Component.text(
-                                event.yValue() + " is smaller than " + event.xValue(),
-                                NamedTextColor.YELLOW));
+                                "Shift [" + event.xValue() + "] right",
+                                NamedTextColor.GOLD
+                        ));
                     })
-                    .step(scene -> scene.playSound("entity.villager.celebrate",1f, 1f))
-                    .step(scene -> {
-                        int left = event.x();
-                        int right = event.y();
+                    .step(scene -> scene.danceSwap(event.x(), event.y()))
+                    .step(2, scene -> scene.commitSwap(event.x(), event.y()))
+                    .build();
+        }
+    }
 
-                        if (scene.hasStagedCompare()) {
-                            if (scene.isStagedPair(left, right)) {
-                                scene.swapStagedComparePositions();
-                                return;
-                            }
-
-                            scene.restoreStagedCompare();
-                            scene.swapDirect(left, right);
-                            return;
-                        }
-
-                        scene.swapDirect(left, right);
+    public static class InsertedHandler implements IAnimationHandler<Inserted> {
+        @Override
+        public AnimationPlan<InsertionScene> handle(Inserted event) {
+            return AnimationPlan.<InsertionScene>builder()
+                    .step(4, scene -> {
+                        scene.markInserted(event.idx());
+                        scene.sendActionBar(Component.text(
+                                "Inserted [" + event.value() + "]",
+                                NamedTextColor.GRAY
+                        ));
                     })
-                    .step(2, scene -> {
-                        int left = event.x();
-                        int right = event.y();
-
-                        if (scene.hasStagedCompare() && scene.isStagedPair(left, right)) {
-                            scene.commitStagedSwap();
-                        }
-                    })
+                    .step(scene -> scene.playSound("block.note_block.pling", 0.7f, 1.6f))
                     .build();
         }
     }

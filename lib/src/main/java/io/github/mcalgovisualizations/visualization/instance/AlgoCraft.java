@@ -18,6 +18,7 @@ import net.minestom.server.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static io.github.mcalgovisualizations.visualization.ui.InteractionType.SPAWN;
 import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
@@ -149,6 +150,7 @@ public class AlgoCraft {
                 .thenCompose(_ -> session.addPlayer(player))
                 .exceptionally(throwable -> {
                     throwable.printStackTrace();
+                    ui.applyDefaultLayout(player);
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
                 })
