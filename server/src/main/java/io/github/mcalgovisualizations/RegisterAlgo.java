@@ -7,7 +7,12 @@ import io.github.mcalgovisualizations.algorithms.GraphSearch.VillagerDFS;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
-import io.github.mcalgovisualizations.algorithms.PlayerAStar;
+import io.github.mcalgovisualizations.algorithms.mazes.GridLayout;
+import io.github.mcalgovisualizations.algorithms.mazes.PlayerAStar;
+import io.github.mcalgovisualizations.algorithms.mazes.PlayerBFS;
+import io.github.mcalgovisualizations.algorithms.mazes.PlayerDFS;
+import io.github.mcalgovisualizations.algorithms.mazes.PlayerGreedyBestFirst;
+import io.github.mcalgovisualizations.algorithms.mazes.Scenes.HeuristicGridScene;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.InsertionScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
@@ -16,6 +21,8 @@ import io.github.mcalgovisualizations.algorithms.sort.selection.SelectionScene;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
+import io.github.mcalgovisualizations.scenes.FlowScene;
+import io.github.mcalgovisualizations.algorithms.mazes.Scenes.GridScene;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.instance.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
@@ -34,6 +41,7 @@ public class RegisterAlgo {
  
         showcaseAlgo(algo);
         //registerTreeSearchAlgo(algo);
+        //registerPathFindingAlgo(algo);
         //registerPathFindingAlgo(algo);
         //registerFlowAlgo(algo);
     }
@@ -136,35 +144,105 @@ public class RegisterAlgo {
                         })
                         .create()
         );
+        //Mazes
+        final int gridX = 20;
+        final int gridY = 20;
+        var finalgrid = buildPathGrid(gridX, gridY);
+        algo.registerAlgorithm(
+                Algorithm.builder(finalgrid)
+                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
+                        .positioning(new GridLayout(gridX))
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "A* Pathfinding",
+                                Material.COMPASS,
+                                "Time: O(E log V) | Space: O(V)",
+                                "Colors show open, closed, and final path.",
+                                "4-way A* on a fixed 2D obstacle map"
+                        ))
+                        .withScene(HeuristicGridScene::new)
+                        .create()
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.builder(finalgrid)
+                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
+                        .positioning(new GridLayout(gridX))
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "BFS Pathfinding",
+                                Material.COMPASS,
+                                "Time: O(V + E) | Space: O(V)",
+                                "Queue-based level-by-level expansion.",
+                                "4-way BFS explores breadth-first"
+                        ))
+                        .withScene(GridScene::new)
+                        .create()
+        );
+
+
+        algo.registerAlgorithm(
+                Algorithm.builder(finalgrid)
+                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
+                        .positioning(new GridLayout(gridX))
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "DFS Pathfinding",
+                                Material.COMPASS,
+                                "Time: O(V + E) | Space: O(V)",
+                                "Stack-based backtracking expansion.",
+                                "4-way DFS explores depth-first"
+                        ))
+                        .withScene(GridScene::new)
+                        .create()
+        );
+
+        algo.registerAlgorithm(
+                Algorithm.builder(finalgrid)
+                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
+                        .positioning(new GridLayout(gridX))
+                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
+                        .onEvent(Message.class, new MessageHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Greedy Best-First",
+                                Material.COMPASS,
+                                "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
+                        ))
+                        .withScene(HeuristicGridScene::new)
+                        .create()
+        );
     }
 
-    private static void registerFlowAlgo(AlgoCraft algo) {
-        var flowMatrix = new GridContext<Integer>(new ArrayList<>(Arrays.asList(
-                0,16, 13, 0,  0,  0,
-                0,0,  10, 12, 0,  0,
-                0,4,  0,  0,  14, 0,
-                0,0,  9,  0,  0,  20,
-                0,0,  0,  7,  0,  4,
-                0,0,  0,  0,  0,  0
-        )));
-            var e = Algorithm.builder(flowMatrix)
-                .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
-                .positioning(new GraphNetworkLayout<>(8.0, 5.0))
-                .withScene(FlowScene::new)
-                .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
-                .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
-                .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
-                .onEvent(FlowStatus.class, new FlowStatusHandler())
-                .withPresentation(new AlgorithmPresentation(
-                        "Max Flow (Edmonds-Karp)",
-                        Material.WATER_BUCKET,
-                        "Graph max-flow from source (0) to sink (n-1)",
-                        "Fixed 6-node flow graph with edge current/max labels",
-                        "Selected augmenting path edges turn particle color"
-                ))
-                .create();
-        algo.registerAlgorithm(e);
-    }
+//    private static void registerFlowAlgo(AlgoCraft algo) {
+//        var flowMatrix = new GridContext<Integer>(new ArrayList<>(Arrays.asList(
+//                0,16, 13, 0,  0,  0,
+//                0,0,  10, 12, 0,  0,
+//                0,4,  0,  0,  14, 0,
+//                0,0,  9,  0,  0,  20,
+//                0,0,  0,  7,  0,  4,
+//                0,0,  0,  0,  0,  0
+//        )));
+//            var e = Algorithm.builder(flowMatrix)
+//                .withIdentity("max flow (edmonds-karp)", PlayerMaxFlow::new)
+//                .positioning(new GraphNetworkLayout<>(8.0, 5.0))
+//                .withScene(FlowScene::new)
+//                .onEvent(FlowEdgeVisit.class, new FlowEdgeVisitHandler())
+//                .onEvent(FlowPathEdge.class, new FlowPathEdgeHandler())
+//                .onEvent(FlowEdgeFlowUpdate.class, new FlowEdgeFlowUpdateHandler())
+//                .onEvent(FlowStatus.class, new FlowStatusHandler())
+//                .withPresentation(new AlgorithmPresentation(
+//                        "Max Flow (Edmonds-Karp)",
+//                        Material.WATER_BUCKET,
+//                        "Graph max-flow from source (0) to sink (n-1)",
+//                        "Fixed 6-node flow graph with edge current/max labels",
+//                        "Selected augmenting path edges turn particle color"
+//                ))
+//                .create();
+//        algo.registerAlgorithm(e);
+//    }
 
     private static void registerSortingAlgo(AlgoCraft algo) {
         var integerCollection1 = new SortingContext<>(new ArrayList<>(List.of(3, 7, 8, 1, 6, 4, 9, 5, 2)));
@@ -264,7 +342,7 @@ public class RegisterAlgo {
 //                        .withPresentation(new AlgorithmPresentation(
 //                                "Binary Search Tree (Search)",
 //                                Material.SPYGLASS,
-//                                "Tip: use Randomize before Start to explore new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
+//                                "Tip: use Randomize before Start to explolocare new search paths", "then searches for one value using branch decisions.", "Builds a BST from the current values"
 //                        ))
 //                        .withScene(DefaultScene::new)
 //                        .create()
@@ -304,75 +382,7 @@ public class RegisterAlgo {
 
 
     private static void registerPathFindingAlgo(AlgoCraft algo) {
-        final int gridX = 20;
-        final int gridY = 20;
-        var aStarGrid = buildPathGrid(gridX, gridY);
-        algo.registerAlgorithm(
-                Algorithm.builder(aStarGrid)
-                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
-                        .positioning(new GridLayout(gridX))
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "A* Pathfinding",
-                                Material.COMPASS,
-                                "Time: O(E log V) | Space: O(V)",
-                                "Colors show open, closed, and final path.",
-                                "4-way A* on a fixed 2D obstacle map"
-                        ))
-                        .withScene(GridScene::new)
-                        .create()
-        );
 
-        algo.registerAlgorithm(
-                Algorithm.builder(aStarGrid)
-                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
-                        .positioning(new GridLayout(gridX))
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "BFS Pathfinding",
-                                Material.RECOVERY_COMPASS,
-                                "Time: O(V + E) | Space: O(V)",
-                                "Queue-based level-by-level expansion.",
-                                "4-way BFS explores breadth-first"
-                        ))
-                        .withScene(GridScene::new)
-                        .create()
-        );
-
-        /*
-        algo.registerAlgorithm(
-                Algorithm.builder(aStarGrid)
-                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
-                        .positioning(new GridLayout(gridX))
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "DFS Pathfinding",
-                                Material.LOOM,
-                                "Time: O(V + E) | Space: O(V)",
-                                "Stack-based backtracking expansion.",
-                                "4-way DFS explores depth-first"
-                        ))
-                        .withScene(GridScene::new)
-                        .create()
-        );
-*/
-        algo.registerAlgorithm(
-                Algorithm.builder(aStarGrid)
-                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
-                        .positioning(new GridLayout(gridX))
-                        .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
-                        .onEvent(Message.class, new MessageHandler())
-                        .withPresentation(new AlgorithmPresentation(
-                                "Greedy Best-First",
-                                Material.REDSTONE_TORCH,
-                                "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
-                        ))
-                        .withScene(GridScene::new)
-                        .create()
-        );
     }
 
     private static GridContext<Integer> buildPathGrid(int xSize, int ySize) {

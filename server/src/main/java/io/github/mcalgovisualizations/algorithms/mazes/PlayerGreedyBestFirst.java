@@ -1,17 +1,16 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.mazes;
 
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Message;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
-public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
+public class PlayerGreedyBestFirst implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -19,24 +18,18 @@ public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
 
     private final int columns;
 
-    public PlayerBFS(int columns) {
+    public PlayerGreedyBestFirst(int columns) {
         if (columns <= 0) throw new IllegalArgumentException("columns must be > 0");
         this.columns = columns;
     }
 
     @Override
-    public void run(GridContext<Integer> values) {
-        var arr = values.getData();
-        int size = arr.size();
+    public void run(GridContext<Integer> ctx) {
+        var values = ctx.getData();
+        int size = values.size();
         if (size == 0) {
-            values.emit(new Message("BFS: empty grid", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: empty grid", Message.MessageType.ERROR));
             return;
-        }
-
-        int[] cells = new int[size];
-        for (int i = 0; i < size; i++) {
-            var number = arr.get(i);
-            cells[i] = number;
         }
 
         int rows = (int) Math.ceil(size / (double) columns);
@@ -44,12 +37,12 @@ public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
         int goal = -1;
 
         for (int i = 0; i < size; i++) {
-            if (cells[i] == START) start = i;
-            if (cells[i] == GOAL) goal = i;
+            if (values.get(i) == START) start = i;
+            if (values.get(i) == GOAL) goal = i;
         }
 
         if (start < 0 || goal < 0) {
-            values.emit(new Message("BFS: start or goal missing", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: start or goal missing", Message.MessageType.ERROR));
             return;
         }
 
@@ -57,21 +50,23 @@ public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
         int[] parent = new int[size];
         Arrays.fill(parent, -1);
 
-        Queue<Integer> frontier = new LinkedList<>();
-        frontier.add(start);
+        PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator.comparingInt(Node::h));
+
+        frontier.add(new Node(start, heuristic(start, goal, columns)));
         visited[start] = true;
 
         boolean found = false;
         while (!frontier.isEmpty()) {
-            int current = frontier.poll();
+            Node currentNode = frontier.poll();
+            int current = currentNode.index();
 
             if (current == goal) {
                 found = true;
                 break;
             }
 
-            if (current != start && current != goal) {
-                values.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+            if (current != start) {
+                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
             int row = current / columns;
@@ -85,33 +80,40 @@ public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
             };
 
             for (int neighbor : neighbors) {
-                if (neighbor < 0 || cells[neighbor] == WALL || visited[neighbor]) continue;
+                if (neighbor < 0 || values.get(neighbor) == WALL || visited[neighbor]) continue;
 
                 parent[neighbor] = current;
-                frontier.add(neighbor);
+                frontier.add(new Node(neighbor, heuristic(neighbor, goal, columns)));
                 visited[neighbor] = true;
 
-                if (neighbor != start && neighbor != goal) {
-                    values.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
+                if (neighbor != goal) {
+                    ctx.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
                 }
             }
         }
 
         if (!found) {
-            values.emit(new Message("BFS: no path found", Message.MessageType.ERROR));
+            ctx.emit(new Message("Greedy Best-First: no path found", Message.MessageType.ERROR));
             return;
         }
 
         int pathCursor = goal;
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
-                CellState previous = visited[pathCursor] ? CellState.CLOSED : CellState.OPEN;
-                values.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
+                ctx.emit(new CellStateTransition(pathCursor, CellState.CLOSED, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }
 
-        values.emit(new Message("BFS: path found", Message.MessageType.SUCCESS));
+        ctx.emit(new Message("Greedy Best-First: path found", Message.MessageType.SUCCESS));
+    }
+
+    private static int heuristic(int from, int to, int columns) {
+        int fromRow = from / columns;
+        int fromCol = from % columns;
+        int toRow = to / columns;
+        int toCol = to % columns;
+        return Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol);
     }
 
     private static int index(int row, int col, int rows, int columns, int size) {
@@ -119,5 +121,7 @@ public class PlayerBFS implements IPlayerSort<GridContext<Integer>> {
         int idx = (row * columns) + col;
         return idx < size ? idx : -1;
     }
+
+    private record Node(int index, int h) {}
 }
 

@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations;
+package io.github.mcalgovisualizations.scenes;
 
 import io.github.mcalgovisualizations.layouts.GraphNetworkLayout;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;

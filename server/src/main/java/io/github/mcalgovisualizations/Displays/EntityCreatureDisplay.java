@@ -110,6 +110,10 @@ public class EntityCreatureDisplay implements IDisplayValue {
         return entity.getEyeHeight();
     }
 
+    public EntityCreature getEntity() {
+        return entity;
+    }
+
     @Override
     public void addViewer(Player player) {
         entity.addViewer(player);
