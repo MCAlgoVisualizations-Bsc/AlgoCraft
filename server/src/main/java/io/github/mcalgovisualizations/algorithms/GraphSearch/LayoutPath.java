@@ -134,21 +134,25 @@ public class LayoutPath implements ILayout<Node> {
                     instance.setBlock(pos.add(x, 1, z), Block.OAK_PLANKS);
                     instance.setBlock(pos.add(x, 2, z), Block.OAK_PLANKS);
                     instance.setBlock(pos.add(x, 3, z), Block.OAK_PLANKS);
+                    instance.setBlock(pos.add(x, 4, z), Block.OAK_PLANKS);
+                    instance.setBlock(pos.add(x, 5, z), Block.OAK_PLANKS);
                 }
                 // Door
                 if (x == 0 || z == 0) {
                     instance.setBlock(pos.add(x, 1, z), Block.AIR);
                     instance.setBlock(pos.add(x, 2, z), Block.AIR);
+                    instance.setBlock(pos.add(x, 3, z), Block.AIR);
                 }
                 // Corners
                 if (Math.abs(x) == size && Math.abs(z) == size) {
-                    instance.setBlock(pos.add(x, 1, z), Block.OAK_LOG);
                     instance.setBlock(pos.add(x, 2, z), Block.OAK_LOG);
                     instance.setBlock(pos.add(x, 3, z), Block.OAK_LOG);
+                    instance.setBlock(pos.add(x, 4, z), Block.OAK_LOG);
+                    instance.setBlock(pos.add(x, 5, z), Block.OAK_LOG);
                 }
 
                 // Roof
-                instance.setBlock(pos.add(x, 4, z), Block.OAK_LOG);
+                instance.setBlock(pos.add(x, 6, z), Block.OAK_LOG);
             }
         }
         /*
