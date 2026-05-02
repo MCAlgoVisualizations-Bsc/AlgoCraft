@@ -28,6 +28,7 @@ import io.github.mcalgovisualizations.visualization.instance.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
+import io.github.mcalgovisualizations.ui.VillagerPovAlgorithmUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.Material;
@@ -383,6 +384,31 @@ public class RegisterAlgo {
 
     private static void registerPathFindingAlgo(AlgoCraft algo) {
 
+    }
+
+    private static GridContext<Integer> buildCaveGrid(int columns, int layers, int depth) {
+        ArrayList<Integer> grid = new ArrayList<>(columns * layers * depth);
+
+        for (int z = 0; z < depth; z++) {
+            for (int y = 0; y < layers; y++) {
+                for (int x = 0; x < columns; x++) {
+                    int value;
+                    if (x == 0 && y == 0 && z == 0) {
+                        value = 2;
+                    } else if (x == columns - 1 && y == layers - 1 && z == depth - 1) {
+                        value = 3;
+                    } else if (x == 0 || y == 0 || z == depth - 1 || x == y || y == z) {
+                        value = 0;
+                    } else {
+                        int noise = Math.floorMod((x * 31) + (y * 17) + (z * 13) + (x * y * 7) + (y * z * 5), 100);
+                        value = noise < 22 ? 1 : 0;
+                    }
+                    grid.add(value);
+                }
+            }
+        }
+
+        return new GridContext<>(grid);
     }
 
     private static GridContext<Integer> buildPathGrid(int xSize, int ySize) {

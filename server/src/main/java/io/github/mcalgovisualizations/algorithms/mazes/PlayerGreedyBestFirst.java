@@ -5,6 +5,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Message;
+import io.github.mcalgovisualizations.events.VillagerMove;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -66,6 +67,7 @@ public class PlayerGreedyBestFirst implements IPlayerSort<GridContext<Integer>> 
             }
 
             if (current != start) {
+                ctx.emit(new VillagerMove(current, 2));
                 ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
@@ -100,6 +102,7 @@ public class PlayerGreedyBestFirst implements IPlayerSort<GridContext<Integer>> 
         int pathCursor = goal;
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
+                ctx.emit(new VillagerMove(pathCursor, 2));
                 ctx.emit(new CellStateTransition(pathCursor, CellState.CLOSED, CellState.PATH));
             }
             pathCursor = parent[pathCursor];

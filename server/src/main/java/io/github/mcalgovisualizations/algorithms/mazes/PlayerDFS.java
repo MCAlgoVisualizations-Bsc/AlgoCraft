@@ -5,6 +5,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Message;
+import io.github.mcalgovisualizations.events.VillagerMove;
 
 import java.util.Arrays;
 import java.util.Stack;
@@ -72,6 +73,7 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
             }
 
             if (current != start && current != goal) {
+                ctx.emit(new VillagerMove(current, 2));
                 ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
@@ -106,6 +108,7 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
                 CellState previous = visited[pathCursor] ? CellState.CLOSED : CellState.OPEN;
+                ctx.emit(new VillagerMove(pathCursor, 2));
                 ctx.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
