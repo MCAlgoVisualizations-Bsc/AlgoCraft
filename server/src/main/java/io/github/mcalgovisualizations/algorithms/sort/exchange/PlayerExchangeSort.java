@@ -63,9 +63,9 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             plan.step(4, scene -> {
                 scene.playSound("minecraft:block.note_block.hat", 0.6f, 1.0f);
 
-                final var message = Component.text("i = ", NamedTextColor.GRAY)
+                final var message = Component.text("▶ i=", NamedTextColor.AQUA, TextDecoration.BOLD)
                         .append(Component.text(event.slot(), NamedTextColor.AQUA, TextDecoration.BOLD))
-                        .append(Component.text(", min = ", NamedTextColor.GRAY))
+                        .append(Component.text("  holding min ", NamedTextColor.GRAY))
                         .append(Component.text(event.value(), NamedTextColor.YELLOW, TextDecoration.BOLD));
 
                 scene.sendActionBar(message);
@@ -98,12 +98,10 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             plan.step(4, scene -> {
                 scene.playSound("minecraft:block.note_block.xylophone", 0.6f, 1.2f);
 
-                final var message = Component.text("Compare ", NamedTextColor.GRAY)
-                        .append(Component.text((int) event.xValue(), NamedTextColor.YELLOW, TextDecoration.BOLD))
-                        .append(Component.text(" < ", NamedTextColor.GRAY))
+                final var message = Component.text((int) event.xValue(), NamedTextColor.YELLOW, TextDecoration.BOLD)
+                        .append(Component.text(" < ", NamedTextColor.DARK_GRAY))
                         .append(Component.text((int) event.yValue(), NamedTextColor.AQUA, TextDecoration.BOLD))
-                        .append(Component.text("?", NamedTextColor.GRAY));
-
+                        .append(Component.text(" ?", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD));
                 scene.sendActionBar(message);
             });
 
@@ -117,7 +115,7 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             final var plan = AnimationPlan.<ExchangeScene>builder();
 
             plan.stepAsync(1, scene ->
-                    scene.swapCurrentMinWithSlot(event.x(), event.y())
+                scene.swapCurrentMinWithSlot(event.x(), event.y())
             );
 
             plan.step(1, scene -> {
@@ -130,8 +128,10 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             plan.step(4, scene -> {
                 scene.playSound("minecraft:entity.item.pickup", 0.8f, 1.0f);
 
-                final var message = Component.text("New min: ", NamedTextColor.GRAY)
-                        .append(Component.text((int) event.yValue(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+                final var message = Component.text("⇄ ", NamedTextColor.GOLD, TextDecoration.BOLD)
+                        .append(Component.text("new min ", NamedTextColor.GRAY))
+                        .append(Component.text((int) event.yValue(), NamedTextColor.YELLOW, TextDecoration.BOLD))
+                        .append(Component.text(" moves in", NamedTextColor.GRAY));
 
                 scene.sendActionBar(message);
             });
@@ -148,13 +148,14 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             plan.step(0, AbstractScene::clearGlowing);
 
             plan.stepAsync(1, scene ->
-                    scene.markSorted(event.slot())
+                scene.markSorted(event.slot())
             );
 
             plan.step(4, scene -> {
                 scene.playSound("minecraft:block.note_block.bell", 0.7f, 1.4f);
 
-                final var message = Component.text("Sorted: ", NamedTextColor.GRAY)
+                final var message = Component.text("✔ ", NamedTextColor.GREEN, TextDecoration.BOLD)
+                        .append(Component.text("sorted ", NamedTextColor.GRAY))
                         .append(Component.text(event.value(), NamedTextColor.GREEN, TextDecoration.BOLD));
 
                 scene.sendActionBar(message);
