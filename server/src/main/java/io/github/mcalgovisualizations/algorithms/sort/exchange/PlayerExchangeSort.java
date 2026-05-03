@@ -7,60 +7,147 @@ import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> {
     @Override
     public void run(SortingContext<Integer> context) {
         final var values = context.getData();
         final var size = values.size();
+
         for (int i = 0; i < size; i++) {
             context.emit(new TrackI(i, values.get(i)));
-            for (int j = i + 1; j < size; j++)
+
+            for (int j = i + 1; j < size; j++) {
+                context.emit(new Compare(j, i, values.get(j), values.get(i)));
+
                 if (values.get(i) > values.get(j)) {
-                    final var temp = values.get(i);
-                    values.set(i, values.get(j));
-                    values.set(j, temp);
+                    final var left = values.get(i);
+                    final var right = values.get(j);
+
+                    context.swap(i, j);
+                    context.emit(new Swap(i, j, left, right));
                 }
+            }
+
+            context.emit(new MarkSorted(i, values.get(i)));
         }
     }
 
-    public record TrackI(int i, Integer value) implements IAlgorithmEvent { }
+    public record TrackI(int slot, Integer value) implements IAlgorithmEvent { }
 
-    public record TrackJ(int j, Integer value) implements IAlgorithmEvent { }
+    public record MarkSorted(int slot, Integer value) implements IAlgorithmEvent { }
 
     public static class TrackIHandler implements IAnimationHandler<TrackI> {
         @Override
-        @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(TrackI event) {
-            final var plan = AnimationPlan.builder();
-            return plan.build();
-        }
-    }
+        public AnimationPlan<ExchangeScene> handle(TrackI event) {
+            final var plan = AnimationPlan.<ExchangeScene>builder();
 
-    public static class TrackJHandler implements IAnimationHandler<TrackJ> {
-        @Override
-        @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(TrackJ event) {
-            final var plan = AnimationPlan.builder();
-            return plan.build();
-        }
-    }
+            plan.step(1, scene -> {
+                scene.clearGlowing();
+                scene.resetLookAt();
 
-    public static class SwapHandler implements IAnimationHandler<Swap> {
-        @Override
-        @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(Swap event) {
-            final var plan = AnimationPlan.builder();
+                scene.stageCurrentMin(event.slot());
+
+                scene.highlightIndex(event.slot());
+                scene.highlightCurrentMin();
+            });
+
+            plan.step(4, scene -> {
+                scene.playSound("minecraft:block.note_block.hat", 0.6f, 1.0f);
+
+                final var message = Component.text("i = ", NamedTextColor.GRAY)
+                        .append(Component.text(event.slot(), NamedTextColor.AQUA, TextDecoration.BOLD))
+                        .append(Component.text(", min = ", NamedTextColor.GRAY))
+                        .append(Component.text(event.value(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+
+                scene.sendActionBar(message);
+            });
+
             return plan.build();
         }
     }
 
     public static class CompareHandler implements IAnimationHandler<Compare> {
         @Override
-        @SuppressWarnings("unchecked")
-        public AnimationPlan<ISceneOps> handle(Compare event) {
-            final var plan = AnimationPlan.builder();
+        public AnimationPlan<ExchangeScene> handle(Compare event) {
+            final var plan = AnimationPlan.<ExchangeScene>builder();
+
+            plan.step(1, scene -> {
+                scene.clearGlowing();
+                scene.setHighlighted(event.x(), true);
+
+                scene.compareChallenger(event.x());
+
+                scene.highlightIndex(event.y());
+                scene.highlightSlot(event.x());
+                scene.highlightCurrentMin();
+            });
+
+            plan.step(4, scene -> {
+                scene.playSound("minecraft:block.note_block.xylophone", 0.6f, 1.2f);
+
+                final var message = Component.text("Compare ", NamedTextColor.GRAY)
+                        .append(Component.text((int) event.xValue(), NamedTextColor.YELLOW, TextDecoration.BOLD))
+                        .append(Component.text(" < ", NamedTextColor.GRAY))
+                        .append(Component.text((int) event.yValue(), NamedTextColor.AQUA, TextDecoration.BOLD))
+                        .append(Component.text("?", NamedTextColor.GRAY));
+
+                scene.sendActionBar(message);
+            });
+
+            return plan.build();
+        }
+    }
+
+    public static class SwapHandler implements IAnimationHandler<Swap> {
+        @Override
+        public AnimationPlan<ExchangeScene> handle(Swap event) {
+            final var plan = AnimationPlan.<ExchangeScene>builder();
+
+            plan.step(1, scene -> {
+                scene.swapCurrentMinWithChallenger(event.x(), event.y());
+
+                scene.clearGlowing();
+
+                scene.highlightIndex(event.x());
+                scene.highlightCurrentMin();
+            });
+
+            plan.step(4, scene -> {
+                scene.playSound("minecraft:entity.item.pickup", 0.8f, 1.0f);
+
+                final var message = Component.text("New min: ", NamedTextColor.GRAY)
+                        .append(Component.text((int) event.yValue(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+
+                scene.sendActionBar(message);
+            });
+
+            return plan.build();
+        }
+    }
+
+    public static class MarkSortedHandler implements IAnimationHandler<MarkSorted> {
+        @Override
+        public AnimationPlan<ExchangeScene> handle(MarkSorted event) {
+            final var plan = AnimationPlan.<ExchangeScene>builder();
+
+            plan.step(1, scene -> {
+                scene.clearGlowing();
+                scene.markSorted(event.slot());
+            });
+
+            plan.step(4, scene -> {
+                scene.playSound("minecraft:block.note_block.bell", 0.7f, 1.4f);
+
+                final var message = Component.text("Sorted: ", NamedTextColor.GRAY)
+                        .append(Component.text(event.value(), NamedTextColor.GREEN, TextDecoration.BOLD));
+
+                scene.sendActionBar(message);
+            });
+
             return plan.build();
         }
     }
