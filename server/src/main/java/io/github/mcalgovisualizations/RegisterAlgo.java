@@ -1,12 +1,13 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeUtils;
-import io.github.mcalgovisualizations.algorithms.*;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.*;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.VillagerDFS;
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.algorithms.GraphSearch.NodeContext;
 import io.github.mcalgovisualizations.algorithms.context.SortingContext;
+import io.github.mcalgovisualizations.algorithms.deprecated.PlayerTSTSearch;
+import io.github.mcalgovisualizations.algorithms.deprecated.PlayerUnorderedTree;
 import io.github.mcalgovisualizations.algorithms.mazes.GridLayout;
 import io.github.mcalgovisualizations.algorithms.mazes.PlayerAStar;
 import io.github.mcalgovisualizations.algorithms.mazes.PlayerBFS;
@@ -21,14 +22,12 @@ import io.github.mcalgovisualizations.algorithms.sort.selection.SelectionScene;
 import io.github.mcalgovisualizations.events.*;
 import io.github.mcalgovisualizations.handlers.*;
 import io.github.mcalgovisualizations.layouts.*;
-import io.github.mcalgovisualizations.scenes.FlowScene;
 import io.github.mcalgovisualizations.algorithms.mazes.Scenes.GridScene;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.instance.Algorithm;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
-import io.github.mcalgovisualizations.ui.VillagerPovAlgorithmUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.Material;
@@ -54,7 +53,7 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
-                        .withIdentity("graph search", VillagerBFS::new)
+                        .withIdentity("1 graph search", VillagerBFS::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
@@ -70,7 +69,7 @@ public class RegisterAlgo {
         
         algo.registerAlgorithm(
                 Algorithm.builder(graphCollection)
-                        .withIdentity("graph dfs", VillagerDFS::new)
+                        .withIdentity("2 graph dfs", VillagerDFS::new)
                         .positioning(new LayoutPath(NodeUtils.GRID_COLS))
                         .onEvent(Compare.class, new GraphCompareHandler())
                         .onEvent(PathFound.class, new PathFoundHandler()) // Registered PathFound event
@@ -88,13 +87,21 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(circleCollection1)
-                        .withIdentity("Selection sort", PlayerSelectionSort::new)
+                        .withIdentity("3 Selection sort", PlayerSelectionSort::new)
                         .positioning(new ArcLayout())
                         .withScene(SelectionScene::new)
                         .onEvent(Compare.class, new PlayerSelectionSort.CompareHandler())
                         .onEvent(Swap.class, new PlayerSelectionSort.SwapHandler())
                         .onEvent(PlayerSelectionSort.TrackI.class, new PlayerSelectionSort.TrackIHandler())
                         .onEvent(PlayerSelectionSort.TrackMinIndex.class, new PlayerSelectionSort.TrackMinIndexHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Selection Sort (Circular)",
+                                Material.DIAMOND_SWORD, // Different sword so it stands out
+                                "Time: O(n^2) | Space: O(1)",
+                                "Scans the unsorted region to find the",
+                                "smallest value, then swaps it into place.",
+                                "Visualized on a 360-degree arc."
+                        ))
                         .onCompletion(ctx -> {
                             final var size = ctx.getData().size();
                             final var plan = AnimationPlan.<SelectionScene>builder();
@@ -112,7 +119,7 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(circleCollection1)
-                        .withIdentity("Circle Layout insertion sort (ints)", PlayerInsertion::new)
+                        .withIdentity("4 Circle Layout insertion sort (ints)", PlayerInsertion::new)
                         .positioning(new ArcLayout())
                         .withScene(InsertionScene::new)
                         .onEvent(Compare.class, new PlayerInsertion.CompareHandler())
@@ -121,9 +128,12 @@ public class RegisterAlgo {
                         .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
                         .onEvent(PlayerInsertion.Inserted.class, new PlayerInsertion.InsertedHandler())
                         .withPresentation(new AlgorithmPresentation(
-                                "Insertion sort circular sorting",
-                                Material.GOLDEN_APPLE,
-                                "Time: O(n^2) | Space: O(1)"
+                                "Insertion Sort (Circular)",
+                                Material.GOLDEN_SWORD,
+                                "Time: O(n^2) | Space: O(1)",
+                                "Builds the final sorted array one",
+                                "item at a time by shifting elements.",
+                                "Visualized on a 360-degree arc."
                         ))
                         .onCompletion(ctx -> {
                             final int size = ctx.values.size();
@@ -151,10 +161,11 @@ public class RegisterAlgo {
         var finalgrid = buildPathGrid(gridX, gridY);
         algo.registerAlgorithm(
                 Algorithm.builder(finalgrid)
-                        .withIdentity("a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
+                        .withIdentity("5 a* pathfinding (4-way)", () -> new PlayerAStar(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "A* Pathfinding",
                                 Material.COMPASS,
@@ -168,10 +179,11 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(finalgrid)
-                        .withIdentity("bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
+                        .withIdentity("6 bfs pathfinding (4-way)", () -> new PlayerBFS(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "BFS Pathfinding",
                                 Material.COMPASS,
@@ -186,10 +198,11 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(finalgrid)
-                        .withIdentity("dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
+                        .withIdentity("7 dfs pathfinding (4-way)", () -> new PlayerDFS(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "DFS Pathfinding",
                                 Material.COMPASS,
@@ -203,10 +216,11 @@ public class RegisterAlgo {
 
         algo.registerAlgorithm(
                 Algorithm.builder(finalgrid)
-                        .withIdentity("greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
+                        .withIdentity("8 greedy best-first (4-way)", () -> new PlayerGreedyBestFirst(gridX))
                         .positioning(new GridLayout(gridX))
                         .onEvent(CellStateTransition.class, new CellStateTransitionHandler())
                         .onEvent(Message.class, new MessageHandler())
+                        .onEvent(VillagerMove.class, new VillagerMoveHandler())
                         .withPresentation(new AlgorithmPresentation(
                                 "Greedy Best-First",
                                 Material.COMPASS,
@@ -216,6 +230,9 @@ public class RegisterAlgo {
                         .create()
         );
     }
+
+    /*--------------------------------------------------------------------------------------------------------------------------------------*/
+    /* Deprecated algorithms below - kept for reference but not currently registered in the UI. Can be re-enabled by uncommenting the calls in registerAlgo() and the method itself. */
 
 //    private static void registerFlowAlgo(AlgoCraft algo) {
 //        var flowMatrix = new GridContext<Integer>(new ArrayList<>(Arrays.asList(

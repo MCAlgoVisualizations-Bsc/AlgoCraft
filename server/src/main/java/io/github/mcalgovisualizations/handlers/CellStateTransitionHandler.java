@@ -1,12 +1,10 @@
 package io.github.mcalgovisualizations.handlers;
 
-import io.github.mcalgovisualizations.CaveTunnelScene;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.algorithms.mazes.Scenes.GridScene;
 import io.github.mcalgovisualizations.algorithms.mazes.Scenes.HeuristicGridScene;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
-import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 
 import java.util.concurrent.CompletableFuture;
 

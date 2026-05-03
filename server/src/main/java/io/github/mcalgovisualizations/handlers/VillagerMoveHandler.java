@@ -1,6 +1,7 @@
 package io.github.mcalgovisualizations.handlers;
 
-import io.github.mcalgovisualizations.GridScene;
+import io.github.mcalgovisualizations.algorithms.mazes.Scenes.GridScene;
+import io.github.mcalgovisualizations.algorithms.mazes.Scenes.ILocatorBarScene;
 import io.github.mcalgovisualizations.events.VillagerMove;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
@@ -10,13 +11,17 @@ public final class VillagerMoveHandler implements IAnimationHandler<VillagerMove
     @Override
     public <O extends ISceneOps> AnimationPlan<O> handle(VillagerMove event) {
         return AnimationPlan.<O>builder()
-                .step(4, sceneOps -> {
+                .step(1, sceneOps -> {
+                    // 1. Move the villager (GridScene now only takes 1 argument)
                     if (sceneOps instanceof GridScene gridScene) {
-                        gridScene.moveVillager(event.slot(), event.algorithmSpeed());
-                        gridScene.updateLocatorBar(event.slot());
+                        gridScene.moveVillager(event.slot());
+                    }
+
+                    // 2. Update the locator bar ONLY if the scene supports it
+                    if (sceneOps instanceof ILocatorBarScene locatorScene) {
+                        locatorScene.updateLocatorBar(event.slot());
                     }
                 })
                 .build();
     }
 }
-

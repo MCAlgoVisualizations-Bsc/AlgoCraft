@@ -23,7 +23,6 @@ public class HeuristicGridScene extends GridScene implements ILocatorBarScene {
     @Override
     public void setLayout(LayoutResult[] layoutResults) {
         super.setLayout(layoutResults);
-
         // Only initialize the bar if the superclass successfully built a block grid
         if (isAStarGrid(layoutResults)) {
             initializeLocatorBar();
@@ -132,6 +131,6 @@ public class HeuristicGridScene extends GridScene implements ILocatorBarScene {
 
     private Component locatorTitle(int currentDistance) {
         int initial = Math.max(initialDistance, 0);
-        return Component.text("Target Distance: " + currentDistance + " / " + initial);
+        return Component.text("Manhatten Distance ignoring walls: " + currentDistance + " / " + initial);
     }
 }

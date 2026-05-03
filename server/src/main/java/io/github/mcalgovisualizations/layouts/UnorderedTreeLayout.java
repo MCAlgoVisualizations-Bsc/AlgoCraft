@@ -6,7 +6,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
 import java.util.List;
-
+@Deprecated
 public record UnorderedTreeLayout<T extends Comparable<T>>(
         double rootYOffset,
         double levelDrop,

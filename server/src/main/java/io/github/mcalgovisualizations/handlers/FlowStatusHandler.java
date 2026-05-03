@@ -6,7 +6,7 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-
+@Deprecated
 public final class FlowStatusHandler implements IAnimationHandler<FlowStatus> {
 
     @Override

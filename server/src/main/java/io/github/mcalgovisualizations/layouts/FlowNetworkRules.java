@@ -1,5 +1,5 @@
 package io.github.mcalgovisualizations.layouts;
-
+@Deprecated
 public final class FlowNetworkRules {
     public static final int NODE_COUNT = 6;
     public static final int MATRIX_SIZE = NODE_COUNT * NODE_COUNT;

@@ -25,7 +25,7 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
 
     @Override
     public void run(GridContext<Integer> ctx) {
-        var values = ctx.values;
+        var values = ctx.getData(); // Using getData() to match your standard context
         int size = values.size();
         if (size == 0) {
             ctx.emit(new Message("DFS: empty grid", Message.MessageType.ERROR));
@@ -34,9 +34,7 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
 
         int[] cells = new int[size];
         for (int i = 0; i < size; i++) {
-            var number = values.get(i);
-
-            cells[i] = number;
+            cells[i] = values.get(i);
         }
 
         int rows = (int) Math.ceil(size / (double) columns);
@@ -54,11 +52,13 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         }
 
         boolean[] visited = new boolean[size];
+        boolean[] inStack = new boolean[size]; // THE FIX: Track what is already in the frontier
         int[] parent = new int[size];
         Arrays.fill(parent, -1);
 
         Stack<Integer> frontier = new Stack<>();
         frontier.push(start);
+        inStack[start] = true; // Mark start as in stack
 
         boolean found = false;
         while (!frontier.isEmpty()) {
@@ -81,16 +81,18 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
             int col = current % columns;
 
             int[] neighbors = new int[] {
-                    index(row - 1, col, rows, columns, size),
-                    index(row + 1, col, rows, columns, size),
-                    index(row, col - 1, rows, columns, size),
-                    index(row, col + 1, rows, columns, size)
+                    index(row - 1, col, rows, columns, size), // UP
+                    index(row + 1, col, rows, columns, size), // DOWN
+                    index(row, col - 1, rows, columns, size), // LEFT
+                    index(row, col + 1, rows, columns, size)  // RIGHT
             };
 
             for (int neighbor : neighbors) {
-                if (neighbor < 0 || cells[neighbor] == WALL || visited[neighbor]) continue;
+                // THE FIX: Check inStack[neighbor] to prevent duplicate pushes and parent overwriting
+                if (neighbor < 0 || cells[neighbor] == WALL || visited[neighbor] || inStack[neighbor]) continue;
 
                 parent[neighbor] = current;
+                inStack[neighbor] = true; // Lock it in so its parent is permanent
                 frontier.push(neighbor);
 
                 if (neighbor != start && neighbor != goal) {
@@ -123,4 +125,3 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         return idx < size ? idx : -1;
     }
 }
-

@@ -1,9 +1,7 @@
-package io.github.mcalgovisualizations;
+package io.github.mcalgovisualizations.scenes;
 
-import io.github.mcalgovisualizations.Displays.BlockDisplay;
-import io.github.mcalgovisualizations.Displays.MobDisplay;
+import io.github.mcalgovisualizations.algorithms.mazes.Scenes.ILocatorBarScene;
 import io.github.mcalgovisualizations.events.CellState;
-import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
@@ -22,25 +20,35 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+@Deprecated
+public final class CaveTunnelScene extends AbstractScene implements ILocatorBarScene {
+    private static final int CELL_SIZE = 4;
 
-/**
- * 2D hedge-maze scene for pathfinding visualizations.
- */
-public class GridScene extends AbstractScene implements ILocatorBarScene {
+    private final int columns;
+    private final int layers;
+    private final int depth;
+
     private final Map<Integer, CellState> slotStates = new HashMap<>();
     private final Map<String, Block> overwrittenBlocks = new HashMap<>();
     private final Set<Player> locatorViewers = new HashSet<>();
+
     private EntityCreature villagerEntity = null;
+    private Pos villagerPos = null;
     private LayoutResult[] layoutResults = null;
     private BossBar locatorBar = null;
     private int startSlot = -1;
     private int goalSlot = -1;
-    private int inferredColumns = 1;
     private int initialDistance = -1;
     private int previousDistance = -1;
 
-    public GridScene(SceneContext context) {
+    public CaveTunnelScene(SceneContext context, int columns, int layers, int depth) {
         super(context);
+        if (columns <= 0 || layers <= 0 || depth <= 0) {
+            throw new IllegalArgumentException("Cave dimensions must be > 0");
+        }
+        this.columns = columns;
+        this.layers = layers;
+        this.depth = depth;
     }
 
     @Override
@@ -50,34 +58,23 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         slotStates.clear();
         startSlot = -1;
         goalSlot = -1;
-        inferredColumns = inferColumns(layoutResults);
 
-        boolean useBlockGridDisplay = isAStarGrid(layoutResults);
+        if (layoutResults.length != columns * layers * depth) {
+            throw new IllegalArgumentException("Cave layout size mismatch");
+        }
 
-        for (int i = 0; i < layoutResults.length; i++) {
-            var pos = layoutResults[i].pos();
-            var value = layoutResults[i].value();
-
-            if (useBlockGridDisplay) {
-                CellState initialState = initialCellState(value);
-                slotStates.put(i, initialState);
-                if (initialState == CellState.START) {
-                    startSlot = i;
-                } else if (initialState == CellState.GOAL) {
-                    goalSlot = i;
-                }
-
-                renderCell(i, pos, initialState);
-            } else {
-                IDisplayValue dv = new MobDisplay(pos, value.toString());
-                displaysBySlot.put(i, dv);
-                dv.setInstance(instance);
+        for (int slot = 0; slot < layoutResults.length; slot++) {
+            CellState initialState = initialCellState(layoutResults[slot].value());
+            slotStates.put(slot, initialState);
+            if (initialState == CellState.START) {
+                startSlot = slot;
+            } else if (initialState == CellState.GOAL) {
+                goalSlot = slot;
             }
+            renderCell(slot, layoutResults[slot].pos(), initialState);
         }
 
-        if (useBlockGridDisplay) {
-            spawnVillagerAtStart();
-        }
+        spawnVillagerAtStart();
     }
 
     public void moveVillager(int slot) {
@@ -89,18 +86,24 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
             return;
         }
 
-        Pos target = toEntityWalkPos(layoutResults[slot].pos());
+        Pos target = toWalkPos(layoutResults[slot].pos());
         if (villagerEntity == null) {
-            spawnVillagerAtPos(target);
+            spawnVillager(target);
             return;
         }
 
-        navigateVillager(target, Math.max(0.25f, algorithmSpeed / 2.0f));
+        if (villagerPos != null && Math.abs(target.y() - villagerPos.y()) > 1.0) {
+            villagerEntity.teleport(target);
+        } else {
+            navigateVillager(target, Math.max(0.25f, algorithmSpeed / 2.0f));
+        }
+
+        villagerPos = target;
     }
 
     public void toggleCellState(int slot, CellState first, CellState second) {
-        var current = slotStates.getOrDefault(slot, CellState.DEFAULT);
-        var next = current == first ? second : first;
+        CellState current = slotStates.getOrDefault(slot, CellState.DEFAULT);
+        CellState next = current == first ? second : first;
         slotStates.put(slot, next);
         applyCellState(slot, next);
     }
@@ -115,7 +118,6 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         initialDistance = manhattanDistance(startSlot, goalSlot);
         previousDistance = initialDistance;
         locatorBar = BossBar.bossBar(locatorTitle(initialDistance), progressForDistance(initialDistance), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
-
         for (Player viewer : locatorViewers) {
             viewer.showBossBar(locatorBar);
         }
@@ -128,10 +130,8 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         }
 
         int currentDistance = manhattanDistance(activeSlot, goalSlot);
-        BossBar.Color color = currentDistance < previousDistance
-                ? BossBar.Color.GREEN
-                : currentDistance > previousDistance
-                ? BossBar.Color.RED
+        BossBar.Color color = currentDistance < previousDistance ? BossBar.Color.GREEN
+                : currentDistance > previousDistance ? BossBar.Color.RED
                 : BossBar.Color.YELLOW;
 
         locatorBar.color(color);
@@ -142,19 +142,17 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
 
     @Override
     public void setLocatorBarVisible(Player player, boolean visible) {
-        if (player == null || locatorBar == null) {
-            if (player != null && locatorBar != null) {
-                player.hideBossBar(locatorBar);
-            }
-            return;
-        }
-
+        if (player == null) return;
         if (visible) {
             locatorViewers.add(player);
-            player.showBossBar(locatorBar);
+            if (locatorBar != null) {
+                player.showBossBar(locatorBar);
+            }
         } else {
             locatorViewers.remove(player);
-            player.hideBossBar(locatorBar);
+            if (locatorBar != null) {
+                player.hideBossBar(locatorBar);
+            }
         }
     }
 
@@ -169,7 +167,7 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         locatorBar = null;
     }
 
-    @Override
+
     public Entity cameraTarget() {
         return villagerEntity;
     }
@@ -177,15 +175,14 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
     @Override
     public void cleanUp() {
         clearLocatorBar();
-
         if (villagerEntity != null) {
             villagerEntity.remove();
             villagerEntity = null;
+            villagerPos = null;
         }
 
-        for (var entry : overwrittenBlocks.entrySet()) {
-            var pos = keyToPos(entry.getKey());
-            instance.setBlock(pos, Block.AIR);
+        for (String key : overwrittenBlocks.keySet()) {
+            instance.setBlock(keyToPos(key), Block.AIR);
         }
         overwrittenBlocks.clear();
 
@@ -193,7 +190,6 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         layoutResults = null;
         startSlot = -1;
         goalSlot = -1;
-        inferredColumns = 1;
         initialDistance = -1;
         previousDistance = -1;
         super.cleanUp();
@@ -206,18 +202,54 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
     }
 
     private void applyCellState(int slot, CellState state) {
-        if (layoutResults == null || slot < 0 || slot >= layoutResults.length) {
-            return;
-        }
-
+        if (layoutResults == null || slot < 0 || slot >= layoutResults.length) return;
         Pos base = layoutResults[slot].pos();
+
         switch (state) {
-            case WALL -> placeWallColumn(base);
-            default -> {
-                clearWallColumn(base);
-                placeBlock(base, blockForState(state));
+            case WALL -> renderWallCell(base);
+            default -> renderTunnelCell(base, floorForState(state));
+        }
+    }
+
+    private void renderTunnelCell(Pos base, Block floorBlock) {
+        placeBlock(base, floorBlock);
+        placeGlassShell(base);
+    }
+
+    private void renderWallCell(Pos base) {
+        placeBlock(base, Block.BLACKSTONE);
+        placeBlock(base.add(0, 1, 0), Block.BLACKSTONE);
+        placeGlassShell(base);
+    }
+
+    private void placeGlassShell(Pos base) {
+        for (int dx = 0; dx < CELL_SIZE; dx++) {
+            for (int dz = 0; dz < CELL_SIZE; dz++) {
+                for (int dy = 0; dy < CELL_SIZE; dy++) {
+                    if (dy == 0) {
+                        continue;
+                    }
+                    boolean boundary = dx == 0 || dx == CELL_SIZE - 1 || dz == 0 || dz == CELL_SIZE - 1 || dy == CELL_SIZE - 1;
+                    if (boundary) {
+                        placeBlock(base.add(dx, dy, dz), Block.GLASS);
+                    }
+                }
             }
         }
+    }
+
+    private void clearCellVolume(Pos base) {
+        for (int dx = 0; dx < CELL_SIZE; dx++) {
+            for (int dy = 0; dy < CELL_SIZE; dy++) {
+                for (int dz = 0; dz < CELL_SIZE; dz++) {
+                    placeBlock(base.add(dx, dy, dz), Block.AIR);
+                }
+            }
+        }
+    }
+
+    private void placeSupportLayer(Pos base) {
+        placeBlock(base.add(0, -1, 0), Block.GRASS_BLOCK);
     }
 
     private static CellState initialCellState(Object value) {
@@ -233,75 +265,24 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         };
     }
 
-    private static Block blockForState(CellState state) {
+    private static Block floorForState(CellState state) {
         return switch (state) {
-            case DEFAULT -> Block.GRASS_BLOCK;
+            case DEFAULT -> Block.LIGHT_GRAY_STAINED_GLASS;
             case START -> Block.LIME_CONCRETE;
             case GOAL -> Block.RED_CONCRETE;
             case OPEN -> Block.LIGHT_BLUE_CONCRETE;
             case CLOSED -> Block.CYAN_TERRACOTTA;
             case PATH -> Block.GLOWSTONE;
-            case WALL -> Block.OAK_LEAVES;
+            case WALL -> Block.BLACKSTONE;
         };
     }
 
-    private boolean isAStarGrid(LayoutResult[] layoutResults) {
-        if (layoutResults == null || layoutResults.length == 0) return false;
-        for (var layoutResult : layoutResults) {
-            Object raw = layoutResult.value();
-            if (!(raw instanceof Integer number)) return false;
-            if (number < 0 || number > 3) return false;
-        }
-        return true;
-    }
-
-    private int inferColumns(LayoutResult[] layoutResults) {
-        if (layoutResults == null || layoutResults.length <= 1) {
-            return 1;
-        }
-
-        double firstY = layoutResults[0].pos().y();
-        int columns = 1;
-        for (int i = 1; i < layoutResults.length; i++) {
-            if (Math.abs(layoutResults[i].pos().y() - firstY) < 0.001) {
-                columns++;
-            } else {
-                break;
-            }
-        }
-        return Math.max(1, columns);
-    }
-
-    private int manhattanDistance(int a, int b) {
-        if (layoutResults == null || a < 0 || b < 0 || a >= layoutResults.length || b >= layoutResults.length) {
-            return 0;
-        }
-
-        Pos pa = layoutResults[a].pos();
-        Pos pb = layoutResults[b].pos();
-        return Math.abs(pa.blockX() - pb.blockX()) + Math.abs(pa.blockY() - pb.blockY()) + Math.abs(pa.blockZ() - pb.blockZ());
-    }
-
-    private float progressForDistance(int distance) {
-        if (initialDistance <= 0) {
-            return 1.0f;
-        }
-        return Math.clamp(1.0f - (distance / (float) initialDistance), 0.0f, 1.0f);
-    }
-
-    private Component locatorTitle(int distance) {
-        return Component.text("Distance to goal: " + distance + " (maze)");
-    }
-
-    private Pos toEntityWalkPos(Pos cellPos) {
-        return new Pos(cellPos.x() + 0.5, cellPos.y() + 1.0, cellPos.z() + 0.5);
+    private Pos toWalkPos(Pos base) {
+        return new Pos(base.x() + 1.5, base.y() + 1.0, base.z() + 1.5);
     }
 
     private void spawnVillagerAtStart() {
-        if (layoutResults == null || layoutResults.length == 0) {
-            return;
-        }
-
+        if (layoutResults == null) return;
         for (int i = 0; i < layoutResults.length; i++) {
             if (Objects.equals(layoutResults[i].value(), 2)) {
                 moveVillager(i, 2);
@@ -310,31 +291,27 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         }
     }
 
-    private void spawnVillagerAtPos(Pos pos) {
+    private void spawnVillager(Pos pos) {
         if (villagerEntity != null) {
             villagerEntity.remove();
         }
-
         villagerEntity = new EntityCreature(EntityType.VILLAGER);
         villagerEntity.setInstance(instance, pos);
+        villagerPos = pos;
     }
 
     private void navigateVillager(Pos pos, float speed) {
         if (villagerEntity == null) {
-            spawnVillagerAtPos(pos);
+            spawnVillager(pos);
             return;
         }
 
         var navigator = villagerEntity.getNavigator();
         boolean invoked = false;
         for (Method method : navigator.getClass().getMethods()) {
-            if (!method.getName().equals("setPathTo") || method.getParameterCount() != 2) {
-                continue;
-            }
+            if (!method.getName().equals("setPathTo") || method.getParameterCount() != 2) continue;
             Class<?>[] params = method.getParameterTypes();
-            if (!params[0].isAssignableFrom(Pos.class)) {
-                continue;
-            }
+            if (!params[0].isAssignableFrom(Pos.class)) continue;
             if (!(params[1] == float.class || params[1] == Float.class || params[1] == double.class || params[1] == Double.class || params[1] == int.class || params[1] == Integer.class)) {
                 continue;
             }
@@ -352,38 +329,28 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         }
     }
 
-    private void clearCellVolume(Pos base) {
-        for (int dx = 0; dx < 1; dx++) {
-            for (int dy = 0; dy < 3; dy++) {
-                for (int dz = 0; dz < 1; dz++) {
-                    placeBlock(base.add(dx, dy, dz), Block.AIR);
-                }
-            }
+    private int manhattanDistance(int a, int b) {
+        if (layoutResults == null || a < 0 || b < 0 || a >= layoutResults.length || b >= layoutResults.length) {
+            return 0;
         }
+
+        Pos pa = layoutResults[a].pos();
+        Pos pb = layoutResults[b].pos();
+        return Math.abs(pa.blockX() - pb.blockX()) + Math.abs(pa.blockY() - pb.blockY()) + Math.abs(pa.blockZ() - pb.blockZ());
     }
 
-    private void placeSupportLayer(Pos base) {
-        placeBlock(base.add(0, -1, 0), Block.GRASS_BLOCK);
+    private float progressForDistance(int distance) {
+        if (initialDistance <= 0) return 1.0f;
+        return Math.clamp(1.0f - (distance / (float) initialDistance), 0.0f, 1.0f);
     }
 
-    private void placeWallColumn(Pos base) {
-        placeBlock(base, Block.OAK_LEAVES);
-        placeBlock(base.add(0, 1, 0), Block.DARK_OAK_LEAVES);
-        placeBlock(base.add(0, 2, 0), Block.DARK_OAK_LEAVES);
-    }
-
-    private void clearWallColumn(Pos base) {
-        placeBlock(base.add(0, 1, 0), Block.AIR);
-        placeBlock(base.add(0, 2, 0), Block.AIR);
+    private Component locatorTitle(int distance) {
+        return Component.text("Distance to goal: " + distance + " (cave)");
     }
 
     private void placeBlock(Pos pos, Block block) {
-        if (pos == null || block == null) {
-            return;
-        }
-
-        String key = key(pos);
-        overwrittenBlocks.putIfAbsent(key, block);
+        if (pos == null || block == null) return;
+        overwrittenBlocks.putIfAbsent(key(pos), block);
         instance.setBlock(pos, block);
     }
 
@@ -396,3 +363,7 @@ public class GridScene extends AbstractScene implements ILocatorBarScene {
         return new Pos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
     }
 }
+
+
+
+

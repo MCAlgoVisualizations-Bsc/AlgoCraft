@@ -71,7 +71,6 @@ public class GridScene extends AbstractScene {
     // Sinks the floor blocks by 1 into the ground
     protected void applyCellState(int slot, CellState state) {
         if (layoutResults == null || slot < 0 || slot >= layoutResults.length) return;
-        if (state == CellState.DEFAULT) return;
 
         // Subtract 1 from Y to replace existing grass with path blocks
         Pos sunkenPos = layoutResults[slot].pos().add(0, -1, 0);
@@ -79,9 +78,9 @@ public class GridScene extends AbstractScene {
         placeWorldBlock(sunkenPos, newFloor);
     }
 
-    // Places foundation underneath the sunken floor
+    //The floor of the maze
     protected void placeSupportLayer(Pos basePos) {
-        placeWorldBlock(basePos.add(0, -2, 0), Block.GRASS_BLOCK);
+        placeWorldBlock(basePos.add(0, -1, 0), Block.MOSS_BLOCK);
     }
 
     // Starts wall columns at floor level (Y-1)
@@ -150,7 +149,7 @@ public class GridScene extends AbstractScene {
 
     protected static Block blockForState(CellState state) {
         return switch (state) {
-            case DEFAULT -> Block.GRASS_BLOCK;
+            case DEFAULT -> Block.MOSS_BLOCK;
             case WALL -> Block.DARK_OAK_LEAVES;
             case START -> Block.LIME_CONCRETE;
             case GOAL -> Block.RED_CONCRETE;

@@ -94,22 +94,7 @@ public final class VillagerPovManager {
     }
 
     public Optional<ISceneOps> resolveScene(Player player) {
-        AlgorithmInstance<?, ?, ?> instance = algo.requireInstance(player);
-        if (instance == null || instance.getController() == null) return Optional.empty();
-
-        try {
-            // Using reflection to get the scene from the library's controller/renderer
-            Field rendererField = instance.getController().getClass().getDeclaredField("renderer");
-            rendererField.setAccessible(true);
-            Object renderer = rendererField.get(instance.getController());
-            if (renderer == null) return Optional.empty();
-
-            Field sceneField = renderer.getClass().getDeclaredField("scene");
-            sceneField.setAccessible(true);
-            return Optional.ofNullable((ISceneOps) sceneField.get(renderer));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        return algo.sceneFor(player);
     }
 
     public interface VillagerPovSceneAdapter<S extends ISceneOps> {

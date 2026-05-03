@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-
+@Deprecated
 public final class GroupedAlgorithmUI implements IAlgorithmUI {
     private static final int MAX_SELECTOR_ITEMS = 54;
 

@@ -2,7 +2,7 @@ package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.Villager.VillagerPovManager;
 import io.github.mcalgovisualizations.commands.*;
-import io.github.mcalgovisualizations.pov.PovManager;
+import io.github.mcalgovisualizations.ui.GroupedAlgorithmUI;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.events.Message;
 import net.kyori.adventure.text.Component;
@@ -35,10 +35,10 @@ public final class Main {
         algo = new AlgoCraft(instance);
         registerAlgo(algo);
 
+        registerAlgo(algo);
         VillagerPovManager povHandler = new VillagerPovManager(algo);
 
         algo.addListener(MinecraftServer.getGlobalEventHandler());
-        PovManager.setup(algo, instance);
 
         registerListeners(instance);
 

@@ -24,7 +24,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     private Pos initialPos;
     private final EntityCreature entity;
     private final Entity textEntity;
-    private boolean gravity;
 
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
         this(pos, entityType, displayText, false);
@@ -33,7 +32,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText, boolean setNoGravity) {
         this.initialPos = pos;
         this.entity = new EntityCreature(entityType);
-        this.gravity = setNoGravity;
         this.entity.setNoGravity(setNoGravity);
         
         // Increase movement speed for better visualization
@@ -48,9 +46,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
         });
     }
 
-    public void setNoGravity(boolean setNoGravity) {
-        entity.setNoGravity(setNoGravity);
-    }
 
     @Override
     public Pos getPos() {

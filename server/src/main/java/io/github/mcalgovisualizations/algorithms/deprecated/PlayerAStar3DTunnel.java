@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.deprecated;
 
 import io.github.mcalgovisualizations.events.CaveVillagerMove;
 import io.github.mcalgovisualizations.events.CellState;
@@ -10,7 +10,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-
+@Deprecated
 public final class PlayerAStar3DTunnel implements IPlayerSort<GridContext<Integer>> {
     private static final int WALL = 1;
     private static final int START = 2;

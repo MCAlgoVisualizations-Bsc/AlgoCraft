@@ -49,7 +49,7 @@ public class LayoutPath implements ILayout<Node> {
             for (int c = -margin; c < cols * SPACING + margin; c++) {
                 instance.setBlock(origin.add(c, 0, r), Block.GRASS_BLOCK);
                 // Also clear above to remove potential houses
-                for (int y = 1; y < 6; y++) {
+                for (int y = 1; y < 10; y++) {
                     instance.setBlock(origin.add(c, y, r), Block.AIR);
                 }
             }
