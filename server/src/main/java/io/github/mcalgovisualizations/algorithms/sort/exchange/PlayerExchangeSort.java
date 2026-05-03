@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
+import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -45,12 +46,16 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
         public AnimationPlan<ExchangeScene> handle(TrackI event) {
             final var plan = AnimationPlan.<ExchangeScene>builder();
 
-            plan.step(1, scene -> {
+            plan.step(0, scene -> {
                 scene.clearGlowing();
                 scene.resetLookAt();
+            });
 
-                scene.stageCurrentMin(event.slot());
+            plan.stepAsync(1, scene ->
+                    scene.stageCurrentMin(event.slot())
+            );
 
+            plan.step(1, scene -> {
                 scene.highlightIndex(event.slot());
                 scene.highlightCurrentMin();
             });
@@ -76,10 +81,14 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
             final var plan = AnimationPlan.<ExchangeScene>builder();
 
             plan.step(1, scene -> {
+                /*
+                 * event.x() = j
+                 * event.y() = i
+                 */
                 scene.clearGlowing();
                 scene.setHighlighted(event.x(), true);
 
-                scene.compareChallenger(event.x());
+                scene.compareSlot(event.x());
 
                 scene.highlightIndex(event.y());
                 scene.highlightSlot(event.x());
@@ -107,9 +116,11 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
         public AnimationPlan<ExchangeScene> handle(Swap event) {
             final var plan = AnimationPlan.<ExchangeScene>builder();
 
-            plan.step(1, scene -> {
-                scene.swapCurrentMinWithChallenger(event.x(), event.y());
+            plan.stepAsync(1, scene ->
+                    scene.swapCurrentMinWithSlot(event.x(), event.y())
+            );
 
+            plan.step(1, scene -> {
                 scene.clearGlowing();
 
                 scene.highlightIndex(event.x());
@@ -134,10 +145,11 @@ public class PlayerExchangeSort implements IPlayerSort<SortingContext<Integer>> 
         public AnimationPlan<ExchangeScene> handle(MarkSorted event) {
             final var plan = AnimationPlan.<ExchangeScene>builder();
 
-            plan.step(1, scene -> {
-                scene.clearGlowing();
-                scene.markSorted(event.slot());
-            });
+            plan.step(0, AbstractScene::clearGlowing);
+
+            plan.stepAsync(1, scene ->
+                    scene.markSorted(event.slot())
+            );
 
             plan.step(4, scene -> {
                 scene.playSound("minecraft:block.note_block.bell", 0.7f, 1.4f);

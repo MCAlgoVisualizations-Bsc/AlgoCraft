@@ -6,28 +6,24 @@ import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ExchangeScene extends AbstractScene {
     private final Map<Integer, Pos> homePositions = new HashMap<>();
 
-    private final Pos centerPos;
-
+    /**
+     * The logical slot currently standing at origin.
+     */
     private Integer stagedSlot;
 
     public ExchangeScene(@NotNull SceneContext context) {
         super(context);
-        this.centerPos = context.origin().add(0, 2.5, 0);
-        this.instance.setBlock(context.origin(), Block.AMETHYST_BLOCK);
-        this.instance.setBlock(context.origin().add(-1, 0, 0), Block.AMETHYST_BLOCK);
-        this.instance.setBlock(context.origin().add(0, 0, -1), Block.AMETHYST_BLOCK);
-        this.instance.setBlock(context.origin().add(-1, 0, -1), Block.AMETHYST_BLOCK);
     }
 
     @Override
@@ -41,102 +37,104 @@ public class ExchangeScene extends AbstractScene {
 
             homePositions.put(slot, layout.pos());
 
-            requireEntityCreature(slot).lookAt(origin.add(0, 1.2, 0));
+            requireEntityCreature(slot).lookAt(origin);
         }
     }
 
     /**
-     * Current-min slot enters the center stage.
+     * Move the current min for slot i to the stage.
+     * The stage is origin.
      */
-    public void stageCurrentMin(int slot) {
-        flushStage();
+    public CompletableFuture<Void> stageCurrentMin(int slot) {
+        return flushStage().thenCompose(_ -> {
+            stagedSlot = slot;
 
-        stagedSlot = slot;
+            final var display = requireEntityCreature(slot);
+            display.lookAt(origin);
 
-        final var display = requireEntityCreature(slot);
-        moveDisplay(display, centerPos);
-        display.lookAt(origin);
+            return display.walkTo(origin);
+        });
     }
 
     /**
-     * Compare the staged current-min against challenger j.
-     * The challenger stays in its array/home position.
+     * Compare staged current min with slot j.
+     * Slot j stays at its home position.
      */
-    public void compareChallenger(int challengerSlot) {
+    public void compareSlot(int slot) {
         if (stagedSlot == null) {
             return;
         }
 
         final var stagedDisplay = requireEntityCreature(stagedSlot);
-        final var challengerDisplay = requireEntityCreature(challengerSlot);
+        final var comparedDisplay = requireEntityCreature(slot);
 
-        stagedDisplay.lookAt(challengerDisplay);
-        challengerDisplay.lookAt(stagedDisplay);
+        stagedDisplay.lookAt(comparedDisplay);
+        comparedDisplay.lookAt(stagedDisplay);
     }
 
     /**
-     * Called when challenger j is smaller than the staged current min.
+     * Swap staged current min with slot j.
      *
      * Before:
-     * - slot i display is on center stage
-     * - slot j display is still at home slot j
+     * - logical slot i is at origin
+     * - logical slot j is at home j
      *
      * After:
-     * - old staged i moves to slot j
-     * - challenger j moves to center stage
-     * - internal mapping swaps
-     * - center stage still represents logical slot i
+     * - old i walks to home j
+     * - old j walks to origin
+     * - slot mapping is swapped
+     * - origin still represents logical slot i
      */
-    public void swapCurrentMinWithChallenger(int i, int j) {
+    public CompletableFuture<Void> swapCurrentMinWithSlot(int i, int j) {
         if (stagedSlot == null) {
             throw new IllegalStateException("Cannot swap: no current min is staged");
         }
 
         if (!stagedSlot.equals(i)) {
             throw new IllegalStateException(
-                    "Cannot swap: expected staged current min slot " + i + ", but found " + stagedSlot
+                    "Cannot swap: expected staged slot " + i + ", but found " + stagedSlot
             );
         }
 
         final var iDisplay = requireEntityCreature(i);
         final var jDisplay = requireEntityCreature(j);
 
-        moveDisplay(iDisplay, requireHomePosition(j));
-        moveDisplay(jDisplay, centerPos);
-
         displaysBySlot.put(i, jDisplay);
         displaysBySlot.put(j, iDisplay);
+
+        stagedSlot = i;
 
         jDisplay.lookAt(iDisplay);
         iDisplay.lookAt(jDisplay);
 
-        /*
-         * Important:
-         * The display currently on stage is now the logical value of slot i.
-         */
-        stagedSlot = i;
+        final var oldMinWalk = iDisplay.walkTo(requireHomePosition(j));
+        final var newMinWalk = jDisplay.walkTo(origin);
+
+        return CompletableFuture.allOf(oldMinWalk, newMinWalk);
     }
 
     /**
-     * Return the staged current-min to its logical home slot.
+     * Return staged entity to its logical home position.
      */
-    public void flushStage() {
+    public CompletableFuture<Void> flushStage() {
         if (stagedSlot == null) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
-        final var display = requireEntityCreature(stagedSlot);
+        final var slot = stagedSlot;
+        stagedSlot = null;
 
-        moveDisplay(display, requireHomePosition(stagedSlot));
+        final var display = requireEntityCreature(slot);
         display.lookAt(origin);
 
-        stagedSlot = null;
+        return display.walkTo(requireHomePosition(slot));
     }
 
-    public void markSorted(int slot) {
-        flushStage();
-        spawnParticleAuraBySlot(slot, Particle.TOTEM_OF_UNDYING);
-        requireEntityCreature(slot).lookAt(origin);
+    public CompletableFuture<Void> markSorted(int slot) {
+        return flushStage().thenRun(() -> {
+            spawnParticleAuraBySlot(slot, Particle.TOTEM_OF_UNDYING);
+            requireEntityCreature(slot).lookAt(origin);
+        });
     }
 
     public void highlightCurrentMin() {
@@ -151,14 +149,17 @@ public class ExchangeScene extends AbstractScene {
         spawnParticleAuraBySlot(slot, Particle.ELECTRIC_SPARK);
     }
 
+    public void highlightIndex(int slot) {
+        spawnParticleAuraAt(
+                requireHomePosition(slot).add(0, 1.2, 0),
+                Particle.END_ROD
+        );
+    }
+
     public void resetLookAt() {
         displaysBySlot.values().forEach(display ->
                 ((EntityCreatureDisplay) display).lookAt(origin)
         );
-    }
-
-    public Pos centerPos() {
-        return centerPos;
     }
 
     public void spawnParticleAuraBySlot(int slot, Particle particle) {
@@ -220,16 +221,5 @@ public class ExchangeScene extends AbstractScene {
 
     private EntityCreatureDisplay requireEntityCreature(int slot) {
         return (EntityCreatureDisplay) super.requireDisplay(slot);
-    }
-
-    public void highlightIndex(int slot) {
-        spawnParticleAuraAt(
-                requireHomePosition(slot).add(0, 1.2, 0),
-                Particle.END_ROD
-        );
-    }
-
-    private void moveDisplay(EntityCreatureDisplay display, Pos pos) {
-        display.teleport(pos);
     }
 }

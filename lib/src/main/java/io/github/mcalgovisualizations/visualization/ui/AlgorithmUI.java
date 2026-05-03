@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
@@ -105,7 +106,7 @@ public class AlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyDefaultLayout(Player player) {
+    public void applyDefaultLayout(Player player, Instance spawnInstance) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
 
@@ -120,11 +121,12 @@ public class AlgorithmUI implements IAlgorithmUI {
                 .build()
         );
 
-        inv.setItemStack(8, ItemStack.builder(Material.COMPASS)
-                .customName(Component.text("Return to Hub", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false))
-                .lore(Component.text("Right-click to return to the hub", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-                .set(ALGO_INTERACTION_TAG, InteractionType.SPAWN)
-                .build()
-        );
+        if(spawnInstance != player.getInstance())
+            inv.setItemStack(8, ItemStack.builder(Material.COMPASS)
+                    .customName(Component.text("Return to Hub", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false))
+                    .lore(Component.text("Right-click to return to the hub", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
+                    .set(ALGO_INTERACTION_TAG, InteractionType.SPAWN)
+                    .build()
+            );
     }
 }
