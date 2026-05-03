@@ -95,7 +95,7 @@ public final class Renderer<I, O extends ISceneOps> {
 
         final var futures = Arrays.stream(layoutResults)
                 .filter(Objects::nonNull)
-                .map(key -> instance.loadChunk(key.pos().chunkX(), key.pos().chunkX()))
+                .map(key -> instance.loadChunk(key.pos().chunkX(), key.pos().chunkZ()))
                 .toArray(CompletableFuture<?>[]::new);
 
         return CompletableFuture.allOf(futures)

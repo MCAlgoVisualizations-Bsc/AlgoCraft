@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.visualization.ui.Tags;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -63,8 +64,8 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyDefaultLayout(Player player) {
-        delegate.applyDefaultLayout(player);
+    public void applyDefaultLayout(Player player, Instance spawnInstance) {
+        delegate.applyDefaultLayout(player, spawnInstance);
     }
 
     private static InventoryType inventoryTypeForRows(int rows) {

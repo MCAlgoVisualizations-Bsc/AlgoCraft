@@ -15,6 +15,8 @@ import io.github.mcalgovisualizations.algorithms.mazes.PlayerDFS;
 import io.github.mcalgovisualizations.algorithms.mazes.PlayerGreedyBestFirst;
 import io.github.mcalgovisualizations.algorithms.mazes.Scenes.HeuristicGridScene;
 import io.github.mcalgovisualizations.algorithms.sort.ArcLayout;
+import io.github.mcalgovisualizations.algorithms.sort.exchange.ExchangeScene;
+import io.github.mcalgovisualizations.algorithms.sort.exchange.PlayerExchangeSort;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.InsertionScene;
 import io.github.mcalgovisualizations.algorithms.sort.insertion.PlayerInsertion;
 import io.github.mcalgovisualizations.algorithms.sort.selection.PlayerSelectionSort;
@@ -95,7 +97,7 @@ public class RegisterAlgo {
                         .onEvent(PlayerSelectionSort.TrackI.class, new PlayerSelectionSort.TrackIHandler())
                         .onEvent(PlayerSelectionSort.TrackMinIndex.class, new PlayerSelectionSort.TrackMinIndexHandler())
                         .withPresentation(new AlgorithmPresentation(
-                                "Selection Sort (Circular)",
+                                "Selection Sort",
                                 Material.DIAMOND_SWORD, // Different sword so it stands out
                                 "Time: O(n^2) | Space: O(1)",
                                 "Scans the unsorted region to find the",
@@ -128,7 +130,7 @@ public class RegisterAlgo {
                         .onEvent(PlayerInsertion.TrackJ.class, new PlayerInsertion.TrackJHandler())
                         .onEvent(PlayerInsertion.Inserted.class, new PlayerInsertion.InsertedHandler())
                         .withPresentation(new AlgorithmPresentation(
-                                "Insertion Sort (Circular)",
+                                "Insertion Sort",
                                 Material.GOLDEN_SWORD,
                                 "Time: O(n^2) | Space: O(1)",
                                 "Builds the final sorted array one",
@@ -155,6 +157,28 @@ public class RegisterAlgo {
                         })
                         .create()
         );
+
+        algo.registerAlgorithm(
+                Algorithm.builder(circleCollection1)
+                        .withIdentity("Exchange sort", PlayerExchangeSort::new)
+                        .positioning(new ArcLayout())
+                        .withScene(ExchangeScene::new)
+                        .onEvent(Compare.class, new PlayerExchangeSort.CompareHandler())
+                        .onEvent(Swap.class, new PlayerExchangeSort.SwapHandler())
+                        .onEvent(PlayerExchangeSort.TrackI.class, new PlayerExchangeSort.TrackIHandler())
+                        .onEvent(PlayerExchangeSort.MarkSorted.class, new PlayerExchangeSort.MarkSortedHandler())
+                        .withPresentation(new AlgorithmPresentation(
+                                "Exchange sort",
+                                Material.COPPER_SWORD,
+                                "O(n²) comparisons, up to O(n²) swaps",
+                                "Moves the current minimum to the center stage.",
+                                "Each next value is compared against the staged minimum.",
+                                "If a smaller value is found, it swaps into the stage immediately.",
+                                "Unlike selection sort, it does not wait until the end to swap."
+                        ))
+                        .create()
+        );
+
         //Mazes
         final int gridX = 20;
         final int gridY = 20;

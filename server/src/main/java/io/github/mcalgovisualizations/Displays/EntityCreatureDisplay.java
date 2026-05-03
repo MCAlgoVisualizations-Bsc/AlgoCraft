@@ -86,15 +86,34 @@ public class EntityCreatureDisplay implements IDisplayValue {
      * @return a future that completes when the target is reached
      */
     public CompletableFuture<Void> walkTo(Pos pos) {
-        if (entity.isActive()) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            // Use speed 1.0 (relative to entity's speed attribute)
-            entity.getNavigator().setPathTo(pos, 1.0, () -> future.complete(null));
-            return future;
-        } else {
+        if (!entity.isActive()) {
             this.initialPos = pos;
             return CompletableFuture.completedFuture(null);
         }
+
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        entity.getNavigator().setPathTo(pos, 1.0, () -> {
+            if (!future.isDone()) {
+                future.complete(null);
+            }
+        });
+
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            if (future.isDone()) {
+                return;
+            }
+
+            /*
+             * Fallback:
+             * pathfinding failed, got stuck, or callback never fired.
+             * Teleport so the animation pipeline can continue.
+             */
+            entity.teleport(pos);
+            future.complete(null);
+        }).delay(60, TimeUnit.SERVER_TICK).schedule();
+
+        return future;
     }
 
     private Pos getTextOffset(Pos pos) {

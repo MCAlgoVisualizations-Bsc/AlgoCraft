@@ -37,6 +37,10 @@ public class AlgoCraft {
         this.defaultInstance = defaultInstance;
     }
 
+    public Instance getDefaultInstance() {
+        return defaultInstance;
+    }
+
     public AlgorithmInstance<?,?,?> createInstance(String id, Player... players){
         if (algorithmRegistry.get(id) == null)
             throw new IllegalArgumentException("No entry with id " + id);
@@ -53,7 +57,7 @@ public class AlgoCraft {
         for(var player : players) {
             var instance = requireInstance(player);
             instance.removePlayer(defaultInstance, player)
-                    .thenRun(() -> ui.applyDefaultLayout(player));
+                    .thenRun(() -> ui.applyDefaultLayout(player, getDefaultInstance()));
         }
     }
 
@@ -74,7 +78,7 @@ public class AlgoCraft {
     }
 
     public void applyDefaultLayout(Player player) {
-        ui.applyDefaultLayout(player);
+        ui.applyDefaultLayout(player, getDefaultInstance());
     }
 
     public void addListener(GlobalEventHandler handler) {
@@ -125,7 +129,7 @@ public class AlgoCraft {
                         .thenRun(() -> playerInventory.remove(player.getUuid()))
                         .thenRun(() -> playerInstance.remove(player.getUuid()))
                         .thenRun(() -> instance.removePlayer(defaultInstance, player));
-                ui.applyDefaultLayout(player);
+                ui.applyDefaultLayout(player, getDefaultInstance());
             }
         }
     }
@@ -159,7 +163,7 @@ public class AlgoCraft {
                 .thenCompose(_ -> session.addPlayer(player))
                 .exceptionally(throwable -> {
                     throwable.printStackTrace();
-                    ui.applyDefaultLayout(player);
+                    ui.applyDefaultLayout(player, getDefaultInstance());
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
                 })

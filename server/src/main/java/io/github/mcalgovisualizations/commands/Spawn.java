@@ -13,7 +13,7 @@ public class Spawn extends Command {
         addSyntax((sender, context) -> {
             if (!(sender instanceof Player p)) return;
             algo.removePlayerFromInstance(p);
-            ui.applyDefaultLayout(p);
+            ui.applyDefaultLayout(p, algo.getDefaultInstance());
         });
     }
 }
