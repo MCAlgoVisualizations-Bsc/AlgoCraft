@@ -52,7 +52,7 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         }
 
         boolean[] visited = new boolean[size];
-        boolean[] inStack = new boolean[size];
+        boolean[] inStack = new boolean[size]; // THE FIX: Track what is already in the frontier
         int[] parent = new int[size];
         Arrays.fill(parent, -1);
 
