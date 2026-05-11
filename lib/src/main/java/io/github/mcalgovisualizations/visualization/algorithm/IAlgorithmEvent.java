@@ -12,7 +12,7 @@ package io.github.mcalgovisualizations.visualization.algorithm;
  * <p>No behavior is defined here; this interface exists to provide a common type
  * for heterogeneous algorithm events.</p>
  *
- * @implNote Implementations should:
+ * Implementations should:
  * <ul>
  *     <li>Be immutable (no internal state changes after creation)</li>
  *     <li>Contain all data required for rendering or interpretation</li>

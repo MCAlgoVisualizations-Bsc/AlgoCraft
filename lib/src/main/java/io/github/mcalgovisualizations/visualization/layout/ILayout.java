@@ -25,7 +25,7 @@ public interface ILayout<I> {
      * @param instance the target instance where the layout will be applied / useful for checking in-game bounds
      * @return an array of {@link LayoutResult}, each representing a positioned display element
      *
-     * @implNote Implementations should:
+     * Implementations should:
      * <ul>
      *     <li>Return a non-null array (empty if nothing to render)</li>
      *     <li>Avoid side effects (do not spawn entities directly)</li>
