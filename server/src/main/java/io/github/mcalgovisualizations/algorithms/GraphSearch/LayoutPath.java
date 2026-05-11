@@ -6,7 +6,6 @@ import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -371,12 +370,13 @@ public class LayoutPath implements ILayout<Node> {
         }
     }
 
-    private boolean placeBushLeaf(Instance instance, int x, int y, int z, int step, int salt, Set<String> dec, Set<String> block) {
-        if (block.contains(key(x, z)) || dec.contains(key(x, z)) || !canPlaceDecoration(instance, x, y, z, block)) return false;
+    private void placeBushLeaf(Instance instance, int x, int y, int z, int step, int salt, Set<String> dec, Set<String> block) {
+        if (block.contains(key(x, z)) || dec.contains(key(x, z)) || !canPlaceDecoration(instance, x, y, z, block)) return;
         dec.add(key(x, z));
         Block leaf = Math.floorMod(stableHash(x, z, step, 97 + salt), 4) == 0 ? Block.FLOWERING_AZALEA_LEAVES : Block.AZALEA_LEAVES;
         instance.setBlock(new Pos(x, y + 1, z), leaf);
-        return true;
+        leaf = Math.floorMod(stableHash(x, z, step, 97 + salt + 1), 4) == 0 ? Block.FLOWERING_AZALEA_LEAVES : Block.AZALEA_LEAVES;
+        instance.setBlock(new Pos(x, y + 2, z), leaf);
     }
 
     private boolean canPlaceDecoration(Instance instance, int x, int y, int z, Set<String> blocked) {
