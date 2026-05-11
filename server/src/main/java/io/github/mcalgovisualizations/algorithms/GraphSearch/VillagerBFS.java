@@ -17,11 +17,13 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
         if (root == null) return;
 
         Queue<Node> queue = new LinkedList<>();
+        Set<Integer> visitedNodes = new HashSet<>();
+        Set<EdgeKey> visitedEdges = new HashSet<>();
         Map<Integer, Node> parents = new HashMap<>();
 
         // Initialize BFS
         queue.add(root);
-        root.visited = true;
+        visitedNodes.add(root.getID());
         parents.put(root.getID(), null);
         villagerPosition = root;
 
@@ -38,86 +40,85 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
             // 1. Pull the next node from the frontier
             Node cursor = queue.poll();
 
+            // In true BFS, "visit/check target" happens when dequeued.
+            if (cursor.getStatus() == Node.NodeTarget.End) {
+                emitFinalPath(cursor, parents, context);
+                return;
+            }
 
-            // Move villager to the node being currently processed.
-            // moveTo handles emitting path steps if needed.
-            moveTo(cursor, parents, context);
+            // 2. Explore Neighbors
+            List<Node> orderedNeighbors = new ArrayList<>(cursor.getNeighbors());
+            orderedNeighbors.sort(
+                    Comparator
+                            .comparing((Node n) -> !visitedNodes.contains(n.getID()))
+                            .thenComparingInt(Node::getValue)
+                            .thenComparingInt(Node::getID));
 
-            if (cursor.getNeighbors().size() <= 1) {
-                boolean hasUnvisited = false;
-                for (Node n : cursor.getNeighbors()) {
-                    if (!n.visited) {
-                        hasUnvisited = true;
-                        break;
-                    }
-                }
-                if (!hasUnvisited) {
-                    context.emit(new Message("No unvisited neighbors", Message.MessageType.INFO));
+            boolean hasUninspectedIncidentEdge = false;
+            for (Node neighbor : orderedNeighbors) {
+                if (!visitedEdges.contains(EdgeKey.of(cursor, neighbor))) {
+                    hasUninspectedIncidentEdge = true;
+                    break;
                 }
             }
-            // 2. Explore Neighbors
-            for (Node neighbor : cursor.getNeighbors()) {
-                if (neighbor.visited) continue;
-                neighbor.visited = true;
-                parents.put(neighbor.getID(), cursor);
-                queue.add(neighbor);
+            if (hasUninspectedIncidentEdge) {
+                moveToCursor(cursor, parents, context);
+            }
 
-                // 3. Physical Exploration: Move to neighbor
-                moveTo(neighbor, parents, context);
-
-                // Check for Victory Condition immediately upon discovery
-                if (neighbor.getStatus() == Node.NodeTarget.End) {
-                    emitFinalPath(neighbor, parents, context);
-                    return;
+            boolean hasUnvisitedNodeNeighbor = false;
+            for (int i = 0; i < orderedNeighbors.size(); i++) {
+                Node neighbor = orderedNeighbors.get(i);
+                boolean isNewNode = visitedNodes.add(neighbor.getID());
+                if (isNewNode) {
+                    hasUnvisitedNodeNeighbor = true;
+                    parents.put(neighbor.getID(), cursor);
+                    queue.add(neighbor);
                 }
 
-
-                // 4. Move back to cursor to continue exploration ONLY if there are more unvisited neighbors
-                boolean hasMoreUnvisitedNeighborsFromCursor = false;
-                for (Node otherNeighbor : cursor.getNeighbors()) {
-                    if (!otherNeighbor.visited) { // Check if it's unvisited
-                        // If it's not the current neighbor we just processed, then it's another unvisited neighbor
-                        if (!otherNeighbor.equals(neighbor)) {
-                            hasMoreUnvisitedNeighborsFromCursor = true;
-                            break;
-                        }
+                // Edge-level tracking: inspect each undirected edge exactly once.
+                EdgeKey edge = EdgeKey.of(cursor, neighbor);
+                if (visitedEdges.add(edge)) {
+                    hopTo(neighbor, context);
+                    if (hasPendingUninspectedEdges(cursor, orderedNeighbors, i + 1, visitedEdges)) {
+                        hopTo(cursor, context);
                     }
                 }
+            }
 
-                if (hasMoreUnvisitedNeighborsFromCursor) {
-                    moveTo(cursor, parents, context);
-                }
+            if (!hasUnvisitedNodeNeighbor) {
+                context.emit(new Message("No unvisited neighbors", Message.MessageType.INFO));
             }
         }
     }
 
     /**
      * Moves the villager from the current position to the target node
-     * by following the path in the BFS tree.
+     * as a single visualization hop.
      */
-    private void moveTo(Node target, Map<Integer, Node> parents, NodeContext context) {
+    private void hopTo(Node target, NodeContext context) {
+        if (villagerPosition == null || villagerPosition.equals(target)) return;
+        context.emit(new Compare(target.getID(), -1, target.getValue(), -1));
+        villagerPosition = target;
+    }
+
+    private void moveToCursor(Node target, Map<Integer, Node> parents, NodeContext context) {
         if (villagerPosition == null || villagerPosition.equals(target)) return;
 
-        // 1. Get path from root to villagerPosition
         List<Node> pathFromRootToCurrent = getPathFromRoot(villagerPosition, parents);
-        // 2. Get path from root to target
         List<Node> pathFromRootToTarget = getPathFromRoot(target, parents);
 
-        // 3. Find Lowest Common Ancestor (LCA)
         int lcaIndex = 0;
         int minSize = Math.min(pathFromRootToCurrent.size(), pathFromRootToTarget.size());
         while (lcaIndex < minSize && pathFromRootToCurrent.get(lcaIndex).equals(pathFromRootToTarget.get(lcaIndex))) {
             lcaIndex++;
         }
-        lcaIndex--; // Last common element
+        lcaIndex--;
 
-        // 4. Move up from current position to LCA
         for (int i = pathFromRootToCurrent.size() - 2; i >= lcaIndex; i--) {
             Node step = pathFromRootToCurrent.get(i);
             context.emit(new Compare(step.getID(), -1, step.getValue(), -1));
         }
 
-        // 5. Move down from LCA to target
         for (int i = lcaIndex + 1; i < pathFromRootToTarget.size(); i++) {
             Node step = pathFromRootToTarget.get(i);
             context.emit(new Compare(step.getID(), -1, step.getValue(), -1));
@@ -137,6 +138,16 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
         return path;
     }
 
+    private boolean hasPendingUninspectedEdges(Node cursor, List<Node> orderedNeighbors, int startIndex,
+                                               Set<EdgeKey> visitedEdges) {
+        for (int i = startIndex; i < orderedNeighbors.size(); i++) {
+            if (!visitedEdges.contains(EdgeKey.of(cursor, orderedNeighbors.get(i)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Reconstructs the path from Start to End using the parent map
      * and emits the PathFound event to draw the final solution.
@@ -152,5 +163,13 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
 
         Collections.reverse(finalPath);
         context.emit(new PathFound(finalPath));
+    }
+
+    private record EdgeKey(int a, int b) {
+        static EdgeKey of(Node first, Node second) {
+            int firstId = first.getID();
+            int secondId = second.getID();
+            return firstId <= secondId ? new EdgeKey(firstId, secondId) : new EdgeKey(secondId, firstId);
+        }
     }
 }

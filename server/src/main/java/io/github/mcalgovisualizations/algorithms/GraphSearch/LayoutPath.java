@@ -8,8 +8,7 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class LayoutPath implements ILayout<Node> {
 
@@ -27,17 +26,21 @@ public class LayoutPath implements ILayout<Node> {
     public LayoutResult[] compute(Node model, Pos origin, Instance instance) {
         if (model == null) return new LayoutResult[0];
 
-        int maxId = findMaxId(model, new HashSet<>());
+        List<Node> nodes = collectNodes(model);
+        if (nodes.isEmpty()) return new LayoutResult[0];
+
+        int maxId = nodes.stream().mapToInt(Node::getID).max().orElse(-1);
         LayoutResult[] results = new LayoutResult[maxId + 1];
 
         double floorY = Math.floor(origin.y()) - 1;
         Pos floorOrigin = new Pos(origin.x(), floorY, origin.z());
+        LayoutGrid layoutGrid = buildPositions(nodes, floorOrigin);
+        Map<Integer, Pos> positions = layoutGrid.positions();
 
         // Clear previous paths/blocks in the expected grid area
-        int maxRow = (maxId / gridCols) + 1;
-        clearArea(floorOrigin, instance, gridCols, maxRow);
+        clearArea(floorOrigin, instance, layoutGrid.width(), layoutGrid.height());
 
-        renderGraph(model, floorOrigin, instance, results, new HashSet<>());
+        renderGraph(model, instance, results, positions, new HashSet<>());
 
         return results;
     }
@@ -56,26 +59,193 @@ public class LayoutPath implements ILayout<Node> {
         }
     }
 
-    private int findMaxId(Node node, Set<Integer> visited) {
-        if (node == null || visited.contains(node.getID())) return -1;
-        visited.add(node.getID());
-        int max = node.getID();
-        for (Node neighbor : node.getNeighbors()) {
-            max = Math.max(max, findMaxId(neighbor, visited));
+    private List<Node> collectNodes(Node root) {
+        List<Node> nodes = new ArrayList<>();
+        if (root == null) return nodes;
+
+        Set<Integer> visited = new HashSet<>();
+        Deque<Node> stack = new ArrayDeque<>();
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            if (!visited.add(node.getID())) continue;
+            nodes.add(node);
+            for (Node neighbor : node.getNeighbors()) {
+                if (!visited.contains(neighbor.getID())) {
+                    stack.push(neighbor);
+                }
+            }
         }
-        return max;
+        return nodes;
     }
 
-    private void renderGraph(Node node, Pos origin, Instance instance,
-                             LayoutResult[] results, Set<Integer> visited) {
+    private LayoutGrid buildPositions(List<Node> nodes, Pos origin) {
+        List<Node> orderedNodes = new ArrayList<>(nodes);
+        orderedNodes.sort(Comparator.comparingInt(Node::getValue).thenComparingInt(Node::getID));
+
+        Map<Integer, int[]> gridPositions = new HashMap<>();
+        Set<String> occupied = new HashSet<>();
+
+        List<Node> squareCycle = findFourCycle(orderedNodes);
+        if (!squareCycle.isEmpty()) {
+            place(gridPositions, occupied, squareCycle.get(0), 0, 0);
+            place(gridPositions, occupied, squareCycle.get(1), 1, 0);
+            place(gridPositions, occupied, squareCycle.get(2), 1, 1);
+            place(gridPositions, occupied, squareCycle.get(3), 0, 1);
+        }
+
+        List<Node> pending = new ArrayList<>();
+        for (Node node : orderedNodes) {
+            if (!gridPositions.containsKey(node.getID())) {
+                pending.add(node);
+            }
+        }
+
+        if (gridPositions.isEmpty() && !pending.isEmpty()) {
+            Node first = pending.removeFirst();
+            place(gridPositions, occupied, first, 0, 0);
+        }
+
+        boolean progressed = true;
+        while (!pending.isEmpty() && progressed) {
+            progressed = false;
+            Iterator<Node> iterator = pending.iterator();
+            while (iterator.hasNext()) {
+                Node node = iterator.next();
+                int[] near = findNearPlacedSlot(node, gridPositions, occupied);
+                if (near != null) {
+                    place(gridPositions, occupied, node, near[0], near[1]);
+                    iterator.remove();
+                    progressed = true;
+                }
+            }
+        }
+
+        int i = 0;
+        for (Node node : pending) {
+            while (occupied.contains(key(i % gridCols, i / gridCols))) {
+                i++;
+            }
+            int xIdx = i % gridCols;
+            int zIdx = i / gridCols;
+            place(gridPositions, occupied, node, xIdx, zIdx);
+            i++;
+        }
+
+        normalizeGridCoordinates(gridPositions);
+        int[] bounds = calculateBounds(gridPositions);
+
+        Map<Integer, Pos> positions = new HashMap<>();
+        for (Node node : orderedNodes) {
+            int[] gridPos = gridPositions.get(node.getID());
+            if (gridPos == null) continue;
+            int xIdx = gridPos[0];
+            int zIdx = gridPos[1];
+            positions.put(node.getID(), origin.add(xIdx * SPACING, 0, zIdx * SPACING));
+        }
+        return new LayoutGrid(positions, bounds[0], bounds[1]);
+    }
+
+    private int[] findNearPlacedSlot(Node node, Map<Integer, int[]> gridPositions, Set<String> occupied) {
+        List<int[]> anchors = new ArrayList<>();
+        for (Node neighbor : node.getNeighbors()) {
+            int[] pos = gridPositions.get(neighbor.getID());
+            if (pos != null) anchors.add(pos);
+        }
+        if (anchors.isEmpty()) return null;
+
+        for (int radius = 1; radius <= 8; radius++) {
+            for (int[] anchor : anchors) {
+                int ax = anchor[0];
+                int az = anchor[1];
+                int[][] candidates = new int[][]{
+                        {ax + radius, az},
+                        {ax, az + radius},
+                        {ax - radius, az},
+                        {ax, az - radius},
+                        {ax + radius, az + radius},
+                        {ax + radius, az - radius},
+                        {ax - radius, az + radius},
+                        {ax - radius, az - radius}
+                };
+                for (int[] candidate : candidates) {
+                    if (!occupied.contains(key(candidate[0], candidate[1]))) {
+                        return candidate;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void normalizeGridCoordinates(Map<Integer, int[]> gridPositions) {
+        int minX = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        for (int[] pos : gridPositions.values()) {
+            minX = Math.min(minX, pos[0]);
+            minZ = Math.min(minZ, pos[1]);
+        }
+        if (minX == Integer.MAX_VALUE) return;
+        if (minX == 0 && minZ == 0) return;
+        for (int[] pos : gridPositions.values()) {
+            pos[0] -= minX;
+            pos[1] -= minZ;
+        }
+    }
+
+    private int[] calculateBounds(Map<Integer, int[]> gridPositions) {
+        int maxX = 0;
+        int maxZ = 0;
+        for (int[] pos : gridPositions.values()) {
+            maxX = Math.max(maxX, pos[0]);
+            maxZ = Math.max(maxZ, pos[1]);
+        }
+        return new int[]{maxX + 1, maxZ + 1};
+    }
+
+    private List<Node> findFourCycle(List<Node> nodes) {
+        for (Node a : nodes) {
+            List<Node> aNeighbors = new ArrayList<>(a.getNeighbors());
+            aNeighbors.sort(Comparator.comparingInt(Node::getValue).thenComparingInt(Node::getID));
+            for (Node b : aNeighbors) {
+                if (b.equals(a)) continue;
+                List<Node> bNeighbors = new ArrayList<>(b.getNeighbors());
+                bNeighbors.sort(Comparator.comparingInt(Node::getValue).thenComparingInt(Node::getID));
+                for (Node c : bNeighbors) {
+                    if (c.equals(a) || c.equals(b)) continue;
+                    List<Node> cNeighbors = new ArrayList<>(c.getNeighbors());
+                    cNeighbors.sort(Comparator.comparingInt(Node::getValue).thenComparingInt(Node::getID));
+                    for (Node d : cNeighbors) {
+                        if (d.equals(a) || d.equals(b) || d.equals(c)) continue;
+                        if (d.getNeighbors().contains(a)) {
+                            return List.of(a, b, c, d);
+                        }
+                    }
+                }
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private void place(Map<Integer, int[]> gridPositions, Set<String> occupied, Node node, int xIdx, int zIdx) {
+        gridPositions.put(node.getID(), new int[]{xIdx, zIdx});
+        occupied.add(key(xIdx, zIdx));
+    }
+
+    private String key(int xIdx, int zIdx) {
+        return xIdx + ":" + zIdx;
+    }
+
+    private record LayoutGrid(Map<Integer, Pos> positions, int width, int height) {}
+
+    private void renderGraph(Node node, Instance instance, LayoutResult[] results,
+                             Map<Integer, Pos> positions, Set<Integer> visited) {
 
         if (node == null || visited.contains(node.getID())) return;
         visited.add(node.getID());
 
-        int xIdx = node.getID() % gridCols;
-        int zIdx = node.getID() / gridCols;
-
-        Pos currentPos = origin.add(xIdx * SPACING, 0, zIdx * SPACING);
+        Pos currentPos = positions.get(node.getID());
+        if (currentPos == null) return;
 
         // --- NEW LOGIC: Block Selection based on Status ---
         Block nodeBlock;
@@ -101,23 +271,13 @@ public class LayoutPath implements ILayout<Node> {
         );
 
         for (Node neighbor : node.getNeighbors()) {
-            // ... (rest of your connection logic remains the same) ...
+            Pos neighborPos = positions.get(neighbor.getID());
+            if (neighborPos != null) {
+                drawConnection(currentPos, neighborPos, instance, pathBlock);
+            }
+
             if (!visited.contains(neighbor.getID())) {
-                int nextX = neighbor.getID() % gridCols;
-                int nextZ = neighbor.getID() / gridCols;
-
-                Pos neighborPos = origin.add(nextX * SPACING, 0, zIdx * SPACING); // Fixed potential bug from original code where nextZ was used but xIdx was being added to gridCols
-                // Wait, original code was: Pos neighborPos = origin.add(nextX * SPACING, 0, nextZ * SPACING);
-                // Restoring original connection logic to avoid regression
-                Pos originalNeighborPos = origin.add(nextX * SPACING, 0, nextZ * SPACING);
-                drawConnection(currentPos, originalNeighborPos, instance, pathBlock);
-
-                renderGraph(neighbor, origin, instance, results, visited);
-            } else {
-                LayoutResult neighborResult = results[neighbor.getID()];
-                if (neighborResult != null) {
-                    drawConnection(currentPos, neighborResult.pos(), instance, pathBlock);
-                }
+                renderGraph(neighbor, instance, results, positions, visited);
             }
         }
     }

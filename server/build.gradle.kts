@@ -61,6 +61,12 @@ tasks.build {
 
 tasks.test {
     useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams = true
+        // Optional: show which tests are running/passing/failing
+        events("passed", "skipped", "failed")
+    }
     finalizedBy(tasks.jacocoTestReport)
 }
 
