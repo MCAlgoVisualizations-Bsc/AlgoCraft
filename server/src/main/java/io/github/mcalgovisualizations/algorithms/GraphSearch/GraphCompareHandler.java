@@ -33,7 +33,7 @@ public final class GraphCompareHandler implements IAnimationHandler<Compare> {
                     sceneOps.sendMessage(Component.text(msg, NamedTextColor.YELLOW));
 
                     // Also update the Action Bar for the current target
-                    sceneOps.sendActionBar(Component.text("Target Node: " + event.yValue(), NamedTextColor.GOLD));
+                    // sceneOps.sendActionBar(Component.text("Target Node: " + event.yValue(), NamedTextColor.GOLD));
 
                     if (searcher == null) {
                         sceneOps.addDisplay(SEARCHER_SLOT, new EntityCreatureDisplay(
