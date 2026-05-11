@@ -65,7 +65,6 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
                 moveToCursor(cursor, parents, context);
             }
 
-            boolean hasUnvisitedNodeNeighbor = false;
             for (int i = 0; i < orderedNeighbors.size(); i++) {
                 Node neighbor = orderedNeighbors.get(i);
 
@@ -78,7 +77,6 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
 
                 boolean isNewNode = visitedNodes.add(neighbor.getID());
                 if (isNewNode) {
-                    hasUnvisitedNodeNeighbor = true;
                     parents.put(neighbor.getID(), cursor);
                     queue.add(neighbor);
                 }
@@ -91,10 +89,6 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
                         hopTo(cursor, context);
                     }
                 }
-            }
-
-            if (!hasUnvisitedNodeNeighbor) {
-                context.emit(new Message("No unvisited neighbors", Message.MessageType.INFO));
             }
         }
     }
