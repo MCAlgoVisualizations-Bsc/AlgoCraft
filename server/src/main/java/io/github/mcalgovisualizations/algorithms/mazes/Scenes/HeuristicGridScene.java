@@ -132,6 +132,6 @@ public class HeuristicGridScene extends GridScene implements VillagerPOV, ILocat
 
     private Component locatorTitle(int currentDistance) {
         int initial = Math.max(initialDistance, 0);
-        return Component.text("Manhatten Distance ignoring walls: " + currentDistance + " / " + initial);
+        return Component.text("Manhatten Distance to Goal: " + currentDistance + " / " + initial + " (heuristic, ignoring walls)");
     }
 }
