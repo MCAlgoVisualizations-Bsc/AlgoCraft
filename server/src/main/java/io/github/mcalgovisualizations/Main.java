@@ -1,6 +1,5 @@
 package io.github.mcalgovisualizations;
 
-import io.github.mcalgovisualizations.Villager.VillagerPovManager;
 import io.github.mcalgovisualizations.commands.*;
 import io.github.mcalgovisualizations.ui.GroupedAlgorithmUI;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
@@ -36,14 +35,13 @@ public final class Main {
         registerAlgo(algo);
 
         registerAlgo(algo);
-        VillagerPovManager povHandler = new VillagerPovManager(algo);
 
         algo.addListener(MinecraftServer.getGlobalEventHandler());
 
         registerListeners(instance);
 
-        // Passing povHandler here so the /pov command works
-        registerCommands(MinecraftServer.getCommandManager(), algo, povHandler);
+        // Passing command handlers for inventory management
+        registerCommands(MinecraftServer.getCommandManager(), algo);
         server.start("0.0.0.0", 25565);
     }
 
@@ -80,12 +78,11 @@ public final class Main {
         });
     }
 
-    static void registerCommands(CommandManager cm, AlgoCraft algo,  VillagerPovManager povHandler) {
+    static void registerCommands(CommandManager cm, AlgoCraft algo) {
         cm.register(new Greet(),
                 new Teleport(),
                 new Gamemode(),
                 new Spawn(algo),
-                new Pov(algo, povHandler),
                 new Invite(algo),
                 new Accept(algo),
                 new PendingInvites(algo)

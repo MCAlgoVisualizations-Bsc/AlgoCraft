@@ -9,6 +9,6 @@ import java.util.function.Function;
 
 public interface IAlgorithmUI {
     Inventory openSelector(Set<String> algorithms, Function<String, AlgorithmPresentation> presentationResolver);
-    void applyRunningLayout(Player player);
+    void applyRunningLayout(Player player, boolean supportsPOV);
     void applyDefaultLayout(Player player, Instance spawnInstance);
 }

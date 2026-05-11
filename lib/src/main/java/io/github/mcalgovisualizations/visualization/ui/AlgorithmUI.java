@@ -77,7 +77,7 @@ public class AlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyRunningLayout(Player player) {
+    public void applyRunningLayout(Player player, boolean supportsPOV) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
 
@@ -99,6 +99,12 @@ public class AlgorithmUI implements IAlgorithmUI {
         inv.setItemStack(5, ItemStack.builder(Material.CLOCK)
                 .customName(Component.text("Change Speed"))
                 .set(ALGO_INTERACTION_TAG, InteractionType.SET_SPEED).build());
+
+        if (supportsPOV) {
+            inv.setItemStack(7, ItemStack.builder(Material.SPYGLASS)
+                    .customName(Component.text("Villager POV"))
+                    .set(Tags.VILLAGER_POV_TAG, true).build());
+        }
 
         inv.setItemStack(8, ItemStack.builder(Material.BARRIER)
                 .customName(Component.text("Clear Algorithm"))

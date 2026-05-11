@@ -7,4 +7,5 @@ public class Tags {
     public static final Tag<InteractionType> ALGO_INTERACTION_TAG = Tag.String("algo_interaction")
             .map(InteractionType::valueOf, InteractionType::name);
     public static final Tag<Boolean> ALGO_SELECTOR_TAG = Tag.Boolean("algo_select");
+    public static final Tag<Boolean> VILLAGER_POV_TAG = Tag.Boolean("villager_pov");
 }

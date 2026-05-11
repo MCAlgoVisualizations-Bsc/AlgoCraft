@@ -4,6 +4,7 @@ import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
+import io.github.mcalgovisualizations.visualization.renderer.scene.VillagerPOV;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.Displays.MobDisplay;
 
@@ -15,7 +16,7 @@ import net.minestom.server.instance.block.Block;
 
 import java.util.*;
 
-public class GridScene extends AbstractScene {
+public class GridScene extends AbstractScene implements VillagerPOV {
     protected final Map<Integer, CellState> slotStates = new HashMap<>();
     protected final Map<BlockPos, Block> overwrittenBlocks = new HashMap<>();
     protected EntityCreature villagerEntity = null;

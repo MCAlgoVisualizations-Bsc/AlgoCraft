@@ -31,7 +31,8 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull Function<C, ? extends AnimationPlan<O>> onComplete,
         @Nullable AlgorithmPresentation presentation,
         @NotNull Function<SceneContext, O> scene,
-        @NotNull IAlgorithmUI runningLayout
+        @NotNull IAlgorithmUI runningLayout,
+        boolean supportsPOV
 ) {
     public Algorithm {
         Objects.requireNonNull(id, "id");
@@ -62,6 +63,7 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         private @Nullable AlgorithmPresentation presentation;
         private Function<SceneContext, O> scene;
         private IAlgorithmUI runningLayout = new AlgorithmUI();
+        private boolean supportsPOV = false;
 
         private Builder(@NotNull C model) {
             this.model = Objects.requireNonNull(model, "model");
@@ -122,6 +124,11 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        public @NotNull Builder<T, C, O> withPOVSupport(boolean supportsPOV) {
+            this.supportsPOV = supportsPOV;
+            return this;
+        }
+
         public @NotNull Algorithm<T, C, O> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing at least 1 event handler");
@@ -136,7 +143,8 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
                     onComplete == null ? defaultOnComplete() : onComplete,
                     presentation,
                     Objects.requireNonNull(scene, "scene"),
-                    Objects.requireNonNull(runningLayout, "runningLayout")
+                    Objects.requireNonNull(runningLayout, "runningLayout"),
+                    supportsPOV
             );
         }
 

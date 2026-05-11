@@ -2,6 +2,7 @@ package io.github.mcalgovisualizations.algorithms.mazes.Scenes;
 
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
+import io.github.mcalgovisualizations.visualization.renderer.scene.VillagerPOV;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Player;
@@ -9,7 +10,7 @@ import net.minestom.server.entity.Player;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HeuristicGridScene extends GridScene implements ILocatorBarScene {
+public class HeuristicGridScene extends GridScene implements VillagerPOV, ILocatorBarScene {
 
     private final Set<Player> locatorViewers = new HashSet<>();
     private BossBar locatorBar = null;
