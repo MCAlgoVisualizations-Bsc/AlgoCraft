@@ -30,7 +30,7 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
         this.presentation = algorithm.presentation();
-        this.partyService = new PartyService(players[0]);
+        this.partyService = new PartyService(players[0], algorithm.id());
 
         instance.setGenerator(unit -> {
             final Point start = unit.absoluteStart();

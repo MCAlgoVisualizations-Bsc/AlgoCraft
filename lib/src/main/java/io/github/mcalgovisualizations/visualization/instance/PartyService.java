@@ -15,9 +15,11 @@ import java.util.concurrent.CompletableFuture;
 public class PartyService {
     private final Player host;
     private final Set<Player> spectators = new HashSet<>();
+    private final String algorithmId;
 
-    public PartyService(Player host) {
+    public PartyService(Player host, String algorithmID) {
         this.host = host;
+        this.algorithmId = algorithmID;
     }
 
     /**
@@ -49,7 +51,7 @@ public class PartyService {
                         player.setAllowFlying(true);
 
                         audience().sendMessage(Component.text(
-                            player.getUsername() + " joined the session",
+                            player.getUsername() + " joined the session: " + algorithmId,
                             NamedTextColor.GREEN
                         ));
                     });
