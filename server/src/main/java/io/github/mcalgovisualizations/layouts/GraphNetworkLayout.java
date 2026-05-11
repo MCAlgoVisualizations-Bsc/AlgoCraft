@@ -12,7 +12,7 @@ import org.intellij.lang.annotations.Flow;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Deprecated
 public record GraphNetworkLayout<T> (double xSpacing, double yOffset) implements ILayout<List<T>> {
     private static final int NODE_COUNT = FlowNetworkRules.NODE_COUNT;
     private static final int MATRIX_SIZE = FlowNetworkRules.MATRIX_SIZE;

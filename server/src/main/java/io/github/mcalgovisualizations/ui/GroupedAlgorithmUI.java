@@ -7,6 +7,7 @@ import io.github.mcalgovisualizations.visualization.ui.Tags;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -17,24 +18,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-
+@Deprecated
 public final class GroupedAlgorithmUI implements IAlgorithmUI {
     private static final int MAX_SELECTOR_ITEMS = 54;
 
-    // Keep category groups adjacent in selector UI.
     private static final List<String> PREFERRED_ORDER = List.of(
-            "insertion sort (ints)",
-            "small insertion sort (ints)",
-            "insertion sort (string)",
-            "sorted insertion",
-            "bst search",
-            "unordered_tree_search",
-            "tst search",
-            "a* pathfinding (4-way)",
-            "bfs pathfinding (4-way)",
-            "dfs pathfinding (4-way)",
-            "greedy best-first (4-way)",
-            "max flow (edmonds-karp)"
+            "insertion sort (ints)", "small insertion sort (ints)", "insertion sort (string)",
+            "sorted insertion", "bst search", "unordered_tree_search", "tst search",
+            "a* pathfinding (4-way)", "bfs pathfinding (4-way)", "dfs pathfinding (4-way)",
+            "greedy best-first (4-way)", "max flow (edmonds-karp)"
     );
 
     private final AlgorithmUI delegate = new AlgorithmUI();
@@ -42,9 +34,7 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
     @Override
     public Inventory openSelector(Set<String> algorithms, Function<String, AlgorithmPresentation> presentationResolver) {
         if (algorithms.size() > MAX_SELECTOR_ITEMS) {
-            throw new IllegalArgumentException(
-                    "Too many algorithms for selector, max is " + MAX_SELECTOR_ITEMS + ", got " + algorithms.size()
-            );
+            throw new IllegalArgumentException("Too many algorithms for selector");
         }
 
         int rowCount = Math.max(1, (int) Math.ceil(algorithms.size() / 9.0));
@@ -55,9 +45,7 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
         for (int i = 0; i < orderedAlgorithms.size(); i++) {
             String algorithm = orderedAlgorithms.get(i);
             AlgorithmPresentation presentation = presentationResolver.apply(algorithm);
-            if (presentation == null) {
-                presentation = new AlgorithmPresentation(algorithm);
-            }
+            if (presentation == null) presentation = new AlgorithmPresentation(algorithm);
 
             ItemStack item = ItemStack.builder(presentation.icon())
                     .customName(presentation.getCustomName())
@@ -67,18 +55,17 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
 
             inventory.setItemStack(i, item);
         }
-
         return inventory;
     }
 
     @Override
-    public void applyRunningLayout(Player player) {
-        delegate.applyRunningLayout(player);
+    public void applyRunningLayout(Player player, boolean supportsPOV) {
+        delegate.applyRunningLayout(player, supportsPOV);
     }
 
     @Override
-    public void applyDefaultLayout(Player player) {
-        delegate.applyDefaultLayout(player);
+    public void applyDefaultLayout(Player player, Instance spawnInstance) {
+        delegate.applyDefaultLayout(player, spawnInstance);
     }
 
     private static InventoryType inventoryTypeForRows(int rows) {
@@ -95,20 +82,16 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
     private static List<String> orderedAlgorithms(Set<String> algorithms) {
         List<String> ordered = new ArrayList<>(algorithms.size());
         Set<String> seen = new HashSet<>();
-
         for (String id : PREFERRED_ORDER) {
             if (algorithms.contains(id)) {
                 ordered.add(id);
                 seen.add(id);
             }
         }
-
         algorithms.stream()
                 .filter(id -> !seen.contains(id))
                 .sorted(Comparator.naturalOrder())
                 .forEach(ordered::add);
-
         return ordered;
     }
 }
-

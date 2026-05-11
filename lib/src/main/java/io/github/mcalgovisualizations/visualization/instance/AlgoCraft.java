@@ -3,10 +3,14 @@ package io.github.mcalgovisualizations.visualization.instance;
 import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation;
 import io.github.mcalgovisualizations.visualization.ui.AlgorithmUI;
+import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
+import io.github.mcalgovisualizations.visualization.renderer.scene.VillagerPOV;
+import io.github.mcalgovisualizations.visualization.ui.Tags;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -28,12 +32,17 @@ public class AlgoCraft {
     // player uuid for fast lookup
     private final Map<UUID, AlgorithmInstance<?,?,?>> playerInstance = new HashMap<>();
     private final Map<UUID, PlayerInventory> playerInventory = new HashMap<>();
+    private final Set<UUID> enabledPOV = new HashSet<>();
     private final AlgorithmUI ui = new AlgorithmUI();
     private final Instance defaultInstance;
     public final static Pos SPAWN_POS = new Pos(194.5, 137, -38.5);
 
     public AlgoCraft(InstanceContainer defaultInstance) {
         this.defaultInstance = defaultInstance;
+    }
+
+    public Instance getDefaultInstance() {
+        return defaultInstance;
     }
 
     public AlgorithmInstance<?,?,?> createInstance(String id, Player... players){
@@ -52,8 +61,16 @@ public class AlgoCraft {
         for(var player : players) {
             var instance = requireInstance(player);
             instance.removePlayer(defaultInstance, player)
-                    .thenRun(() -> ui.applyDefaultLayout(player));
+                    .thenRun(() -> ui.applyDefaultLayout(player, getDefaultInstance()));
         }
+    }
+
+    public Optional<ISceneOps> sceneFor(Player player) {
+        var instance = playerInstance.get(player.getUuid());
+        if (instance == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable((ISceneOps) instance.getScene());
     }
 
     public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
@@ -65,7 +82,7 @@ public class AlgoCraft {
     }
 
     public void applyDefaultLayout(Player player) {
-        ui.applyDefaultLayout(player);
+        ui.applyDefaultLayout(player, getDefaultInstance());
     }
 
     public void addListener(GlobalEventHandler handler) {
@@ -82,6 +99,11 @@ public class AlgoCraft {
         final ItemStack itemStack = event.getItemStack();
         if (itemStack.hasTag(ALGO_SELECTOR_TAG)) {
             selectAlgorithm(player);
+            return;
+        }
+        
+        if (itemStack.hasTag(Tags.VILLAGER_POV_TAG)) {
+            toggleVillagerPOV(player, instance);
             return;
         }
 
@@ -116,8 +138,49 @@ public class AlgoCraft {
                         .thenRun(() -> playerInventory.remove(player.getUuid()))
                         .thenRun(() -> playerInstance.remove(player.getUuid()))
                         .thenRun(() -> instance.removePlayer(defaultInstance, player));
-                ui.applyDefaultLayout(player);
+                ui.applyDefaultLayout(player, getDefaultInstance());
             }
+        }
+    }
+
+    private void toggleVillagerPOV(Player player, AlgorithmInstance<?, ?, ?> instance) {
+        if (instance == null) {
+            player.sendMessage(Component.text("No active algorithm", NamedTextColor.RED));
+            return;
+        }
+
+        var scene = instance.getScene();
+        if (!(scene instanceof VillagerPOV povScene)) {
+            // Silently ignore - shouldn't happen if item setup is correct
+            return;
+        }
+
+        UUID playerId = player.getUuid();
+
+        if (enabledPOV.contains(playerId)) {
+            // Disable POV
+            if (player.getVehicle() != null) {
+                player.getVehicle().removePassenger(player);
+            }
+            player.setInvisible(false);
+            povScene.setLocatorBarVisible(player, false);
+            povScene.onPovToggle(player, false);
+            enabledPOV.remove(playerId);
+            player.sendMessage(Component.text("POV disabled", NamedTextColor.GRAY));
+        } else {
+            // Enable POV
+            Entity cameraTarget = povScene.cameraTarget();
+            if (cameraTarget == null || !cameraTarget.isActive()) {
+                player.sendMessage(Component.text("Villager POV unavailable (no active villager)", NamedTextColor.GRAY));
+                return;
+            }
+
+            player.setInvisible(true);
+            cameraTarget.addPassenger(player);
+            povScene.setLocatorBarVisible(player, true);
+            povScene.onPovToggle(player, true);
+            enabledPOV.add(playerId);
+            player.sendMessage(Component.text("POV enabled", NamedTextColor.YELLOW));
         }
     }
 
@@ -150,11 +213,11 @@ public class AlgoCraft {
                 .thenCompose(_ -> session.addPlayer(player))
                 .exceptionally(throwable -> {
                     throwable.printStackTrace();
-                    ui.applyDefaultLayout(player);
+                    ui.applyDefaultLayout(player, getDefaultInstance());
                     player.sendMessage(Component.text("Failed to initialize visualization", NamedTextColor.RED));
                     return null;
                 })
-                .thenRun(() -> ui.applyRunningLayout(player));
+                .thenRun(() -> entry.runningLayout().applyRunningLayout(player, entry.supportsPOV()));
         });
 
         player.openInventory(inventory);

@@ -7,7 +7,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.block.Block;
 
 import java.util.List;
-
+@Deprecated
 public final class ParticleTreeNodeStylingProfile {
     private final BstNodeStylingProfile.NodeRole role;
     private final Pos[] targets;

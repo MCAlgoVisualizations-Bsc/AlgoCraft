@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
+@Deprecated
 /**
  * Places elements randomly within a bounded 2D grid (matrix) centered on origin.
  * Produces positions only (no entities).

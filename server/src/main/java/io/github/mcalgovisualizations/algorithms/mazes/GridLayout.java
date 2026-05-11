@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.layouts;
+package io.github.mcalgovisualizations.algorithms.mazes;
 
 import io.github.mcalgovisualizations.Displays.MobDisplay;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
@@ -19,7 +19,7 @@ public record GridLayout(
 ) implements ILayout<List<Integer>> {
 
     public GridLayout(int columns) {
-        this(columns, 1.5, 0.0, 0.0);
+        this(columns, 1.0, 0.0, 0.0);
     }
 
     public GridLayout {

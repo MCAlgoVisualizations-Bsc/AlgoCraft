@@ -1,16 +1,17 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.mazes;
 
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
-import io.github.mcalgovisualizations.algorithms.context.SortingContext;
 import io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort;
 import io.github.mcalgovisualizations.events.CellState;
 import io.github.mcalgovisualizations.events.CellStateTransition;
 import io.github.mcalgovisualizations.events.Message;
+import io.github.mcalgovisualizations.events.VillagerMove;
 
 import java.util.Arrays;
-import java.util.Stack;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
-public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
+public class PlayerAStar implements IPlayerSort<GridContext<Integer>> {
 
     public static final int WALL = 1;
     public static final int START = 2;
@@ -18,25 +19,23 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
 
     private final int columns;
 
-    public PlayerDFS(int columns) {
+    public PlayerAStar(int columns) {
         if (columns <= 0) throw new IllegalArgumentException("columns must be > 0");
         this.columns = columns;
     }
 
     @Override
     public void run(GridContext<Integer> ctx) {
-        var values = ctx.values;
+        var values = ctx.getData();
         int size = values.size();
         if (size == 0) {
-            ctx.emit(new Message("DFS: empty grid", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: empty grid", Message.MessageType.ERROR));
             return;
         }
 
         int[] cells = new int[size];
         for (int i = 0; i < size; i++) {
-            var number = values.get(i);
-
-            cells[i] = number;
+            cells[i] = values.get(i);
         }
 
         int rows = (int) Math.ceil(size / (double) columns);
@@ -49,31 +48,41 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         }
 
         if (start < 0 || goal < 0) {
-            ctx.emit(new Message("DFS: start or goal missing", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: start or goal missing", Message.MessageType.ERROR));
             return;
         }
 
-        boolean[] visited = new boolean[size];
+        int[] g = new int[size];
         int[] parent = new int[size];
+        boolean[] closed = new boolean[size];
+        boolean[] seenOpen = new boolean[size];
+        Arrays.fill(g, Integer.MAX_VALUE);
         Arrays.fill(parent, -1);
 
-        Stack<Integer> frontier = new Stack<>();
-        frontier.push(start);
+        PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator
+                .comparingInt(Node::f)
+                .thenComparingInt(Node::h));
+
+        g[start] = 0;
+        frontier.add(new Node(start, heuristic(start, goal, columns), heuristic(start, goal, columns)));
+        seenOpen[start] = true;
 
         boolean found = false;
         while (!frontier.isEmpty()) {
-            int current = frontier.pop();
+            Node currentNode = frontier.poll();
+            int current = currentNode.index();
 
-            if (visited[current]) continue;
-            visited[current] = true;
+            if (closed[current]) continue;
+            closed[current] = true;
+
+            if (current != start && current != goal) {
+                ctx.emit(new VillagerMove(current, 2));
+                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
+            }
 
             if (current == goal) {
                 found = true;
                 break;
-            }
-
-            if (current != start && current != goal) {
-                ctx.emit(new CellStateTransition(current, CellState.OPEN, CellState.CLOSED));
             }
 
             int row = current / columns;
@@ -87,32 +96,48 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
             };
 
             for (int neighbor : neighbors) {
-                if (neighbor < 0 || cells[neighbor] == WALL || visited[neighbor]) continue;
+                if (neighbor < 0 || cells[neighbor] == WALL || closed[neighbor]) continue;
+
+                int tentativeG = g[current] + 1;
+                if (tentativeG >= g[neighbor]) continue;
 
                 parent[neighbor] = current;
-                frontier.push(neighbor);
+                g[neighbor] = tentativeG;
 
-                if (neighbor != start && neighbor != goal) {
+                int h = heuristic(neighbor, goal, columns);
+                frontier.add(new Node(neighbor, tentativeG + h, h));
+
+                if (!seenOpen[neighbor] && neighbor != start && neighbor != goal) {
                     ctx.emit(new CellStateTransition(neighbor, CellState.DEFAULT, CellState.OPEN));
                 }
+                seenOpen[neighbor] = true;
             }
         }
 
         if (!found) {
-            ctx.emit(new Message("DFS: no path found", Message.MessageType.ERROR));
+            ctx.emit(new Message("A*: no path found", Message.MessageType.ERROR));
             return;
         }
 
         int pathCursor = goal;
         while (pathCursor != -1) {
             if (pathCursor != start && pathCursor != goal) {
-                CellState previous = visited[pathCursor] ? CellState.CLOSED : CellState.OPEN;
+                CellState previous = closed[pathCursor] ? CellState.CLOSED : CellState.OPEN;
+                ctx.emit(new VillagerMove(pathCursor, 2));
                 ctx.emit(new CellStateTransition(pathCursor, previous, CellState.PATH));
             }
             pathCursor = parent[pathCursor];
         }
 
-        ctx.emit(new Message("DFS: path found", Message.MessageType.SUCCESS));
+        ctx.emit(new Message("A*: path found", Message.MessageType.SUCCESS));
+    }
+
+    private static int heuristic(int from, int to, int columns) {
+        int fromRow = from / columns;
+        int fromCol = from % columns;
+        int toRow = to / columns;
+        int toCol = to % columns;
+        return Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol);
     }
 
     private static int index(int row, int col, int rows, int columns, int size) {
@@ -120,5 +145,8 @@ public class PlayerDFS implements IPlayerSort<GridContext<Integer>> {
         int idx = (row * columns) + col;
         return idx < size ? idx : -1;
     }
+
+    private record Node(int index, int f, int h) {}
 }
+
 

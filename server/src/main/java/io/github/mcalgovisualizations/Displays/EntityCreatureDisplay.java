@@ -24,7 +24,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     private Pos initialPos;
     private final EntityCreature entity;
     private final Entity textEntity;
-    private boolean gravity;
 
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
         this(pos, entityType, displayText, false);
@@ -33,7 +32,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText, boolean setNoGravity) {
         this.initialPos = pos;
         this.entity = new EntityCreature(entityType);
-        this.gravity = setNoGravity;
         this.entity.setNoGravity(setNoGravity);
         
         // Increase movement speed for better visualization
@@ -48,9 +46,6 @@ public class EntityCreatureDisplay implements IDisplayValue {
         });
     }
 
-    public void setNoGravity(boolean setNoGravity) {
-        entity.setNoGravity(setNoGravity);
-    }
 
     @Override
     public Pos getPos() {
@@ -91,15 +86,34 @@ public class EntityCreatureDisplay implements IDisplayValue {
      * @return a future that completes when the target is reached
      */
     public CompletableFuture<Void> walkTo(Pos pos) {
-        if (entity.isActive()) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            // Use speed 1.0 (relative to entity's speed attribute)
-            entity.getNavigator().setPathTo(pos, 1.0, () -> future.complete(null));
-            return future;
-        } else {
+        if (!entity.isActive()) {
             this.initialPos = pos;
             return CompletableFuture.completedFuture(null);
         }
+
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        entity.getNavigator().setPathTo(pos, 1.0, () -> {
+            if (!future.isDone()) {
+                future.complete(null);
+            }
+        });
+
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            if (future.isDone()) {
+                return;
+            }
+
+            /*
+             * Fallback:
+             * pathfinding failed, got stuck, or callback never fired.
+             * Teleport so the animation pipeline can continue.
+             */
+            entity.teleport(pos);
+            future.complete(null);
+        }).delay(60, TimeUnit.SERVER_TICK).schedule();
+
+        return future;
     }
 
     private Pos getTextOffset(Pos pos) {
@@ -108,6 +122,10 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
     public double getEyeHeight() {
         return entity.getEyeHeight();
+    }
+
+    public EntityCreature getEntity() {
+        return entity;
     }
 
     @Override

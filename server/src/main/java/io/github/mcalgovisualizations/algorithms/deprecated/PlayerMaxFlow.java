@@ -1,4 +1,4 @@
-package io.github.mcalgovisualizations.algorithms;
+package io.github.mcalgovisualizations.algorithms.deprecated;
 
 import io.github.mcalgovisualizations.algorithms.context.GridContext;
 import io.github.mcalgovisualizations.events.FlowEdgeFlowUpdate;

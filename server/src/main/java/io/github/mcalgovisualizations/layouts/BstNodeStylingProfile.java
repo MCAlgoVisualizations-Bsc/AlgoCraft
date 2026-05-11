@@ -4,7 +4,7 @@ import io.github.mcalgovisualizations.Displays.BlockDisplay;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.block.Block;
-
+@Deprecated
 public final class BstNodeStylingProfile {
 
     public enum NodeRole {

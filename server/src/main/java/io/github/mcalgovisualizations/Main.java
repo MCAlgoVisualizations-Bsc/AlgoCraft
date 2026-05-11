@@ -1,9 +1,7 @@
 package io.github.mcalgovisualizations;
 
 import io.github.mcalgovisualizations.commands.*;
-import io.github.mcalgovisualizations.commands.Accept;
-import io.github.mcalgovisualizations.commands.Invite;
-import io.github.mcalgovisualizations.commands.PendingInvites;
+import io.github.mcalgovisualizations.ui.GroupedAlgorithmUI;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.events.Message;
 import net.kyori.adventure.text.Component;
@@ -30,29 +28,26 @@ public final class Main {
         MinecraftServer server = MinecraftServer.init(new Auth.Online());
         InstanceContainer instance = createMainInstance();
 
-        // Sets the game time
-        instance.setTimeRate(0);  // Stops time
-        instance.setTime(6000);   // Sets time to noon
+        instance.setTimeRate(0);
+        instance.setTime(6000);
 
         algo = new AlgoCraft(instance);
+        registerAlgo(algo);
 
         registerAlgo(algo);
 
-        //algo.setSpawnAction(player -> player.teleport(HUB_SPAWN));
         algo.addListener(MinecraftServer.getGlobalEventHandler());
 
-        // Register visualization control listeners (item interactions)
         registerListeners(instance);
-        // registerControls(instance, algo.visualizationManager);
-        registerCommands(MinecraftServer.getCommandManager(), algo);
 
+        // Passing command handlers for inventory management
+        registerCommands(MinecraftServer.getCommandManager(), algo);
         server.start("0.0.0.0", 25565);
     }
 
     static void registerListeners(InstanceContainer instance) {
         final var globalEventHandler = MinecraftServer.getGlobalEventHandler();
 
-        // Player configuration - set spawn instance and respawn point
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             PlayerSkin skin = PlayerSkin.fromUsername(player.getUsername());
@@ -63,44 +58,34 @@ public final class Main {
             player.setRespawnPoint(new Pos(194.5, 137, -38.5));
         });
 
-        // Player spawn - give items and assign visualization (player is now fully in the world)
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
-            if (!event.isFirstSpawn()) return; // Only on first spawn
+            if (!event.isFirstSpawn()) return;
 
             Player player = event.getPlayer();
 
-            // Give fly access to player
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlying(true);
 
-            // Library UI owns default hotbar layout (selector + spawn item)
             algo.applyDefaultLayout(player);
 
-            // Send welcome message
             player.sendMessage(Component.text(
                     "Right-click the Nether Star to select an algorithm to visualize!", NamedTextColor.YELLOW));
             player.sendMessage(Component.text(
                     "Welcome to Algorithm Visualizations!", Message.MessageType.SUCCESS.color()));
-
         });
 
-        // Cleanup visualization when player disconnects
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-            // VisualizationManager.removeVisualization(event.getPlayer());
         });
-
     }
-
-
 
     static void registerCommands(CommandManager cm, AlgoCraft algo) {
         cm.register(new Greet(),
-            new Teleport(),
-            new Gamemode(),
-            new Spawn(algo),
-            new Invite(algo),
-            new Accept(algo),
-            new PendingInvites(algo)
+                new Teleport(),
+                new Gamemode(),
+                new Spawn(algo),
+                new Invite(algo),
+                new Accept(algo),
+                new PendingInvites(algo)
         );
     }
 }

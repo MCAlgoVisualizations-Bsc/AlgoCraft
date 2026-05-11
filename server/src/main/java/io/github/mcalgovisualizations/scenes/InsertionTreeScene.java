@@ -1,10 +1,10 @@
-package io.github.mcalgovisualizations;
+package io.github.mcalgovisualizations.scenes;
 
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import io.github.mcalgovisualizations.visualization.renderer.scene.AbstractScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
 import org.jetbrains.annotations.NotNull;
-
+@Deprecated
 public class InsertionTreeScene extends AbstractScene {
     private LayoutResult[] layoutResults;
 

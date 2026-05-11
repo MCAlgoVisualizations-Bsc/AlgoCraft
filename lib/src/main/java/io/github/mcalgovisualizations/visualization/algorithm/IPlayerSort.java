@@ -21,7 +21,7 @@ public interface IPlayerSort<C> {
      * @param context the execution context containing input data and/or
      *                mechanisms for emitting {@link IAlgorithmEvent}s
      *
-     * @implNote Implementations should:
+     * <p><strong>Implementation Requirements:</strong></p>
      * <ul>
      *     <li>Be deterministic for the same input</li>
      *     <li>Emit events in a consistent, ordered manner</li>

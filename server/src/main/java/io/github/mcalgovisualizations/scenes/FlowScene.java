@@ -1,9 +1,9 @@
-package io.github.mcalgovisualizations;
+package io.github.mcalgovisualizations.scenes;
 
 import io.github.mcalgovisualizations.layouts.GraphNetworkLayout;
 import io.github.mcalgovisualizations.visualization.renderer.scene.DefaultScene;
 import io.github.mcalgovisualizations.visualization.renderer.scene.SceneContext;
-
+@Deprecated
 public class FlowScene extends DefaultScene {
     public FlowScene(SceneContext context) {
         super(context);

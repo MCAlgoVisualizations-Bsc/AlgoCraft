@@ -15,6 +15,7 @@ import net.minestom.server.timer.TaskSchedule;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+@Deprecated
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {
     protected final IDisplayValue base;

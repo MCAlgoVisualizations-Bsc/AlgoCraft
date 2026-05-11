@@ -6,7 +6,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 
 import java.util.List;
-
+@Deprecated
 public record BSTNodeLayout<T extends Comparable<T>>() implements ILayout<List<T>> {
     @Override
     public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
