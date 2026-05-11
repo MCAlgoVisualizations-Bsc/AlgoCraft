@@ -68,6 +68,14 @@ public final class VillagerBFS implements IPlayerSort<NodeContext> {
             boolean hasUnvisitedNodeNeighbor = false;
             for (int i = 0; i < orderedNeighbors.size(); i++) {
                 Node neighbor = orderedNeighbors.get(i);
+
+                if (neighbor.getStatus() == Node.NodeTarget.End) {
+                    parents.put(neighbor.getID(), cursor); // Link it first
+                    hopTo(neighbor, context);              // Move to it visually
+                    emitFinalPath(neighbor, parents, context);
+                    return; // Terminate the entire algorithm
+                }
+
                 boolean isNewNode = visitedNodes.add(neighbor.getID());
                 if (isNewNode) {
                     hasUnvisitedNodeNeighbor = true;
