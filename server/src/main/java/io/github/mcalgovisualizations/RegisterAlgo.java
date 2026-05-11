@@ -66,6 +66,7 @@ public class RegisterAlgo {
                                 "Searches a graph using Breadth-First Search.", "Visit nodes level by level.", "Demonstrates pathfinding on a dynamic graph."
                         ))
                         .withScene(GraphScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
         
@@ -81,6 +82,7 @@ public class RegisterAlgo {
                                 "Searches a graph using Depth-First Search.", "Explores as far as possible along each branch.", "Demonstrates pathfinding on a dynamic graph."
                         ))
                         .withScene(GraphScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
 
@@ -198,6 +200,7 @@ public class RegisterAlgo {
                                 "4-way A* on a fixed 2D obstacle map"
                         ))
                         .withScene(HeuristicGridScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
 
@@ -216,6 +219,7 @@ public class RegisterAlgo {
                                 "4-way BFS explores breadth-first"
                         ))
                         .withScene(GridScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
 
@@ -235,6 +239,7 @@ public class RegisterAlgo {
                                 "4-way DFS explores depth-first"
                         ))
                         .withScene(GridScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
 
@@ -251,6 +256,7 @@ public class RegisterAlgo {
                                 "Time: O(E log V) | Space: O(V)", "Prioritizes closeness to goal, may miss optimal paths.", "Fast heuristic-only pathfinding"
                         ))
                         .withScene(HeuristicGridScene::new)
+                        .withPOVSupport(true)
                         .create()
         );
     }

@@ -59,8 +59,8 @@ public final class GroupedAlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyRunningLayout(Player player) {
-        delegate.applyRunningLayout(player);
+    public void applyRunningLayout(Player player, boolean supportsPOV) {
+        delegate.applyRunningLayout(player, supportsPOV);
     }
 
     @Override
