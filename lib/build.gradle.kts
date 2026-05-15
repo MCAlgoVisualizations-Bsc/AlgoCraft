@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `maven-publish`
     jacoco
 }
 
@@ -36,4 +37,12 @@ tasks.test {
 
 jacoco {
     toolVersion = "0.8.14"
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
 }
