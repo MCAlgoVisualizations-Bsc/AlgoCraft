@@ -1,0 +1,43 @@
+name: PR Build and Trigger JitPack
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "25"
+          cache: "gradle"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Compile project
+        run: ./gradlew --no-daemon clean assemble
+
+  trigger-jitpack:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger JitPack PR snapshot build
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          VERSION: PR${{ github.event.pull_request.number }}-SNAPSHOT
+        run: |
+          set -euo pipefail
+          echo "Triggering JitPack build for com.github.${OWNER}/${REPO}/${VERSION}"
+          curl --fail --silent --show-error \
+            "https://jitpack.io/api/builds/com.github.${OWNER}/${REPO}/${VERSION}"

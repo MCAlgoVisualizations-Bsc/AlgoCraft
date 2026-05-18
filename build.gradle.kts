@@ -3,6 +3,5 @@ plugins {
 }
 
 tasks.named("publishToMavenLocal") {
-    dependsOn(":lib:publishToMavenLocal")
+    dependsOn(":lib:publishToMavenLocal", ":prefab:publishToMavenLocal")
 }
-

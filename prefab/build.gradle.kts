@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("com.gradleup.shadow") version "9.3.0"
     id("application")
+    `maven-publish`
     jacoco
 }
 
@@ -76,5 +77,13 @@ tasks.jacocoTestReport {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(false)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
     }
 }
