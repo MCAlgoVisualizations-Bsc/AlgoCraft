@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.prefab.config;
 
-import io.github.mcalgovisualizations.Main;
+import io.github.mcalgovisualizations.prefab.Main;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.anvil.AnvilLoader;
