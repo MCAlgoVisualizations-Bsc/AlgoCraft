@@ -1,11 +1,12 @@
 package io.github.mcalgovisualizations.algorithms.GraphSearch;
 
-import io.github.mcalgovisualizations.events.Compare;
-import io.github.mcalgovisualizations.events.Message;
+import io.github.mcalgovisualizations.prefab.events.Compare;
+import io.github.mcalgovisualizations.prefab.events.Message;
+import io.github.mcalgovisualizations.prefab.algorithms.GraphSearch.Node;
+import io.github.mcalgovisualizations.prefab.algorithms.GraphSearch.NodeContext;
+import io.github.mcalgovisualizations.prefab.algorithms.GraphSearch.VillagerBFS;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
