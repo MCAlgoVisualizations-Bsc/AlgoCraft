@@ -18,9 +18,9 @@ import io.github.mcalgovisualizations.prefab.algorithms.sort.insertion.Insertion
 import io.github.mcalgovisualizations.prefab.algorithms.sort.insertion.PlayerInsertion;
 import io.github.mcalgovisualizations.prefab.algorithms.sort.selection.PlayerSelectionSort;
 import io.github.mcalgovisualizations.prefab.algorithms.sort.selection.SelectionScene;
-import io.github.mcalgovisualizations.events.*;
-import io.github.mcalgovisualizations.handlers.*;
-import io.github.mcalgovisualizations.layouts.*;
+import io.github.mcalgovisualizations.prefab.events.*;
+import io.github.mcalgovisualizations.prefab.handlers.*;
+import io.github.mcalgovisualizations.prefab.layouts.*;
 import io.github.mcalgovisualizations.prefab.algorithms.mazes.Scenes.GridScene;
 import io.github.mcalgovisualizations.visualization.instance.AlgoCraft;
 import io.github.mcalgovisualizations.visualization.instance.Algorithm;
