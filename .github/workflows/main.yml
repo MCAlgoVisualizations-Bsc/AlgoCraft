@@ -34,12 +34,6 @@ jobs:
       - name: Build project and generate Javadoc
         run: ./gradlew --no-daemon clean javadoc
 
-      - name: Deploy Javadoc to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.PAGES_TOKEN }}
-          publish_dir: ./build/docs/javadoc
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
