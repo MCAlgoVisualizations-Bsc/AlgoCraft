@@ -1,0 +1,9 @@
+io.github.mcalgovisualizations.visualization.algorithm
+io.github.mcalgovisualizations.visualization.engine
+io.github.mcalgovisualizations.visualization.instance
+io.github.mcalgovisualizations.visualization.layout
+io.github.mcalgovisualizations.visualization.models
+io.github.mcalgovisualizations.visualization.renderer
+io.github.mcalgovisualizations.visualization.renderer.dispatch
+io.github.mcalgovisualizations.visualization.renderer.scene
+io.github.mcalgovisualizations.visualization.ui
