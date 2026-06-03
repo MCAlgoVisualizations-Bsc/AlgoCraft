@@ -18,6 +18,7 @@ nav:
   - Home: index.md
   - Guide:
       - Getting Started: getting-started.md
+      - UI: ui.md
       - Making Your First Algorithm: making-your-first-algorithm.md
       - Scenes: scenes.md
       - Layouts and Displays: layouts-and-displays.md

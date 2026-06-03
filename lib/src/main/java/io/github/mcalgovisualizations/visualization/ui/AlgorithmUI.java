@@ -83,13 +83,13 @@ public class AlgorithmUI implements IAlgorithmUI {
         return slots;
     }
 
-    @Override
         /**
          * Applies the hotbar layout used while a visualization is running.
          *
          * @param player the player whose inventory should be updated
          * @param supportsPOV whether to include the POV toggle item
          */
+        @Override
         public void applyRunningLayout(Player player, boolean supportsPOV) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
@@ -124,13 +124,13 @@ public class AlgorithmUI implements IAlgorithmUI {
                 .set(ALGO_INTERACTION_TAG, InteractionType.CLEAR).build());
     }
 
-    @Override
         /**
          * Applies the default hub layout.
          *
          * @param player the player whose inventory should be updated
          * @param spawnInstance the instance the player can return to
          */
+        @Override
         public void applyDefaultLayout(Player player, Instance spawnInstance) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
