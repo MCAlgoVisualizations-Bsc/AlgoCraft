@@ -80,11 +80,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">PlayerControls</span></div>
-<div class="block">Defines control actions for a visualization or playback system.
-<p>
-Implementations translate these high-level control signals into
-concrete behavior (e.g., updating state, triggering animations,
-or providing user feedback).</div>
+<div class="block">Defines control actions for a visualization playback system.
+
+<p>Implementations translate these high-level control signals into state changes,
+animation control, and user feedback.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -108,7 +107,7 @@ or providing user feedback).</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#changeSpeed()" class="member-name-link">changeSpeed</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Sets the speed of the visualization.</div>
+<div class="block">Cycles the playback speed.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
@@ -118,17 +117,17 @@ or providing user feedback).</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#pause()" class="member-name-link">pause</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Stops or halts execution.</div>
+<div class="block">Pauses automatic playback.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#randomize()" class="member-name-link">randomize</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Triggers randomization of layout.</div>
+<div class="block">Regenerates the visualization from a randomized starting state.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#start()" class="member-name-link">start</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Starts or initializes execution.</div>
+<div class="block">Starts or resumes automatic playback.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#step()" class="member-name-link">step</a>()</code></div>
@@ -154,7 +153,7 @@ or providing user feedback).</div>
 <h3>randomize</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">randomize</span>()</div>
-<div class="block">Triggers randomization of layout.</div>
+<div class="block">Regenerates the visualization from a randomized starting state.</div>
 </div>
 </section>
 </li>
@@ -163,7 +162,7 @@ or providing user feedback).</div>
 <h3>start</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">start</span>()</div>
-<div class="block">Starts or initializes execution.</div>
+<div class="block">Starts or resumes automatic playback.</div>
 </div>
 </section>
 </li>
@@ -172,7 +171,7 @@ or providing user feedback).</div>
 <h3>pause</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
-<div class="block">Stops or halts execution.</div>
+<div class="block">Pauses automatic playback.</div>
 </div>
 </section>
 </li>
@@ -208,7 +207,11 @@ or providing user feedback).</div>
 <h3>changeSpeed</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">changeSpeed</span>()</div>
-<div class="block">Sets the speed of the visualization.</div>
+<div class="block">Cycles the playback speed.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the new speed value, where smaller values mean faster playback</dd>
+</dl>
 </div>
 </section>
 </li>

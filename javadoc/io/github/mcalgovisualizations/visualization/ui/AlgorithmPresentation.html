@@ -98,7 +98,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public record </span><span class="element-name type-name-label">AlgorithmPresentation</span>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithmId, net.minestom.server.item.Material&nbsp;icon, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;complexity, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]&nbsp;description)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
-<div class="block">Represents a visual representation of an algorithm.</div>
+<div class="block">Metadata used to present an algorithm in the selector UI.</div>
 </div>
 </section>
 <section class="summary">
@@ -119,7 +119,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates an instance of a <code>AlgorithmPresentation</code> record class.</div>
 </div>
 <div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String)" class="member-name-link">AlgorithmPresentation</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithmId)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">Creates a default presentation for the given algorithm id.</div>
+</div>
 </div>
 </section>
 </li>
@@ -156,10 +158,14 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;net.kyori.adventure.text.Component&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getComponents()" class="member-name-link">getComponents</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the lore lines shown in the selector UI.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>net.kyori.adventure.text.Component</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCustomName()" class="member-name-link">getCustomName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the selector display name for the algorithm.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -197,6 +203,11 @@ loadScripts(document, 'script');</script>
 <h3>AlgorithmPresentation</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AlgorithmPresentation</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithmId)</span></div>
+<div class="block">Creates a default presentation for the given algorithm id.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>algorithmId</code> - the algorithm id</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -233,6 +244,11 @@ loadScripts(document, 'script');</script>
 <h3>getComponents</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;net.kyori.adventure.text.Component&gt;</span>&nbsp;<span class="element-name">getComponents</span>()</div>
+<div class="block">Returns the lore lines shown in the selector UI.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the presentation components</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -241,6 +257,11 @@ loadScripts(document, 'script');</script>
 <h3>getCustomName</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">net.kyori.adventure.text.Component</span>&nbsp;<span class="element-name">getCustomName</span>()</div>
+<div class="block">Returns the selector display name for the algorithm.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the custom item name</dd>
+</dl>
 </div>
 </section>
 </li>

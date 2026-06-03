@@ -126,7 +126,9 @@ implements <a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisua
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>net.minestom.server.inventory.Inventory</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#openSelector(java.util.Set,java.util.function.Function)" class="member-name-link">openSelector</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;algorithms,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AlgorithmPresentation.html" title="class in io.github.mcalgovisualizations.visualization.ui">AlgorithmPresentation</a>&gt;&nbsp;presentationResolver)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Opens the algorithm selection inventory.</div>
+</div>
 </div>
 </div>
 </div>
@@ -166,9 +168,15 @@ implements <a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisua
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">net.minestom.server.inventory.Inventory</span>&nbsp;<span class="element-name">openSelector</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;algorithms,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AlgorithmPresentation.html" title="class in io.github.mcalgovisualizations.visualization.ui">AlgorithmPresentation</a>&gt;&nbsp;presentationResolver)</span></div>
+<div class="block">Opens the algorithm selection inventory.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="IAlgorithmUI.html#openSelector(java.util.Set,java.util.function.Function)">openSelector</a></code>&nbsp;in interface&nbsp;<code><a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>algorithms</code> - registered algorithm ids</dd>
+<dd><code>presentationResolver</code> - resolves UI metadata for each algorithm id</dd>
+<dt>Returns:</dt>
+<dd>the inventory shown to the player</dd>
 </dl>
 </div>
 </section>

@@ -84,7 +84,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">AudienceChannel</span></div>
-<div class="block">Defines a channel for delivering feedback to an audience.</div>
+<div class="block">Defines a channel for delivering feedback to an audience.
+
+<p>Implementations typically bridge Minestom audiences, player parties, or
+other presentation layers that can receive messages and sounds.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -109,11 +112,15 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendActionBar(java.lang.String)" class="member-name-link">sendActionBar</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sends a plain-text action bar message.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendActionBar(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)" class="member-name-link">sendActionBar</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sends a colored plain-text action bar message.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendActionBar(net.kyori.adventure.text.Component)" class="member-name-link">sendActionBar</a><wbr>(net.kyori.adventure.text.Component&nbsp;message)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -121,11 +128,15 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendMessage(java.lang.String)" class="member-name-link">sendMessage</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sends a plain-text message to the audience.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendMessage(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)" class="member-name-link">sendMessage</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sends a colored plain-text message to the audience.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sendMessage(net.kyori.adventure.text.Component)" class="member-name-link">sendMessage</a><wbr>(net.kyori.adventure.text.Component&nbsp;message)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -181,6 +192,11 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">sendMessage</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
+<div class="block">Sends a plain-text message to the audience.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -191,6 +207,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">sendMessage</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</span></div>
+<div class="block">Sends a colored plain-text message to the audience.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+<dd><code>color</code> - the message color</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -213,6 +235,11 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">sendActionBar</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
+<div class="block">Sends a plain-text action bar message.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -223,6 +250,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">sendActionBar</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</span></div>
+<div class="block">Sends a colored plain-text action bar message.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+<dd><code>color</code> - the message color</dd>
+</dl>
 </div>
 </section>
 </li>

@@ -104,30 +104,46 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#create()" class="member-name-link">create</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Builds the immutable algorithm definition.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCompletion(java.util.function.Function)" class="member-name-link">onCompletion</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>, ? extends <a href="../renderer/dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;&gt;&nbsp;handler)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the animation plan to run after the algorithm finishes.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;E extends <a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;<br>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onEvent(java.lang.Class,io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler)" class="member-name-link">onEvent</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;E&gt;&nbsp;event,
  @NotNull <a href="../renderer/IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;E&gt;&nbsp;handler)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Registers an event handler for a concrete event class.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#positioning(io.github.mcalgovisualizations.visualization.layout.ILayout)" class="member-name-link">positioning</a><wbr>(@NotNull <a href="../layout/ILayout.html" title="interface in io.github.mcalgovisualizations.visualization.layout">ILayout</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>&gt;&nbsp;layout)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the layout strategy used to place model values in the world.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withIdentity(java.lang.String,java.util.function.Supplier)" class="member-name-link">withIdentity</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;? extends <a href="../algorithm/IPlayerSort.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IPlayerSort</a>&lt;<a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>&gt;&gt;&nbsp;ctor)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the algorithm identity and constructor.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withPOVSupport(boolean)" class="member-name-link">withPOVSupport</a><wbr>(boolean&nbsp;supportsPOV)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Enables or disables villager POV support for the algorithm.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withPresentation(io.github.mcalgovisualizations.visualization.ui.AlgorithmPresentation)" class="member-name-link">withPresentation</a><wbr>(@Nullable <a href="../ui/AlgorithmPresentation.html" title="class in io.github.mcalgovisualizations.visualization.ui">AlgorithmPresentation</a>&nbsp;presentation)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the UI presentation metadata for the algorithm.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withRunningLayout(io.github.mcalgovisualizations.visualization.ui.IAlgorithmUI)" class="member-name-link">withRunningLayout</a><wbr>(@NotNull <a href="../ui/IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a>&nbsp;runningLayout)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the running-state inventory layout.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;NO extends <a href="../renderer/scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr>NO&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withScene(java.util.function.Function)" class="member-name-link">withScene</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="../renderer/scene/SceneContext.html" title="class in io.github.mcalgovisualizations.visualization.renderer.scene">SceneContext</a>, NO&gt;&nbsp;scene)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -157,6 +173,14 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;? extends <a href="../algorithm/IPlayerSort.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IPlayerSort</a>&lt;<a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>&gt;&gt;&nbsp;ctor)</span></div>
+<div class="block">Sets the algorithm identity and constructor.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>id</code> - algorithm id shown in the UI</dd>
+<dd><code>ctor</code> - constructor for the algorithm implementation</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -167,6 +191,13 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">positioning</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="../layout/ILayout.html" title="interface in io.github.mcalgovisualizations.visualization.layout">ILayout</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>&gt;&nbsp;layout)</span></div>
+<div class="block">Sets the layout strategy used to place model values in the world.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>layout</code> - layout implementation</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -191,6 +222,16 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;E&gt;&nbsp;event,
  @NotNull
  @NotNull <a href="../renderer/IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;E&gt;&nbsp;handler)</span></div>
+<div class="block">Registers an event handler for a concrete event class.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="onEvent(java.lang.Class,io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler)-type-param-E"><code>E</code> - event type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>event</code> - the event class to handle</dd>
+<dd><code>handler</code> - the handler that converts the event into animation steps</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -201,6 +242,13 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">onCompletion</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>, ? extends <a href="../renderer/dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;&gt;&nbsp;handler)</span></div>
+<div class="block">Sets the animation plan to run after the algorithm finishes.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>handler</code> - completion animation factory</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -211,6 +259,13 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">withPresentation</span><wbr><span class="parameters">(@Nullable
  @Nullable <a href="../ui/AlgorithmPresentation.html" title="class in io.github.mcalgovisualizations.visualization.ui">AlgorithmPresentation</a>&nbsp;presentation)</span></div>
+<div class="block">Sets the UI presentation metadata for the algorithm.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>presentation</code> - selector presentation, or null for the default icon/name</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -221,6 +276,13 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">withRunningLayout</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="../ui/IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a>&nbsp;runningLayout)</span></div>
+<div class="block">Sets the running-state inventory layout.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>runningLayout</code> - inventory layout shown while the visualization is active</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -230,6 +292,13 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">withPOVSupport</span><wbr><span class="parameters">(boolean&nbsp;supportsPOV)</span></div>
+<div class="block">Enables or disables villager POV support for the algorithm.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>supportsPOV</code> - whether the algorithm exposes POV mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -239,6 +308,13 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="Algorithm.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm</a>&lt;<a href="#type-param-T" title="type parameter in Algorithm.Builder">T</a>,<wbr><a href="#type-param-C" title="type parameter in Algorithm.Builder">C</a>,<wbr><a href="#type-param-O" title="type parameter in Algorithm.Builder">O</a>&gt;</span>&nbsp;<span class="element-name">create</span>()</div>
+<div class="block">Builds the immutable algorithm definition.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the finished algorithm definition</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalStateException.html" title="class or interface in java.lang" class="external-link">IllegalStateException</a></code> - if no event handlers were registered</dd>
+</dl>
 </div>
 </section>
 </li>

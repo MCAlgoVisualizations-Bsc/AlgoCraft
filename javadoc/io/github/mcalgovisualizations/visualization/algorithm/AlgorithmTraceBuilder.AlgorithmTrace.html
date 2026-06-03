@@ -76,7 +76,7 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Record Class AlgorithmTraceBuilder.AlgorithmTrace" class="title">Record Class AlgorithmTraceBuilder.AlgorithmTrace&lt;<span id="type-param-T">T</span>&gt;</h1>
+<h1 title="Record Class AlgorithmTraceBuilder.AlgorithmTrace" class="title">Record Class AlgorithmTraceBuilder.AlgorithmTrace&lt;T&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">java.lang.Record</a>
@@ -85,6 +85,12 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Record Components:</dt>
+<dd><code><span id="param-initialData">initialData</span></code> - the starting model snapshot</dd>
+<dd><code><span id="param-finalData">finalData</span></code> - the model state after the algorithm finishes</dd>
+<dd><code><span id="param-history">history</span></code> - the ordered event history</dd>
+</dl>
+<dl class="notes">
 <dt>Enclosing class:</dt>
 <dd><code><a href="AlgorithmTraceBuilder.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder</a>&lt;<a href="AlgorithmTraceBuilder.html#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>, <a href="AlgorithmTraceBuilder.html#type-param-C" title="type parameter in AlgorithmTraceBuilder">C</a> extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;<a href="AlgorithmTraceBuilder.html#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>&gt;&gt;</code></dd>
 </dl>
@@ -92,6 +98,10 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public static record </span><span class="element-name type-name-label">AlgorithmTraceBuilder.AlgorithmTrace&lt;T&gt;</span>(<a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a>&nbsp;initialData, <a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a>&nbsp;finalData, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;&nbsp;history)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
+<div class="block">Immutable algorithm trace data.
+
+<p>The trace contains the starting model, the final model, and the ordered
+history of events emitted during execution.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -132,7 +142,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#finalData()" class="member-name-link">finalData</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>finalData</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-finalData"><code>finalData</code></a> record component.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
@@ -142,12 +152,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#history()" class="member-name-link">history</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>history</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-history"><code>history</code></a> record component.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initialData()" class="member-name-link">initialData</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>initialData</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-initialData"><code>initialData</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
@@ -181,9 +191,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates an instance of a <code>AlgorithmTrace</code> record class.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>initialData</code> - the value for the <code>initialData</code> record component</dd>
-<dd><code>finalData</code> - the value for the <code>finalData</code> record component</dd>
-<dd><code>history</code> - the value for the <code>history</code> record component</dd>
+<dd><code>initialData</code> - the value for the <a href="#param-initialData"><code>initialData</code></a> record component</dd>
+<dd><code>finalData</code> - the value for the <a href="#param-finalData"><code>finalData</code></a> record component</dd>
+<dd><code>history</code> - the value for the <a href="#param-history"><code>history</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -248,10 +258,10 @@ loadScripts(document, 'script');</script>
 <h3>initialData</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a></span>&nbsp;<span class="element-name">initialData</span>()</div>
-<div class="block">Returns the value of the <code>initialData</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-initialData"><code>initialData</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>initialData</code> record component</dd>
+<dd>the value of the <a href="#param-initialData"><code>initialData</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -261,10 +271,10 @@ loadScripts(document, 'script');</script>
 <h3>finalData</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a></span>&nbsp;<span class="element-name">finalData</span>()</div>
-<div class="block">Returns the value of the <code>finalData</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-finalData"><code>finalData</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>finalData</code> record component</dd>
+<dd>the value of the <a href="#param-finalData"><code>finalData</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -274,10 +284,10 @@ loadScripts(document, 'script');</script>
 <h3>history</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;</span>&nbsp;<span class="element-name">history</span>()</div>
-<div class="block">Returns the value of the <code>history</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-history"><code>history</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>history</code> record component</dd>
+<dd>the value of the <a href="#param-history"><code>history</code></a> record component</dd>
 </dl>
 </div>
 </section>

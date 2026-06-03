@@ -106,7 +106,9 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;, <a href="IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;?&gt;&gt;&nbsp;handlers,
  @NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;complete,
  <a href="#type-param-O" title="type parameter in Renderer">O</a>&nbsp;scene)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a renderer for a model/layout pair and a specific runtime scene.</div>
+</div>
 </div>
 </section>
 </li>
@@ -123,28 +125,44 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#complete()" class="member-name-link">complete</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Enqueues the algorithm completion animation.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasPendingAnimations()" class="member-name-link">hasPendingAnimations</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the executor still has queued or active animation work.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initialize(I)" class="member-name-link">initialize</a><wbr>(<a href="#type-param-I" title="type parameter in Renderer">I</a>&nbsp;initialModel)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the initial layout and spawns all displays into the scene.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCleanup()" class="member-name-link">onCleanup</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Releases the scene and cancels any pending playback state.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pause()" class="member-name-link">pause</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Pauses queued animation playback.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent)" class="member-name-link">render</a><wbr>(<a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&nbsp;event)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Dispatches a single algorithm event into the scene.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resume()" class="member-name-link">resume</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resumes queued animation playback.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(int)" class="member-name-link">setSpeed</a><wbr>(int&nbsp;ticksPerStep)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Updates the animation playback speed.</div>
+</div>
 </div>
 </div>
 </div>
@@ -180,6 +198,7 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;complete,
  @NotNull
  <a href="#type-param-O" title="type parameter in Renderer">O</a>&nbsp;scene)</span></div>
+<div class="block">Creates a renderer for a model/layout pair and a specific runtime scene.</div>
 </div>
 </section>
 </li>
@@ -196,6 +215,11 @@ loadScripts(document, 'script');</script>
 <h3>setSpeed</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSpeed</span><wbr><span class="parameters">(int&nbsp;ticksPerStep)</span></div>
+<div class="block">Updates the animation playback speed.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>ticksPerStep</code> - ticks between scheduled steps</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -204,6 +228,7 @@ loadScripts(document, 'script');</script>
 <h3>pause</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
+<div class="block">Pauses queued animation playback.</div>
 </div>
 </section>
 </li>
@@ -212,6 +237,7 @@ loadScripts(document, 'script');</script>
 <h3>resume</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">resume</span>()</div>
+<div class="block">Resumes queued animation playback.</div>
 </div>
 </section>
 </li>
@@ -220,6 +246,11 @@ loadScripts(document, 'script');</script>
 <h3>render</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">render</span><wbr><span class="parameters">(<a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&nbsp;event)</span></div>
+<div class="block">Dispatches a single algorithm event into the scene.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>event</code> - the event to render</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -228,6 +259,7 @@ loadScripts(document, 'script');</script>
 <h3>complete</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">complete</span>()</div>
+<div class="block">Enqueues the algorithm completion animation.</div>
 </div>
 </section>
 </li>
@@ -236,6 +268,11 @@ loadScripts(document, 'script');</script>
 <h3>hasPendingAnimations</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">hasPendingAnimations</span>()</div>
+<div class="block">Returns whether the executor still has queued or active animation work.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd><code>true</code> if animations are still pending</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -244,6 +281,7 @@ loadScripts(document, 'script');</script>
 <h3>onCleanup</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onCleanup</span>()</div>
+<div class="block">Releases the scene and cancels any pending playback state.</div>
 </div>
 </section>
 </li>
@@ -252,6 +290,13 @@ loadScripts(document, 'script');</script>
 <h3 id="initialize(java.lang.Object)">initialize</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">initialize</span><wbr><span class="parameters">(<a href="#type-param-I" title="type parameter in Renderer">I</a>&nbsp;initialModel)</span></div>
+<div class="block">Computes the initial layout and spawns all displays into the scene.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>initialModel</code> - the initial model snapshot</dd>
+<dt>Returns:</dt>
+<dd>a future that completes once chunk loading and layout setup finish</dd>
+</dl>
 </div>
 </section>
 </li>

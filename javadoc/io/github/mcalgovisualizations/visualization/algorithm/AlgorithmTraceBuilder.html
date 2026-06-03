@@ -73,16 +73,25 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Class AlgorithmTraceBuilder" class="title">Class AlgorithmTraceBuilder&lt;<span id="type-param-T">T</span>, <span id="type-param-C">C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;T&gt;</span>&gt;</h1>
+<h1 title="Class AlgorithmTraceBuilder" class="title">Class AlgorithmTraceBuilder&lt;T, C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;T&gt;&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance">io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder&lt;T,<wbr>C&gt;</div>
 </div>
 <section class="class-description" id="class-description">
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="type-param-T"><code>T</code> - model value type</span></dd>
+<dd><span id="type-param-C"><code>C</code> - context type</span></dd>
+</dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">AlgorithmTraceBuilder&lt;T, C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;T&gt;&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">Builds immutable playback traces by running an algorithm against a copied context.
+
+<p>The builder captures the initial model, executes the algorithm once, and stores
+the resulting event history so playback can be reproduced later.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -98,7 +107,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final record&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="AlgorithmTraceBuilder.AlgorithmTrace.html" class="type-name-link" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder.AlgorithmTrace</a>&lt;<a href="AlgorithmTraceBuilder.AlgorithmTrace.html#type-param-T" title="type parameter in AlgorithmTraceBuilder.AlgorithmTrace">T</a>&gt;</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Immutable algorithm trace data.</div>
+</div>
 </div>
 </section>
 </li>
@@ -112,7 +123,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.github.mcalgovisualizations.visualization.algorithm.IPlayerSort,C)" class="member-name-link">AlgorithmTraceBuilder</a><wbr>(@NotNull <a href="IPlayerSort.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IPlayerSort</a>&lt;<a href="#type-param-C" title="type parameter in AlgorithmTraceBuilder">C</a>&gt;&nbsp;algorithm,
  <a href="#type-param-C" title="type parameter in AlgorithmTraceBuilder">C</a>&nbsp;context)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a new trace builder for the given algorithm and context.</div>
+</div>
 </div>
 </section>
 </li>
@@ -130,17 +143,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="AlgorithmTraceBuilder.AlgorithmTrace.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder.AlgorithmTrace</a><wbr>&lt;<a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#build()" class="member-name-link">build</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Builds a fresh immutable trace from the current initial data.</div>
+<div class="block">Runs the algorithm once and captures the resulting trace.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInitialData()" class="member-name-link">getInitialData</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the current initial data snapshot.</div>
+<div class="block">Returns the initial data snapshot used by the builder.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="AlgorithmTraceBuilder.AlgorithmTrace.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder.AlgorithmTrace</a><wbr>&lt;<a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#randomizeAndBuild()" class="member-name-link">randomizeAndBuild</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Replaces the initial data with a user-defined randomized version, then builds a new trace.</div>
+<div class="block">Randomizes the source data and then captures a new trace.</div>
 </div>
 </div>
 </div>
@@ -167,6 +180,12 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="IPlayerSort.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IPlayerSort</a>&lt;<a href="#type-param-C" title="type parameter in AlgorithmTraceBuilder">C</a>&gt;&nbsp;algorithm,
  @NotNull
  <a href="#type-param-C" title="type parameter in AlgorithmTraceBuilder">C</a>&nbsp;context)</span></div>
+<div class="block">Creates a new trace builder for the given algorithm and context.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>algorithm</code> - algorithm implementation that emits events</dd>
+<dd><code>context</code> - source context used to build traces</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -183,7 +202,14 @@ loadScripts(document, 'script');</script>
 <h3>build</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="AlgorithmTraceBuilder.AlgorithmTrace.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder.AlgorithmTrace</a>&lt;<a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>&gt;</span>&nbsp;<span class="element-name">build</span>()</div>
-<div class="block">Builds a fresh immutable trace from the current initial data.</div>
+<div class="block">Runs the algorithm once and captures the resulting trace.
+
+<p>The algorithm is executed on a copied context so the original input remains
+untouched.</p></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a fresh immutable algorithm trace</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -193,7 +219,11 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="AlgorithmTraceBuilder.AlgorithmTrace.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder.AlgorithmTrace</a>&lt;<a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a>&gt;</span>&nbsp;<span class="element-name">randomizeAndBuild</span>()</div>
-<div class="block">Replaces the initial data with a user-defined randomized version, then builds a new trace.</div>
+<div class="block">Randomizes the source data and then captures a new trace.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a fresh immutable randomized algorithm trace</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -203,7 +233,11 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-T" title="type parameter in AlgorithmTraceBuilder">T</a></span>&nbsp;<span class="element-name">getInitialData</span>()</div>
-<div class="block">Returns the current initial data snapshot.</div>
+<div class="block">Returns the initial data snapshot used by the builder.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the current initial data</dd>
+</dl>
 </div>
 </section>
 </li>

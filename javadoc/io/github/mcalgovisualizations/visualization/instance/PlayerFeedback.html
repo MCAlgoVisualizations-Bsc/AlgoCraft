@@ -115,7 +115,9 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.function.Supplier)" class="member-name-link">PlayerFeedback</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;net.kyori.adventure.audience.Audience&gt;&nbsp;supplier)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a feedback bridge for the supplied audience.</div>
+</div>
 </div>
 </section>
 </li>
@@ -164,11 +166,15 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendActionBar(java.lang.String)" class="member-name-link">sendActionBar</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sends an action bar message using default coloring.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendActionBar(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)" class="member-name-link">sendActionBar</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sends a colored action bar message.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendActionBar(net.kyori.adventure.text.Component)" class="member-name-link">sendActionBar</a><wbr>(@NotNull net.kyori.adventure.text.Component&nbsp;message)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -176,11 +182,15 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendMessage(java.lang.String)" class="member-name-link">sendMessage</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sends a plain-text message.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendMessage(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)" class="member-name-link">sendMessage</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sends a colored plain-text message.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sendMessage(net.kyori.adventure.text.Component)" class="member-name-link">sendMessage</a><wbr>(@NotNull net.kyori.adventure.text.Component&nbsp;message)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -219,6 +229,11 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PlayerFeedback</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;net.kyori.adventure.audience.Audience&gt;&nbsp;supplier)</span></div>
+<div class="block">Creates a feedback bridge for the supplied audience.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>supplier</code> - audience supplier, typically backed by a party service</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -273,9 +288,12 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sendActionBar</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
+<div class="block">Sends an action bar message using default coloring.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="AudienceChannel.html#sendActionBar(java.lang.String)">sendActionBar</a></code>&nbsp;in interface&nbsp;<code><a href="AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
 </dl>
 </div>
 </section>
@@ -287,9 +305,13 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sendActionBar</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</span></div>
+<div class="block">Sends a colored action bar message.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="AudienceChannel.html#sendActionBar(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)">sendActionBar</a></code>&nbsp;in interface&nbsp;<code><a href="AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+<dd><code>color</code> - the color to apply</dd>
 </dl>
 </div>
 </section>
@@ -316,9 +338,12 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sendMessage</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
+<div class="block">Sends a plain-text message.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="AudienceChannel.html#sendMessage(java.lang.String)">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
 </dl>
 </div>
 </section>
@@ -330,9 +355,13 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sendMessage</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message,
  net.kyori.adventure.text.format.NamedTextColor&nbsp;color)</span></div>
+<div class="block">Sends a colored plain-text message.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="AudienceChannel.html#sendMessage(java.lang.String,net.kyori.adventure.text.format.NamedTextColor)">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>message</code> - the message to send</dd>
+<dd><code>color</code> - the color to apply</dd>
 </dl>
 </div>
 </section>
@@ -424,6 +453,8 @@ implementing both <a href="AudienceChannel.html" title="interface in io.github.m
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../engine/PlayerControls.html#changeSpeed()">changeSpeed</a></code>&nbsp;in interface&nbsp;<code><a href="../engine/PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
+<dt>Returns:</dt>
+<dd>the new speed value, where smaller values mean faster playback</dd>
 </dl>
 </div>
 </section>

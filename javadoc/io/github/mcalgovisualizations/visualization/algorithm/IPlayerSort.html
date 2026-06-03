@@ -74,15 +74,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">IPlayerSort&lt;C&gt;</span></div>
-<div class="block">Defines an algorithm that produces a sequence of <a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm"><code>IAlgorithmEvent</code></a>
-based on a provided context.
+<div class="block">Represents an algorithm that emits a deterministic sequence of playback events.
 
-<p>Implementations are expected to execute a sorting (or sorting-like)
-procedure while emitting events that describe each significant step
-(e.g. comparisons, swaps).</p>
-
-<p>The provided context acts as both the data source and the
-event sink.</p></div>
+<p>The algorithm reads and mutates the provided context while emitting
+<a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm"><code>IAlgorithmEvent</code></a>s that describe each meaningful step of execution.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -125,15 +120,7 @@ event sink.</p></div>
 <div class="block">Executes the algorithm using the given context.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>context</code> - the execution context containing input data and/or
-               mechanisms for emitting <a href="IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm"><code>IAlgorithmEvent</code></a>s
-
-<p><strong>Implementation Requirements:</strong></p>
-<ul>
-    <li>Be deterministic for the same input</li>
-    <li>Emit events in a consistent, ordered manner</li>
-    <li>Avoid mutating external state outside the provided context</li>
-</ul></dd>
+<dd><code>context</code> - the execution context containing input data and event emission support</dd>
 </dl>
 </div>
 </section>

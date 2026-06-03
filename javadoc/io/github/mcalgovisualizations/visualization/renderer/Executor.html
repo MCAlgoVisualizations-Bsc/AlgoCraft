@@ -92,9 +92,9 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Executes queued <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch"><code>AnimationPlan</code></a>s against a scene over time.
 
-<p>The executor processes animation plans step by step using Minestom's scheduler.
-Each step applies an operation to the scene and may wait a configured number of
-ticks before the next step is executed.</p>
+<p>The executor advances one plan step at a time using Minestom's scheduler. It
+waits between steps according to each step's tick delay, and it can also bridge
+asynchronous scene operations without blocking the server thread.</p>
 
 <p>Zero-wait steps are processed in the same tick, up to <code>MAX_OPS_PER_TICK</code>,
 to avoid infinite loops or excessive work in a single server tick.</p></div>
@@ -111,7 +111,9 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(O)" class="member-name-link">Executor</a><wbr>(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a new executor for a specific scene.</div>
+</div>
 </div>
 </section>
 </li>
@@ -134,8 +136,7 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isIdle()" class="member-name-link">isIdle</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether this executor has no active scheduler, no active plan, and no
-queued plans.</div>
+<div class="block">Returns whether this executor has no active scheduler, no active plan, and no queued plans.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCleanup()" class="member-name-link">onCleanup</a>()</code></div>
@@ -160,8 +161,7 @@ queued plans.</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startIfIdle()" class="member-name-link">startIfIdle</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is
-currently running.</div>
+<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is running.</div>
 </div>
 </div>
 </div>
@@ -185,6 +185,11 @@ currently running.</div>
 <h3 id="&lt;init&gt;(io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps)">Executor</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Executor</span><wbr><span class="parameters">(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene)</span></div>
+<div class="block">Creates a new executor for a specific scene.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>scene</code> - the scene that animation plans will act on</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -217,8 +222,7 @@ currently running.</div>
 <h3>startIfIdle</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">startIfIdle</span>()</div>
-<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is
-currently running.</div>
+<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is running.</div>
 </div>
 </section>
 </li>
@@ -229,8 +233,7 @@ currently running.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
 <div class="block">Pauses execution and stops the scheduler.
 
-<p>The current plan, step index, remaining wait time, and queued plans are
-preserved.</p></div>
+<p>The current plan, step index, remaining wait time, and queued plans are preserved.</p></div>
 </div>
 </section>
 </li>
@@ -248,8 +251,7 @@ preserved.</p></div>
 <h3>isIdle</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isIdle</span>()</div>
-<div class="block">Returns whether this executor has no active scheduler, no active plan, and no
-queued plans.</div>
+<div class="block">Returns whether this executor has no active scheduler, no active plan, and no queued plans.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>true</code> if there is no work currently running or queued</dd>
@@ -282,7 +284,7 @@ and so on.</p></div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onCleanup</span>()</div>
 <div class="block">Stops execution and clears all queued and active animation state.
 
-<p>This should be called when the owning scene/session is being destroyed.</p></div>
+<p>This should be called when the owning scene or session is being destroyed.</p></div>
 </div>
 </section>
 </li>

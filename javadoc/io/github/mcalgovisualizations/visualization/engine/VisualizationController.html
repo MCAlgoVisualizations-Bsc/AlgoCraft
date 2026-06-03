@@ -93,7 +93,10 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">VisualizationController&lt;I, C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;I&gt;&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></span></div>
-<div class="block">A controller of time so forwards, back, adjusting speed belongs here.</div>
+<div class="block">Coordinates trace playback, stepping, speed changes, and user feedback for a visualization session.
+
+<p>This controller owns the session state machine and bridges the trace builder,
+renderer, and player feedback layer.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -109,7 +112,9 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.github.mcalgovisualizations.visualization.renderer.Renderer,io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder,io.github.mcalgovisualizations.visualization.instance.PlayerFeedback)" class="member-name-link">VisualizationController</a><wbr>(@NotNull <a href="../renderer/Renderer.html" title="class in io.github.mcalgovisualizations.visualization.renderer">Renderer</a>&lt;<a href="#type-param-I" title="type parameter in VisualizationController">I</a>,<wbr>?&gt;&nbsp;renderer,
  @NotNull <a href="../algorithm/AlgorithmTraceBuilder.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder</a>&lt;<a href="#type-param-I" title="type parameter in VisualizationController">I</a>,<wbr><a href="#type-param-C" title="type parameter in VisualizationController">C</a>&gt;&nbsp;traceBuilder,
  @NotNull <a href="../instance/PlayerFeedback.html" title="class in io.github.mcalgovisualizations.visualization.instance">PlayerFeedback</a>&nbsp;audience)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a new visualization controller.</div>
+</div>
 </div>
 </section>
 </li>
@@ -132,7 +137,7 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#changeSpeed()" class="member-name-link">changeSpeed</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the speed of the visualization.</div>
+<div class="block">Cycles the playback speed.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
@@ -142,24 +147,28 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pause()" class="member-name-link">pause</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Stops or halts execution.</div>
+<div class="block">Pauses automatic playback.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#randomize()" class="member-name-link">randomize</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Triggers randomization of layout.</div>
+<div class="block">Regenerates the visualization from a randomized starting state.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resume()" class="member-name-link">resume</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resumes automatic playback from the paused state.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start()" class="member-name-link">start</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Starts or initializes execution.</div>
+<div class="block">Starts or resumes automatic playback.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startVisualization()" class="member-name-link">startVisualization</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Builds the initial trace and initializes the renderer with the first model snapshot.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#step()" class="member-name-link">step</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -192,6 +201,13 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
  @NotNull <a href="../algorithm/AlgorithmTraceBuilder.html" title="class in io.github.mcalgovisualizations.visualization.algorithm">AlgorithmTraceBuilder</a>&lt;<a href="#type-param-I" title="type parameter in VisualizationController">I</a>,<wbr><a href="#type-param-C" title="type parameter in VisualizationController">C</a>&gt;&nbsp;traceBuilder,
  @NotNull
  @NotNull <a href="../instance/PlayerFeedback.html" title="class in io.github.mcalgovisualizations.visualization.instance">PlayerFeedback</a>&nbsp;audience)</span></div>
+<div class="block">Creates a new visualization controller.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>renderer</code> - the renderer that executes animation events</dd>
+<dd><code>traceBuilder</code> - the trace builder used to rebuild playback state</dd>
+<dd><code>audience</code> - the player feedback bridge</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -209,7 +225,10 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">startVisualization</span>()
                                            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></span></div>
+<div class="block">Builds the initial trace and initializes the renderer with the first model snapshot.</div>
 <dl class="notes">
+<dt>Returns:</dt>
+<dd>a future that completes when initialization finishes</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></code></dd>
 </dl>
@@ -222,7 +241,7 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#start()">PlayerControls</a></code></span></div>
-<div class="block">Starts or initializes execution.</div>
+<div class="block">Starts or resumes automatic playback.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#start()">start</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -235,6 +254,7 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <h3>resume</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">resume</span>()</div>
+<div class="block">Resumes automatic playback from the paused state.</div>
 </div>
 </section>
 </li>
@@ -244,7 +264,7 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#pause()">PlayerControls</a></code></span></div>
-<div class="block">Stops or halts execution.</div>
+<div class="block">Pauses automatic playback.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#pause()">pause</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -286,10 +306,12 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">changeSpeed</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#changeSpeed()">PlayerControls</a></code></span></div>
-<div class="block">Sets the speed of the visualization.</div>
+<div class="block">Cycles the playback speed.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#changeSpeed()">changeSpeed</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
+<dt>Returns:</dt>
+<dd>the new speed value, where smaller values mean faster playback</dd>
 </dl>
 </div>
 </section>
@@ -314,7 +336,7 @@ implements <a href="PlayerControls.html" title="interface in io.github.mcalgovis
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">randomize</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#randomize()">PlayerControls</a></code></span></div>
-<div class="block">Triggers randomization of layout.</div>
+<div class="block">Regenerates the visualization from a randomized starting state.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#randomize()">randomize</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>

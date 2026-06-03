@@ -134,7 +134,7 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="../ui/IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a>&nbsp;runningLayout,
  boolean&nbsp;supportsPOV)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Creates an instance of a <code>Algorithm</code> record class.</div>
+<div class="block">Creates a validated algorithm record and copies the handler registry defensively.</div>
 </div>
 </div>
 </section>
@@ -152,7 +152,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T, C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;T&gt;, O extends <a href="../renderer/scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br>@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a><wbr>&lt;T,<wbr>C,<wbr>O&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#builder(C)" class="member-name-link">builder</a><wbr>(C&nbsp;model)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Starts building a new algorithm definition for the given model.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a><wbr>&lt;? extends <a href="../algorithm/IPlayerSort.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IPlayerSort</a>&lt;<a href="#type-param-C" title="type parameter in Algorithm">C</a>&gt;&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ctor()" class="member-name-link">ctor</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -258,20 +260,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="../ui/IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a>&nbsp;runningLayout,
  boolean&nbsp;supportsPOV)</span></div>
-<div class="block">Creates an instance of a <code>Algorithm</code> record class.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>id</code> - the value for the <code>id</code> record component</dd>
-<dd><code>ctor</code> - the value for the <code>ctor</code> record component</dd>
-<dd><code>model</code> - the value for the <code>model</code> record component</dd>
-<dd><code>layout</code> - the value for the <code>layout</code> record component</dd>
-<dd><code>handlerRegistry</code> - the value for the <code>handlerRegistry</code> record component</dd>
-<dd><code>onComplete</code> - the value for the <code>onComplete</code> record component</dd>
-<dd><code>presentation</code> - the value for the <code>presentation</code> record component</dd>
-<dd><code>scene</code> - the value for the <code>scene</code> record component</dd>
-<dd><code>runningLayout</code> - the value for the <code>runningLayout</code> record component</dd>
-<dd><code>supportsPOV</code> - the value for the <code>supportsPOV</code> record component</dd>
-</dl>
+<div class="block">Creates a validated algorithm record and copies the handler registry defensively.</div>
 </div>
 </section>
 </li>
@@ -291,6 +280,17 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;T, C extends <a href="../models/AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;T&gt;, O extends <a href="../renderer/scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="return-type">@NotNull <a href="Algorithm.Builder.html" title="class in io.github.mcalgovisualizations.visualization.instance">Algorithm.Builder</a>&lt;T,<wbr>C,<wbr>O&gt;</span>&nbsp;<span class="element-name">builder</span><wbr><span class="parameters">(@NotNull
  C&nbsp;model)</span></div>
+<div class="block">Starts building a new algorithm definition for the given model.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="builder(C)-type-param-T"><code>T</code> - model value type</span></dd>
+<dd><span id="builder(C)-type-param-C"><code>C</code> - context type</span></dd>
+<dd><span id="builder(C)-type-param-O"><code>O</code> - scene type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>model</code> - the initial model snapshot used to build playback traces</dd>
+<dt>Returns:</dt>
+<dd>a new builder for the algorithm</dd>
+</dl>
 </div>
 </section>
 </li>

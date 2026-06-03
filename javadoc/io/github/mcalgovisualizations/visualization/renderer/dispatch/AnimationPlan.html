@@ -98,7 +98,9 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final record&nbsp;</code></div>
 <div class="col-second odd-row-color"><code><a href="AnimationPlan.Step.html" class="type-name-link" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan.Step</a>&lt;<a href="AnimationPlan.Step.html#type-param-O" title="type parameter in AnimationPlan.Step">O</a> extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">A single scheduled operation within an animation plan.</div>
+</div>
 </div>
 </section>
 </li>
@@ -115,22 +117,34 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br><a href="AnimationPlan.Builder.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan.Builder</a><wbr>&lt;O&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#builder()" class="member-name-link">builder</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a new animation plan builder.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a><wbr>&lt;O&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#empty()" class="member-name-link">empty</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns an empty animation plan.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a><wbr>&lt;O&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#instant(java.util.function.Consumer)" class="member-name-link">instant</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;O&gt;&nbsp;op)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a one-step plan from a synchronous scene operation.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;<br><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a><wbr>&lt;O&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#instantAsync(java.util.function.Function)" class="member-name-link">instantAsync</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;O, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;&gt;&nbsp;op)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a one-step plan from an asynchronous scene operation.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether this plan contains any steps.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="AnimationPlan.Step.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan.Step</a>&lt;<a href="#type-param-O" title="type parameter in AnimationPlan">O</a>&gt;&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#steps()" class="member-name-link">steps</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the immutable list of steps contained in this plan.</div>
+</div>
 </div>
 </div>
 </div>
@@ -153,6 +167,11 @@ loadScripts(document, 'script');</script>
 <h3>steps</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AnimationPlan.Step.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan.Step</a>&lt;<a href="#type-param-O" title="type parameter in AnimationPlan">O</a>&gt;&gt;</span>&nbsp;<span class="element-name">steps</span>()</div>
+<div class="block">Returns the immutable list of steps contained in this plan.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>plan steps</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -161,6 +180,11 @@ loadScripts(document, 'script');</script>
 <h3>isEmpty</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEmpty</span>()</div>
+<div class="block">Returns whether this plan contains any steps.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd><code>true</code> if the plan is empty</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -170,6 +194,13 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="return-type"><a href="AnimationPlan.Builder.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan.Builder</a>&lt;O&gt;</span>&nbsp;<span class="element-name">builder</span>()</div>
+<div class="block">Creates a new animation plan builder.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="builder()-type-param-O"><code>O</code> - scene type</span></dd>
+<dt>Returns:</dt>
+<dd>a new builder</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -179,6 +210,15 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="return-type"><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;O&gt;</span>&nbsp;<span class="element-name">instant</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;O&gt;&nbsp;op)</span></div>
+<div class="block">Creates a one-step plan from a synchronous scene operation.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="instant(java.util.function.Consumer)-type-param-O"><code>O</code> - scene type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>op</code> - the operation to run</dd>
+<dt>Returns:</dt>
+<dd>a one-step plan</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -188,6 +228,15 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="return-type"><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;O&gt;</span>&nbsp;<span class="element-name">instantAsync</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;O, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;&gt;&nbsp;op)</span></div>
+<div class="block">Creates a one-step plan from an asynchronous scene operation.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="instantAsync(java.util.function.Function)-type-param-O"><code>O</code> - scene type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>op</code> - the operation to run</dd>
+<dt>Returns:</dt>
+<dd>a one-step plan</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -197,6 +246,13 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="return-type"><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;O&gt;</span>&nbsp;<span class="element-name">empty</span>()</div>
+<div class="block">Returns an empty animation plan.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="empty()-type-param-O"><code>O</code> - scene type</span></dd>
+<dt>Returns:</dt>
+<dd>an empty plan</dd>
+</dl>
 </div>
 </section>
 </li>

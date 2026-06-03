@@ -83,16 +83,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">AlgorithmContext&lt;V&gt;</span></div>
-<div class="block">Represents the execution context for an algorithm.
+<div class="block">Represents the mutable execution context for an algorithm.
 
-<p>An <code>AlgorithmContext</code> encapsulates:</p>
-<ul>
-    <li>the underlying data being operated on</li>
-    <li>a history of emitted <a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm"><code>IAlgorithmEvent</code></a>s</li>
-    <li>mechanisms for emitting events during execution</li>
-</ul>
-
-<p>The context acts as both the data source and the event sink for an algorithm.</p></div>
+<p>The context acts as both the data source and the event sink for algorithm
+execution.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -131,7 +125,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getEvents()" class="member-name-link">getEvents</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the list of emitted algorithm events.</div>
+<div class="block">Returns the ordered list of emitted algorithm events.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-V" title="type parameter in AlgorithmContext">V</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#randomizeData()" class="member-name-link">randomizeData</a>()</code></div>
@@ -170,9 +164,7 @@ loadScripts(document, 'script');</script>
 <h3>getEvents</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;</span>&nbsp;<span class="element-name">getEvents</span>()</div>
-<div class="block">Returns the list of emitted algorithm events.
-
-<p>The returned list represents the execution history in order.</p></div>
+<div class="block">Returns the ordered list of emitted algorithm events.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>ordered list of emitted events</dd>
@@ -185,10 +177,7 @@ loadScripts(document, 'script');</script>
 <h3>emit</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">emit</span><wbr><span class="parameters">(<a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>...&nbsp;e)</span></div>
-<div class="block">Emits one or more algorithm events.
-
-<p>Events are appended to the internal history and are expected to represent
-discrete, replayable steps of the algorithm.</p></div>
+<div class="block">Emits one or more algorithm events.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>e</code> - the events to emit</dd>
@@ -201,10 +190,7 @@ discrete, replayable steps of the algorithm.</p></div>
 <h3>copy</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="type-parameters">&lt;C extends <a href="AlgorithmContext.html" title="interface in io.github.mcalgovisualizations.visualization.models">AlgorithmContext</a>&lt;<a href="#type-param-V" title="type parameter in AlgorithmContext">V</a>&gt;&gt;</span>&nbsp;<span class="return-type">C</span>&nbsp;<span class="element-name">copy</span>()</div>
-<div class="block">Creates a copy of this context.
-
-<p>The copy should include a copy of the data and a separate event history.
-Mutating the returned context must not affect the original.</p></div>
+<div class="block">Creates a copy of this context.</div>
 <dl class="notes">
 <dt>Type Parameters:</dt>
 <dd><span id="copy()-type-param-C"><code>C</code> - the concrete context type</span></dd>
@@ -219,9 +205,7 @@ Mutating the returned context must not affect the original.</p></div>
 <h3>copyData</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="#type-param-V" title="type parameter in AlgorithmContext">V</a></span>&nbsp;<span class="element-name">copyData</span>()</div>
-<div class="block">Creates a copy of the underlying data.
-
-<p>The returned data must be independent from the original.</p></div>
+<div class="block">Creates a copy of the underlying data.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>a copy of the data</dd>
@@ -234,10 +218,7 @@ Mutating the returned context must not affect the original.</p></div>
 <h3>randomizeData</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="#type-param-V" title="type parameter in AlgorithmContext">V</a></span>&nbsp;<span class="element-name">randomizeData</span>()</div>
-<div class="block">Produces a randomized version of the underlying data.
-
-<p>This may mutate the current context's data or return a new instance,
-depending on the implementation.</p></div>
+<div class="block">Produces a randomized version of the underlying data.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>randomized data</dd>

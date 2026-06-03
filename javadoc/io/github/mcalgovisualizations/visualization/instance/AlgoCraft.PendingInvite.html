@@ -87,6 +87,12 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Record Components:</dt>
+<dd><code><span id="param-inviter">inviter</span></code> - the inviting player id</dd>
+<dd><code><span id="param-instance">instance</span></code> - the target session</dd>
+<dd><code><span id="param-expiresAt">expiresAt</span></code> - the expiration timestamp in epoch milliseconds</dd>
+</dl>
+<dl class="notes">
 <dt>Enclosing class:</dt>
 <dd><code><a href="AlgoCraft.html" title="class in io.github.mcalgovisualizations.visualization.instance">AlgoCraft</a></code></dd>
 </dl>
@@ -94,6 +100,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public static record </span><span class="element-name type-name-label">AlgoCraft.PendingInvite</span>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a>&nbsp;inviter, <a href="AlgorithmInstance.html" title="class in io.github.mcalgovisualizations.visualization.instance">AlgorithmInstance</a>&lt;?,<wbr>?,<wbr>?&gt;&nbsp;instance, long&nbsp;expiresAt)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
+<div class="block">Represents a pending invitation to join a visualization session.</div>
 </div>
 </section>
 <section class="summary">
@@ -134,7 +141,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#expiresAt()" class="member-name-link">expiresAt</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>expiresAt</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-expiresAt"><code>expiresAt</code></a> record component.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
@@ -144,19 +151,23 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="AlgorithmInstance.html" title="class in io.github.mcalgovisualizations.visualization.instance">AlgorithmInstance</a><wbr>&lt;?,<wbr>?,<wbr>?&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#instance()" class="member-name-link">instance</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>instance</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-instance"><code>instance</code></a> record component.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inviter()" class="member-name-link">inviter</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>inviter</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-inviter"><code>inviter</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isExpired()" class="member-name-link">isExpired</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether this invite has expired.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remainingMillis()" class="member-name-link">remainingMillis</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the remaining time before the invite expires.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -189,9 +200,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates an instance of a <code>PendingInvite</code> record class.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>inviter</code> - the value for the <code>inviter</code> record component</dd>
-<dd><code>instance</code> - the value for the <code>instance</code> record component</dd>
-<dd><code>expiresAt</code> - the value for the <code>expiresAt</code> record component</dd>
+<dd><code>inviter</code> - the value for the <a href="#param-inviter"><code>inviter</code></a> record component</dd>
+<dd><code>instance</code> - the value for the <a href="#param-instance"><code>instance</code></a> record component</dd>
+<dd><code>expiresAt</code> - the value for the <a href="#param-expiresAt"><code>expiresAt</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -209,6 +220,11 @@ loadScripts(document, 'script');</script>
 <h3>isExpired</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isExpired</span>()</div>
+<div class="block">Returns whether this invite has expired.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd><code>true</code> if the invite is expired</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -217,6 +233,11 @@ loadScripts(document, 'script');</script>
 <h3>remainingMillis</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">long</span>&nbsp;<span class="element-name">remainingMillis</span>()</div>
+<div class="block">Returns the remaining time before the invite expires.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>milliseconds remaining until expiration</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -272,10 +293,10 @@ loadScripts(document, 'script');</script>
 <h3>inviter</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></span>&nbsp;<span class="element-name">inviter</span>()</div>
-<div class="block">Returns the value of the <code>inviter</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-inviter"><code>inviter</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>inviter</code> record component</dd>
+<dd>the value of the <a href="#param-inviter"><code>inviter</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -285,10 +306,10 @@ loadScripts(document, 'script');</script>
 <h3>instance</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="AlgorithmInstance.html" title="class in io.github.mcalgovisualizations.visualization.instance">AlgorithmInstance</a>&lt;?,<wbr>?,<wbr>?&gt;</span>&nbsp;<span class="element-name">instance</span>()</div>
-<div class="block">Returns the value of the <code>instance</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-instance"><code>instance</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>instance</code> record component</dd>
+<dd>the value of the <a href="#param-instance"><code>instance</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -298,10 +319,10 @@ loadScripts(document, 'script');</script>
 <h3>expiresAt</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">long</span>&nbsp;<span class="element-name">expiresAt</span>()</div>
-<div class="block">Returns the value of the <code>expiresAt</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-expiresAt"><code>expiresAt</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>expiresAt</code> record component</dd>
+<dd>the value of the <a href="#param-expiresAt"><code>expiresAt</code></a> record component</dd>
 </dl>
 </div>
 </section>

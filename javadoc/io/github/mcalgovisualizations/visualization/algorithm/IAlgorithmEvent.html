@@ -64,23 +64,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">IAlgorithmEvent</span></div>
-<div class="block">Marker interface representing a single step or action produced by an algorithm.
+<div class="block">Marker interface for a single replayable algorithm event.
 
-<p>Implementations should be immutable and describe a discrete, replayable event
-in the algorithm's execution (e.g. comparison, swap, insertion).</p>
-
-<p>These events are consumed by a renderer that
-interprets them to produce visual changes.</p>
-
-<p>No behavior is defined here; this interface exists to provide a common type
-for heterogeneous algorithm events.</p>
-
-<p><strong>Implementation Requirements:</strong></p>
-<ul>
-    <li>Be immutable (no internal state changes after creation)</li>
-    <li>Contain all data required for rendering or interpretation</li>
-    <li>Avoid referencing external mutable state</li>
-</ul></div>
+<p>Events should be immutable and contain all data needed by the renderer or
+animation handlers to reproduce the visual step.</p></div>
 </div>
 </section>
 <!-- ========= END OF CLASS DATA ========= -->

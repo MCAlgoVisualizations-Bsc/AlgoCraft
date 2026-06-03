@@ -85,11 +85,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Represents a visual element in the world that can be positioned, displayed,
 and controlled for one or more viewers.
 
-<p>An <code>IDisplayValue</code> abstracts over concrete Minestom entities or
-composite render objects, providing a uniform interface for positioning,
-visibility, and basic visual state.</p>
-
-<p>Implementations may wrap one or more underlying entities.</p></div>
+<p>Implementations may wrap one or more underlying Minestom entities or composite
+render objects.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -107,7 +104,9 @@ visibility, and basic visual state.</p>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addViewer(net.minestom.server.entity.Player)" class="member-name-link">addViewer</a><wbr>(net.minestom.server.entity.Player&nbsp;player)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Adds a player as a viewer of this display.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>net.minestom.server.coordinate.Pos</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getPos()" class="member-name-link">getPos</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -136,7 +135,9 @@ visibility, and basic visual state.</p>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setInstance(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos)" class="member-name-link">setInstance</a><wbr>(net.minestom.server.instance.Instance&nbsp;instance,
  net.minestom.server.coordinate.Pos&nbsp;pos)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sets the instance and position for this display.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#teleport(net.minestom.server.coordinate.Pos)" class="member-name-link">teleport</a><wbr>(net.minestom.server.coordinate.Pos&nbsp;pos)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -179,9 +180,7 @@ visibility, and basic visual state.</p>
 <h3>setInstance</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">setInstance</span><wbr><span class="parameters">(net.minestom.server.instance.Instance&nbsp;instance)</span></div>
-<div class="block">Sets the instance (world) this display belongs to.
-
-<p>This typically spawns or moves the underlying entity into the given instance.</p></div>
+<div class="block">Sets the instance (world) this display belongs to.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>instance</code> - the target instance</dd>
@@ -195,6 +194,12 @@ visibility, and basic visual state.</p>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">setInstance</span><wbr><span class="parameters">(net.minestom.server.instance.Instance&nbsp;instance,
  net.minestom.server.coordinate.Pos&nbsp;pos)</span></div>
+<div class="block">Sets the instance and position for this display.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>instance</code> - the target instance</dd>
+<dd><code>pos</code> - the target position</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -203,6 +208,11 @@ visibility, and basic visual state.</p>
 <h3>addViewer</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">addViewer</span><wbr><span class="parameters">(net.minestom.server.entity.Player&nbsp;player)</span></div>
+<div class="block">Adds a player as a viewer of this display.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>player</code> - the player to add</dd>
+</dl>
 </div>
 </section>
 </li>

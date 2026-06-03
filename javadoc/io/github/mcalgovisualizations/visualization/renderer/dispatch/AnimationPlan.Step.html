@@ -76,7 +76,7 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Record Class AnimationPlan.Step" class="title">Record Class AnimationPlan.Step&lt;<span id="type-param-O">O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a></span>&gt;</h1>
+<h1 title="Record Class AnimationPlan.Step" class="title">Record Class AnimationPlan.Step&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">java.lang.Record</a>
@@ -85,6 +85,11 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Record Components:</dt>
+<dd><code><span id="param-ticks">ticks</span></code> - wait time after the step completes</dd>
+<dd><code><span id="param-op">op</span></code> - the scene operation to run</dd>
+</dl>
+<dl class="notes">
 <dt>Enclosing class:</dt>
 <dd><code><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="AnimationPlan.html#type-param-O" title="type parameter in AnimationPlan">O</a> extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</code></dd>
 </dl>
@@ -92,6 +97,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public static record </span><span class="element-name type-name-label">AnimationPlan.Step&lt;O extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>(int&nbsp;ticks, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-O" title="type parameter in AnimationPlan.Step">O</a> extends <a href="../scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;&gt;&nbsp;op)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
+<div class="block">A single scheduled operation within an animation plan.</div>
 </div>
 </section>
 <section class="summary">
@@ -136,15 +142,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a><wbr>&lt;<a href="#type-param-O" title="type parameter in AnimationPlan.Step">O</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#op()" class="member-name-link">op</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>op</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-op"><code>op</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(O)" class="member-name-link">run</a><wbr>(<a href="#type-param-O" title="type parameter in AnimationPlan.Step">O</a>&nbsp;scene)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Executes the step against the provided scene.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ticks()" class="member-name-link">ticks</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>ticks</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-ticks"><code>ticks</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
@@ -177,8 +185,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates an instance of a <code>Step</code> record class.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>ticks</code> - the value for the <code>ticks</code> record component</dd>
-<dd><code>op</code> - the value for the <code>op</code> record component</dd>
+<dd><code>ticks</code> - the value for the <a href="#param-ticks"><code>ticks</code></a> record component</dd>
+<dd><code>op</code> - the value for the <a href="#param-op"><code>op</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -196,6 +204,13 @@ loadScripts(document, 'script');</script>
 <h3 id="run(io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps)">run</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</span>&nbsp;<span class="element-name">run</span><wbr><span class="parameters">(<a href="#type-param-O" title="type parameter in AnimationPlan.Step">O</a>&nbsp;scene)</span></div>
+<div class="block">Executes the step against the provided scene.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>scene</code> - the scene to apply the step to</dd>
+<dt>Returns:</dt>
+<dd>a future that completes when the step finishes</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -251,10 +266,10 @@ loadScripts(document, 'script');</script>
 <h3>ticks</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">ticks</span>()</div>
-<div class="block">Returns the value of the <code>ticks</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-ticks"><code>ticks</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>ticks</code> record component</dd>
+<dd>the value of the <a href="#param-ticks"><code>ticks</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -264,10 +279,10 @@ loadScripts(document, 'script');</script>
 <h3>op</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-O" title="type parameter in AnimationPlan.Step">O</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;&gt;</span>&nbsp;<span class="element-name">op</span>()</div>
-<div class="block">Returns the value of the <code>op</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-op"><code>op</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>op</code> record component</dd>
+<dd>the value of the <a href="#param-op"><code>op</code></a> record component</dd>
 </dl>
 </div>
 </section>

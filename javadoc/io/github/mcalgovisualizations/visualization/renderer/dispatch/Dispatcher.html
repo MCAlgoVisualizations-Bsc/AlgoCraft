@@ -93,7 +93,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.Map)" class="member-name-link">Dispatcher</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="../../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;, <a href="../IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;?&gt;&gt;&nbsp;handlers)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a dispatcher backed by the provided handler registry.</div>
+</div>
 </div>
 </section>
 </li>
@@ -110,7 +112,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a><wbr>&lt;<a href="#type-param-O" title="type parameter in Dispatcher">O</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dispatch(io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent)" class="member-name-link">dispatch</a><wbr>(@NotNull <a href="../../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&nbsp;event)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Dispatches an event to its registered animation handler.</div>
+</div>
 </div>
 </div>
 </div>
@@ -133,6 +137,11 @@ loadScripts(document, 'script');</script>
 <h3>Dispatcher</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Dispatcher</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="../../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;, <a href="../IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;?&gt;&gt;&nbsp;handlers)</span></div>
+<div class="block">Creates a dispatcher backed by the provided handler registry.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>handlers</code> - concrete event-to-handler mappings</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -150,6 +159,15 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Dispatcher">O</a>&gt;</span>&nbsp;<span class="element-name">dispatch</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="../../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&nbsp;event)</span></div>
+<div class="block">Dispatches an event to its registered animation handler.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>event</code> - the concrete event to dispatch</dd>
+<dt>Returns:</dt>
+<dd>the resulting animation plan</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalStateException.html" title="class or interface in java.lang" class="external-link">IllegalStateException</a></code> - if no handler exists for the event class</dd>
+</dl>
 </div>
 </section>
 </li>

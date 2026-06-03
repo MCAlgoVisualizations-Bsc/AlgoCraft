@@ -83,10 +83,17 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 <section class="class-description" id="class-description">
+<dl class="notes">
+<dt>Record Components:</dt>
+<dd><code><span id="param-instance">instance</span></code> - the Minestom instance that backs the visualization</dd>
+<dd><code><span id="param-audience">audience</span></code> - the audience channel used for feedback</dd>
+<dd><code><span id="param-origin">origin</span></code> - the spatial anchor for layout placement</dd>
+</dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public record </span><span class="element-name type-name-label">SceneContext</span>(net.minestom.server.instance.Instance&nbsp;instance, <a href="../../instance/AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a>&nbsp;audience, net.minestom.server.coordinate.Pos&nbsp;origin)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
+<div class="block">Immutable runtime context used to construct a scene.</div>
 </div>
 </section>
 <section class="summary">
@@ -122,7 +129,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../instance/AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#audience()" class="member-name-link">audience</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>audience</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-audience"><code>audience</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</code></div>
@@ -137,12 +144,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>net.minestom.server.instance.Instance</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#instance()" class="member-name-link">instance</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>instance</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-instance"><code>instance</code></a> record component.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>net.minestom.server.coordinate.Pos</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#origin()" class="member-name-link">origin</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>origin</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-origin"><code>origin</code></a> record component.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
@@ -176,9 +183,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates an instance of a <code>SceneContext</code> record class.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>instance</code> - the value for the <code>instance</code> record component</dd>
-<dd><code>audience</code> - the value for the <code>audience</code> record component</dd>
-<dd><code>origin</code> - the value for the <code>origin</code> record component</dd>
+<dd><code>instance</code> - the value for the <a href="#param-instance"><code>instance</code></a> record component</dd>
+<dd><code>audience</code> - the value for the <a href="#param-audience"><code>audience</code></a> record component</dd>
+<dd><code>origin</code> - the value for the <a href="#param-origin"><code>origin</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -243,10 +250,10 @@ loadScripts(document, 'script');</script>
 <h3>instance</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">net.minestom.server.instance.Instance</span>&nbsp;<span class="element-name">instance</span>()</div>
-<div class="block">Returns the value of the <code>instance</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-instance"><code>instance</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>instance</code> record component</dd>
+<dd>the value of the <a href="#param-instance"><code>instance</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -256,10 +263,10 @@ loadScripts(document, 'script');</script>
 <h3>audience</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../instance/AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a></span>&nbsp;<span class="element-name">audience</span>()</div>
-<div class="block">Returns the value of the <code>audience</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-audience"><code>audience</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>audience</code> record component</dd>
+<dd>the value of the <a href="#param-audience"><code>audience</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -269,10 +276,10 @@ loadScripts(document, 'script');</script>
 <h3>origin</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">net.minestom.server.coordinate.Pos</span>&nbsp;<span class="element-name">origin</span>()</div>
-<div class="block">Returns the value of the <code>origin</code> record component.</div>
+<div class="block">Returns the value of the <a href="#param-origin"><code>origin</code></a> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the value of the <code>origin</code> record component</dd>
+<dd>the value of the <a href="#param-origin"><code>origin</code></a> record component</dd>
 </dl>
 </div>
 </section>
