@@ -23,5 +23,5 @@ nav:
       - Layouts and Displays: layouts-and-displays.md
       - Events and Handlers: events-and-handlers.md
       - Architecture & Engine: architecture.md
-  - API Reference:
+  - JAVADOC API References:
       - JavaDoc Engine: javadoc/index.html

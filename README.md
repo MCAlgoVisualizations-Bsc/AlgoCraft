@@ -20,6 +20,8 @@ This repository is primarily the framework codebase, with a runnable example app
 - WikiHub: https://mcalgovisualizations-bsc.github.io/AlgoCraft/
 - JavaDoc: https://mcalgovisualizations-bsc.github.io/AlgoCraft/javadoc/
 
+For a full demo world, see: https://github.com/MCAlgoVisualizations-Bsc/Demo
+
 ## Local Development
 
 1. Build and run tests:
