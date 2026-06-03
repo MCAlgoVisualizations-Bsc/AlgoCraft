@@ -12,9 +12,6 @@ import java.util.List;
  * <p>This class stores the algorithm data and collects emitted
  * {@link IAlgorithmEvent}s in insertion order.</p>
  *
- * <p>{@link #getEvents()} returns a defensive copy, so callers cannot mutate the
- * internal event history directly.</p>
- *
  * @param <T> the type of data stored by this context
  */
 public abstract class AbstractContext<T> implements AlgorithmContext<T> {

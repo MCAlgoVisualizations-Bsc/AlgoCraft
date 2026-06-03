@@ -15,6 +15,9 @@ import net.minestom.server.timer.TaskSchedule;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+/**
+ * Base helper for displays that render particle effects around another display.
+ */
 @Deprecated
 
 public abstract class AbstractParticleDisplay implements IDisplayValue {

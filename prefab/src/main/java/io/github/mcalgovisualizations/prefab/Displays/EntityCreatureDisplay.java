@@ -20,15 +20,24 @@ import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Display that renders an entity creature with a floating label.
+ */
 public class EntityCreatureDisplay implements IDisplayValue {
     private Pos initialPos;
     private final EntityCreature entity;
     private final Entity textEntity;
 
+    /**
+     * Creates a creature display with default gravity settings.
+     */
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText) {
         this(pos, entityType, displayText, false);
     }
 
+    /**
+     * Creates a creature display with configurable gravity.
+     */
     public EntityCreatureDisplay(Pos pos, EntityType entityType, String displayText, boolean setNoGravity) {
         this.initialPos = pos;
         this.entity = new EntityCreature(entityType);
@@ -48,11 +57,17 @@ public class EntityCreatureDisplay implements IDisplayValue {
 
 
     @Override
+    /**
+     * Returns the current creature position.
+     */
     public Pos getPos() {
         return this.entity.isActive() ? this.entity.getPosition() : initialPos;
     }
 
     @Override
+    /**
+     * Spawns the entity and label into the target instance.
+     */
     public void setInstance(Instance instance) {
         Pos spawnPos = getPos();
         entity.setInstance(instance, spawnPos).thenRun(() -> {
@@ -65,12 +80,18 @@ public class EntityCreatureDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Spawns the entity and label at a specific position.
+     */
     public void setInstance(Instance instance, Pos pos) {
         this.initialPos = pos;
         setInstance(instance);
     }
 
     @Override
+    /**
+     * Teleports the creature display.
+     */
     public void teleport(Pos pos) {
         if (entity.isActive()) {
             entity.teleport(pos);
@@ -84,6 +105,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
      *
      * @param pos the target position
      * @return a future that completes when the target is reached
+     */
+    /**
+     * Attempts to pathfind the creature display to a new position.
      */
     public CompletableFuture<Void> walkTo(Pos pos) {
         if (!entity.isActive()) {
@@ -124,6 +148,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
         return entity.getEyeHeight();
     }
 
+    /**
+     * Returns the backing creature entity.
+     */
     public EntityCreature getEntity() {
         return entity;
     }
@@ -143,6 +170,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Removes the creature and label entities.
+     */
     public void remove() {
         entity.remove();
         textEntity.remove();
@@ -171,6 +201,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Toggles the glowing outline on the creature display.
+     */
     public void setGlowing(boolean highlighted) {
         entity.setGlowing(highlighted);
     }
@@ -183,6 +216,9 @@ public class EntityCreatureDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Returns whether the display is currently active.
+     */
     public boolean isSpawned() {
         return entity.isActive();
     }

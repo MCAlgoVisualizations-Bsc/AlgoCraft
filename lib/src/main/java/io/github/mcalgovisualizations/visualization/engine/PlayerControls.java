@@ -1,26 +1,25 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
 /**
- * Defines control actions for a visualization or playback system.
- * <p>
- * Implementations translate these high-level control signals into
- * concrete behavior (e.g., updating state, triggering animations,
- * or providing user feedback).
+ * Defines control actions for a visualization playback system.
+ *
+ * <p>Implementations translate these high-level control signals into state changes,
+ * animation control, and user feedback.</p>
  */
 public interface PlayerControls {
 
     /**
-     * Triggers randomization of layout.
+     * Regenerates the visualization from a randomized starting state.
      */
     void randomize();
 
     /**
-     * Starts or initializes execution.
+     * Starts or resumes automatic playback.
      */
     void start();
 
     /**
-     * Stops or halts execution.
+     * Pauses automatic playback.
      */
     void pause();
 
@@ -40,7 +39,9 @@ public interface PlayerControls {
     void clear();
 
     /**
-     * Sets the speed of the visualization.
+     * Cycles the playback speed.
+     *
+     * @return the new speed value, where smaller values mean faster playback
      */
     int changeSpeed();
 }

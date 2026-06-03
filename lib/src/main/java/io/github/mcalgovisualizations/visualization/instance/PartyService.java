@@ -12,11 +12,20 @@ import net.minestom.server.instance.Instance;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Manages the player party attached to a single visualization session.
+ */
 public class PartyService {
     private final Player host;
     private final Set<Player> spectators = new HashSet<>();
     private final String algorithmId;
 
+    /**
+     * Creates a party service for one visualization host.
+     *
+     * @param host the host player who owns the session
+     * @param algorithmID the id of the algorithm being viewed
+     */
     public PartyService(Player host, String algorithmID) {
         this.host = host;
         this.algorithmId = algorithmID;

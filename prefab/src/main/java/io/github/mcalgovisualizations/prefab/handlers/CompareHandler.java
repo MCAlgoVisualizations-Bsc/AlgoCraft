@@ -7,8 +7,17 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+/**
+ * Converts compare events into highlight and hover animations.
+ */
 public final class CompareHandler implements IAnimationHandler<Compare> {
 
+    /**
+     * Builds the animation plan for a compare event.
+     *
+     * @param event compare event to render
+     * @return animation plan for the compare action
+     */
     @Override
     public AnimationPlan<ISceneOps> handle(Compare event) {
         return AnimationPlan.builder()

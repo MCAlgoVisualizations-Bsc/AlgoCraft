@@ -15,11 +15,17 @@ import net.minestom.server.instance.Instance;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Simple text-based node display used by graph-style visualizations.
+ */
 public class NodeDisplay implements IDisplayValue {
     private final Entity textEntity;
     private Pos pos;
     private static final double FONT_BASELINE_CORRECTION = -0.25;
 
+    /**
+     * Creates a new node display at the given position.
+     */
     public NodeDisplay(String value, Pos pos) {
         textEntity = new Entity(EntityType.TEXT_DISPLAY);
         this.pos = translatePos(pos);
@@ -27,32 +33,50 @@ public class NodeDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Returns the current display position.
+     */
     public Pos getPos() {
         return pos;
     }
 
     @Override
+    /**
+     * Spawns the text display into the given instance.
+     */
     public void setInstance(Instance instance) {
         textEntity.setInstance(instance, pos);
     }
 
     @Override
+    /**
+     * Spawns the text display at a specific position.
+     */
     public void setInstance(Instance instance, Pos pos) {
         this.pos = pos;
         textEntity.setInstance(instance, pos);
     }
 
     @Override
+    /**
+     * Adds a viewer for the display.
+     */
     public void addViewer(Player player) {
         textEntity.addViewer(player);
     }
 
     @Override
+    /**
+     * Removes the display entity.
+     */
     public void remove() {
         textEntity.remove();
     }
 
     @Override
+    /**
+     * Teleports the node display.
+     */
     public void teleport(Pos pos) {
         this.pos = translatePos(pos);
         textEntity.teleport(this.pos);
@@ -60,11 +84,17 @@ public class NodeDisplay implements IDisplayValue {
 
 
     @Override
+    /**
+     * Toggles the glowing state.
+     */
     public void setGlowing(boolean highlighted) {
         textEntity.setGlowing(highlighted);
     }
 
     @Override
+    /**
+     * Returns whether the display is active.
+     */
     public boolean isSpawned() {
         return textEntity.isActive();
     }

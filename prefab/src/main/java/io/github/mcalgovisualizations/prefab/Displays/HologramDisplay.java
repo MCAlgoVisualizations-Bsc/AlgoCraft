@@ -10,16 +10,17 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.instance.Instance;
-@Deprecated
-
 /**
- * A floating text hologram displayed above the visualization.
- * Uses a TEXT_DISPLAY entity so it's always billboard-facing the viewer.
+ * Floating text hologram displayed above the visualization.
  */
+@Deprecated
 public final class HologramDisplay implements IDisplayValue {
     private final Pos pos;
     private final Entity textEntity;
 
+    /**
+     * Creates a new hologram at the given position.
+     */
     public HologramDisplay(String value, Pos pos) {
         this.pos = pos;
         this.textEntity = new Entity(EntityType.TEXT_DISPLAY);
@@ -34,12 +35,18 @@ public final class HologramDisplay implements IDisplayValue {
     }
 
     /** Update the displayed text. */
+    /**
+     * Updates the displayed text.
+     */
     public void setText(Component text) {
         var meta = (TextDisplayMeta) textEntity.getEntityMeta();
         meta.setText(text);
     }
 
     @Override
+    /**
+     * Returns the hologram position.
+     */
     public Pos getPos() {
         return this.pos;
     }
@@ -58,6 +65,9 @@ public final class HologramDisplay implements IDisplayValue {
         textEntity.addViewer(player);
     }
 
+    /**
+     * Removes the hologram entity.
+     */
     public void remove() {
         textEntity.remove();
     }

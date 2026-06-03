@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Defines a channel for delivering feedback to an audience.
+ *
+ * <p>Implementations typically bridge Minestom audiences, player parties, or
+ * other presentation layers that can receive messages and sounds.</p>
  */
 public interface AudienceChannel {
 
@@ -25,17 +28,40 @@ public interface AudienceChannel {
      */
     void sendMessage(final Component message);
 
+    /**
+     * Sends a plain-text message to the audience.
+     *
+     * @param message the message to send
+     */
     void sendMessage(@NotNull final String message);
 
+    /**
+     * Sends a colored plain-text message to the audience.
+     *
+     * @param message the message to send
+     * @param color the message color
+     */
     void sendMessage(@NotNull final String message, final NamedTextColor color);
 
     /**
      * Sends an action bar message to the audience.
+     *
      * @param message the message to send
      */
     void sendActionBar(final Component message);
 
+    /**
+     * Sends a plain-text action bar message.
+     *
+     * @param message the message to send
+     */
     void sendActionBar(@NotNull final String message);
 
+    /**
+     * Sends a colored plain-text action bar message.
+     *
+     * @param message the message to send
+     * @param color the message color
+     */
     void sendActionBar(@NotNull final String message, final NamedTextColor color);
 }

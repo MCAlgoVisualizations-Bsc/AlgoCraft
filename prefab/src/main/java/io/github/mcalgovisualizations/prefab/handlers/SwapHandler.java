@@ -7,7 +7,16 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+/**
+ * Converts swap events into highlight, hover, and slot swap animations.
+ */
 public final class SwapHandler implements IAnimationHandler<Swap> {
+    /**
+     * Builds the animation plan for a swap event.
+     *
+     * @param event swap event to render
+     * @return animation plan for the swap action
+     */
     @Override
     public AnimationPlan<ISceneOps> handle(Swap event) {
         return AnimationPlan.builder()

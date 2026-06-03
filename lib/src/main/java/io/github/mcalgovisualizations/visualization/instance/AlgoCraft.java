@@ -37,14 +37,32 @@ public class AlgoCraft {
     private final Instance defaultInstance;
     public final static Pos SPAWN_POS = new Pos(194.5, 137, -38.5);
 
+    /**
+     * Creates a new AlgoCraft session manager bound to the provided hub instance.
+     *
+     * @param defaultInstance the default instance players return to when leaving a visualization
+     */
     public AlgoCraft(InstanceContainer defaultInstance) {
         this.defaultInstance = defaultInstance;
     }
 
+    /**
+     * Returns the hub instance used as the default spawn location.
+     *
+     * @return the default instance
+     */
     public Instance getDefaultInstance() {
         return defaultInstance;
     }
 
+    /**
+     * Creates a runnable visualization session for the algorithm with the given id.
+     *
+     * @param id the registered algorithm id
+     * @param players players that should be attached to the session immediately
+     * @return the created algorithm session
+     * @throws IllegalArgumentException if no algorithm with the given id exists
+     */
     public AlgorithmInstance<?,?,?> createInstance(String id, Player... players){
         if (algorithmRegistry.get(id) == null)
             throw new IllegalArgumentException("No entry with id " + id);
@@ -57,6 +75,11 @@ public class AlgoCraft {
         return instance;
     }
 
+    /**
+     * Removes the given players from their current visualization and returns them to the hub.
+     *
+     * @param players players to remove from the active session
+     */
     public void removePlayerFromInstance(Player... players) {
         for(var player : players) {
             var instance = requireInstance(player);
@@ -65,6 +88,12 @@ public class AlgoCraft {
         }
     }
 
+    /**
+     * Looks up the active scene for a player, if one exists.
+     *
+     * @param player the player to inspect
+     * @return the active scene, or an empty optional if the player is not in a session
+     */
     public Optional<ISceneOps> sceneFor(Player player) {
         var instance = playerInstance.get(player.getUuid());
         if (instance == null) {
@@ -73,18 +102,41 @@ public class AlgoCraft {
         return Optional.ofNullable((ISceneOps) instance.getScene());
     }
 
+    /**
+     * Registers an algorithm so it appears in the selector UI.
+     *
+     * @param algorithm the algorithm definition to register
+     * @param <T> model value type
+     * @param <C> algorithm context type
+     */
     public <T, C extends AlgorithmContext<T>> void registerAlgorithm(Algorithm<T, C, ?> algorithm) {
         algorithmRegistry.put(algorithm.id(), algorithm);
     }
 
+    /**
+     * Returns the active session for a player.
+     *
+     * @param player the player to inspect
+     * @return the active algorithm session, or {@code null} if the player is not in one
+     */
     public AlgorithmInstance<?,?,?> requireInstance(Player player) {
         return playerInstance.get(player.getUuid());
     }
 
+    /**
+     * Gives the player the default hub inventory layout.
+     *
+     * @param player the player to update
+     */
     public void applyDefaultLayout(Player player) {
         ui.applyDefaultLayout(player, getDefaultInstance());
     }
 
+    /**
+     * Registers the global item interaction listeners needed by AlgoCraft.
+     *
+     * @param handler the global event handler to attach listeners to
+     */
     public void addListener(GlobalEventHandler handler) {
         handler.addListener(PlayerUseItemEvent.class, this::onPlayerUseItem);
 
@@ -143,6 +195,12 @@ public class AlgoCraft {
         }
     }
 
+    /**
+     * Toggles the special villager camera mode for a player.
+     *
+     * @param player the player toggling POV
+     * @param instance the active visualization session
+     */
     private void toggleVillagerPOV(Player player, AlgorithmInstance<?, ?, ?> instance) {
         if (instance == null) {
             player.sendMessage(Component.text("No active algorithm", NamedTextColor.RED));
@@ -184,6 +242,11 @@ public class AlgoCraft {
         }
     }
 
+    /**
+     * Opens the algorithm selector GUI for a player.
+     *
+     * @param player the player opening the selector
+     */
     public void selectAlgorithm(Player player) {
         final var inventory = ui.openSelector(algorithmRegistry.keySet(), presentation -> {
             var entry = algorithmRegistry.get(presentation).presentation();
@@ -225,10 +288,27 @@ public class AlgoCraft {
 
     private final Map<UUID, Set<PendingInvite>> pendingInvites = new HashMap<>();
 
+    /**
+     * Represents a pending invitation to join a visualization session.
+     *
+     * @param inviter the inviting player id
+     * @param instance the target session
+     * @param expiresAt the expiration timestamp in epoch milliseconds
+     */
     public record PendingInvite(UUID inviter, AlgorithmInstance<?, ?, ?> instance, long expiresAt) {
+        /**
+         * Returns whether this invite has expired.
+         *
+         * @return {@code true} if the invite is expired
+         */
         public boolean isExpired() {
                 return System.currentTimeMillis() > expiresAt;
         }
+        /**
+         * Returns the remaining time before the invite expires.
+         *
+         * @return milliseconds remaining until expiration
+         */
         public long remainingMillis() {
             return Math.max(0, expiresAt - System.currentTimeMillis());
         }
@@ -244,12 +324,25 @@ public class AlgoCraft {
         }
     }
 
+    /**
+     * Returns all active invites targeting the given player.
+     *
+     * @param player the player to inspect
+     * @return immutable set of active invites
+     */
     public Set<PendingInvite> getPendingInvites(Player player) {
         var invites = pendingInvites.getOrDefault(player.getUuid(), new HashSet<>());
         invites.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());
         return Set.copyOf(invites);
     }
 
+    /**
+     * Sends an invite from one player to another.
+     *
+     * @param inviter the player issuing the invite
+     * @param target the player receiving the invite
+     * @param expiresIn expiration timestamp in epoch milliseconds
+     */
     public void invitePlayer(Player inviter, Player target, long expiresIn) {
         final var inviterInstance = requireInstance(inviter);
 
@@ -269,6 +362,13 @@ public class AlgoCraft {
         invites.add(new PendingInvite(inviter.getUuid(), inviterInstance, expiresIn));
     }
 
+    /**
+     * Accepts an invite sent by a specific player.
+     *
+     * @param invited the player accepting the invite
+     * @param inviter the player who sent the invite
+     * @return {@code true} if an invite was accepted
+     */
     public boolean acceptInvite(Player invited, Player inviter) {
         var inviteList = pendingInvites.computeIfAbsent(invited.getUuid(), _ -> new HashSet<>());
         inviteList.removeIf(invite -> invite.isExpired() || !invite.instance.getInstance().isRegistered());

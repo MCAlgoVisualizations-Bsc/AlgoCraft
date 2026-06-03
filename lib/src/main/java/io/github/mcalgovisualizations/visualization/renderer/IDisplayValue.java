@@ -11,11 +11,8 @@ import java.util.concurrent.CompletableFuture;
  * Represents a visual element in the world that can be positioned, displayed,
  * and controlled for one or more viewers.
  *
- * <p>An {@code IDisplayValue} abstracts over concrete Minestom entities or
- * composite render objects, providing a uniform interface for positioning,
- * visibility, and basic visual state.</p>
- *
- * <p>Implementations may wrap one or more underlying entities.</p>
+ * <p>Implementations may wrap one or more underlying Minestom entities or composite
+ * render objects.</p>
  */
 public interface IDisplayValue {
 
@@ -29,16 +26,25 @@ public interface IDisplayValue {
     /**
      * Sets the instance (world) this display belongs to.
      *
-     * <p>This typically spawns or moves the underlying entity into the given instance.</p>
-     *
      * @param instance the target instance
      */
     void setInstance(Instance instance);
 
+    /**
+     * Sets the instance and position for this display.
+     *
+     * @param instance the target instance
+     * @param pos the target position
+     */
     void setInstance(Instance instance, Pos pos);
 
-    // TODO : Remove
+    /**
+     * Adds a player as a viewer of this display.
+     *
+     * @param player the player to add
+     */
     void addViewer(Player player);
+
     /**
      * Removes this display from the world.
      *

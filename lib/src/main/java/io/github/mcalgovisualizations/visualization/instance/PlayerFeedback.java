@@ -22,6 +22,11 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
     private final Supplier<Audience> supplier;
     private Audience audience() { return this.supplier.get(); }
 
+    /**
+     * Creates a feedback bridge for the supplied audience.
+     *
+     * @param supplier audience supplier, typically backed by a party service
+     */
     public PlayerFeedback(@NotNull Supplier<Audience> supplier) {
         this.supplier = supplier;
     }
@@ -43,11 +48,22 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         audience().sendActionBar(message);
     }
 
+    /**
+     * Sends an action bar message using default coloring.
+     *
+     * @param message the message to send
+     */
     @Override
     public void sendActionBar(@NotNull final String message) {
         audience().sendActionBar(Component.text(message));
     }
 
+    /**
+     * Sends a colored action bar message.
+     *
+     * @param message the message to send
+     * @param color the color to apply
+     */
     @Override
     public void sendActionBar(@NotNull final String message, NamedTextColor color) {
         audience().sendActionBar(Component.text(message).color(color));
@@ -63,11 +79,22 @@ public final class PlayerFeedback implements AudienceChannel, PlayerControls {
         audience().sendMessage(message);
     }
 
+    /**
+     * Sends a plain-text message.
+     *
+     * @param message the message to send
+     */
     @Override
     public void sendMessage(@NotNull String message) {
         audience().sendMessage(Component.text(message));
     }
 
+    /**
+     * Sends a colored plain-text message.
+     *
+     * @param message the message to send
+     * @param color the color to apply
+     */
     @Override
     public void sendMessage(@NotNull final String message, NamedTextColor color) {
         audience().sendMessage(Component.text(message).color(color));

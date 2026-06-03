@@ -49,6 +49,9 @@ public class MobDisplay implements IDisplayValue {
     private final Entity textEntity;
     private Pos pos;
 
+    /**
+     * Creates a mob display for a textual value.
+     */
     public MobDisplay(Pos pos, String text) {
         if (text == null || text.isBlank()) throw new IllegalArgumentException("text cannot be blank");
 
@@ -61,11 +64,17 @@ public class MobDisplay implements IDisplayValue {
         setupText(text);
     }
 
+    /**
+     * Maps a value to the mob type ladder used for visuals.
+     */
     public static EntityType mobTypeForValue(int value) {
         int index = Math.clamp(value - 1, 0, MOB_LADDER.length - 1);
         return MOB_LADDER[index];
     }
 
+    /**
+     * Returns the current display position.
+     */
     public Pos getPos() {
         return pos;
     }
@@ -81,18 +90,27 @@ public class MobDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Spawns the mob display into the given instance.
+     */
     public void setInstance(@NotNull Instance instance) {
         mobEntity.setInstance(instance, pos);
         textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
     }
 
     @Override
+    /**
+     * Spawns the mob display at a specific position.
+     */
     public void setInstance(Instance instance, Pos pos) {
         mobEntity.setInstance(instance, pos);
         textEntity.setInstance(instance, pos.add(0, TEXT_Y_OFFSET, 0));
     }
 
     @Override
+    /**
+     * Adds a viewer for the mob and label entities.
+     */
     public void addViewer(Player player) {
         mobEntity.addViewer(player);
         textEntity.addViewer(player);
@@ -100,12 +118,18 @@ public class MobDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Removes the mob and label entities.
+     */
     public void remove() {
         mobEntity.remove();
         textEntity.remove();
     }
 
     @Override
+    /**
+     * Teleports the mob display.
+     */
     public void teleport(Pos pos) {
         this.pos = pos;
         mobEntity.teleport(pos);
@@ -113,16 +137,25 @@ public class MobDisplay implements IDisplayValue {
     }
 
     @Override
+    /**
+     * Toggles the glowing state on both entities.
+     */
     public void setGlowing(boolean highlighted) {
         mobEntity.setGlowing(highlighted);
         textEntity.setGlowing(highlighted);
     }
 
     @Override
+    /**
+     * Returns whether the display is active.
+     */
     public boolean isSpawned() {
         return mobEntity.isActive() || textEntity.isActive();
     }
 
+    /**
+     * Updates the label text to show a numeric value.
+     */
     public void setValue(int value) {
         var meta = (TextDisplayMeta) textEntity.getEntityMeta();
         meta.setText(Component.text(Integer.toString(value), NamedTextColor.GOLD));

@@ -28,6 +28,12 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
     private final O scene;
     public static final Pos INSTANCE_ORIGIN = new Pos(0, 40, 0);
 
+    /**
+     * Creates a runtime session for a specific algorithm and player group.
+     *
+     * @param algorithm the algorithm definition to run
+     * @param players the players that initially join the session
+     */
     public AlgorithmInstance(Algorithm<T,C,O> algorithm, Player... players) {
         this.presentation = algorithm.presentation();
         this.partyService = new PartyService(players[0], algorithm.id());
@@ -81,29 +87,67 @@ public class AlgorithmInstance<T, C extends AlgorithmContext<T>, O extends IScen
 
     }
 
+    /**
+     * Returns the Minestom instance used to render the visualization.
+     *
+     * @return the backing instance
+     */
     public Instance getInstance() {
         return this.instance;
     }
 
+    /**
+     * Adds one or more players as spectators to the active session.
+     *
+     * @param players players to add
+     * @return a future that completes when the players are moved
+     */
     public CompletableFuture<Void> addPlayer(Player... players) {
         return partyService.addSpectator(instance, INSTANCE_ORIGIN, players);
     }
 
+    /**
+     * Removes players from the session and returns them to another instance.
+     *
+     * @param returnInstance the instance to return players to
+     * @param players players to remove
+     * @return a future that completes when the players are moved
+     */
     public CompletableFuture<Void> removePlayer(@NotNull Instance returnInstance, Player... players) {
         return partyService.removeSpectator(returnInstance, AlgoCraft.SPAWN_POS, players);
     }
 
+    /**
+     * Initializes playback for the visualization.
+     *
+     * @return a future that completes when the scene has been initialized
+     */
     public CompletableFuture<Void> startVisualization() {
         return controller.startVisualization();
     }
+    /**
+     * Returns the presentation metadata used by the selector UI.
+     *
+     * @return the presentation metadata
+     */
     public AlgorithmPresentation getPresentation() {
         return this.presentation;
     }
 
+    /**
+     * Returns the playback controller for the session.
+     *
+     * @return the controller instance
+     */
     public PlayerControls getController() {
         return this.controller;
     }
 
+    /**
+     * Returns the runtime scene created for this session.
+     *
+     * @return the active scene
+     */
     public O getScene() {
         return scene;
     }

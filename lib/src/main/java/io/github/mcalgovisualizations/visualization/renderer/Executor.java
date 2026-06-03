@@ -14,9 +14,9 @@ import java.util.Queue;
 /**
  * Executes queued {@link AnimationPlan}s against a scene over time.
  *
- * <p>The executor processes animation plans step by step using Minestom's scheduler.
- * Each step applies an operation to the scene and may wait a configured number of
- * ticks before the next step is executed.</p>
+ * <p>The executor advances one plan step at a time using Minestom's scheduler. It
+ * waits between steps according to each step's tick delay, and it can also bridge
+ * asynchronous scene operations without blocking the server thread.</p>
  *
  * <p>Zero-wait steps are processed in the same tick, up to {@link #MAX_OPS_PER_TICK},
  * to avoid infinite loops or excessive work in a single server tick.</p>
@@ -43,6 +43,11 @@ public final class Executor<O extends ISceneOps> {
 
     private int speed = 1;
 
+    /**
+     * Creates a new executor for a specific scene.
+     *
+     * @param scene the scene that animation plans will act on
+     */
     public Executor(O scene) {
         this.scene = Objects.requireNonNull(scene, "scene");
     }
@@ -60,8 +65,7 @@ public final class Executor<O extends ISceneOps> {
     }
 
     /**
-     * Starts the scheduler if the executor is not paused and no scheduler task is
-     * currently running.
+     * Starts the scheduler if the executor is not paused and no scheduler task is running.
      */
     public void startIfIdle() {
         if (paused) return;
@@ -76,8 +80,7 @@ public final class Executor<O extends ISceneOps> {
     /**
      * Pauses execution and stops the scheduler.
      *
-     * <p>The current plan, step index, remaining wait time, and queued plans are
-     * preserved.</p>
+     * <p>The current plan, step index, remaining wait time, and queued plans are preserved.</p>
      */
     public void pause() {
         paused = true;
@@ -94,8 +97,7 @@ public final class Executor<O extends ISceneOps> {
     }
 
     /**
-     * Returns whether this executor has no active scheduler, no active plan, and no
-     * queued plans.
+     * Returns whether this executor has no active scheduler, no active plan, and no queued plans.
      *
      * @return {@code true} if there is no work currently running or queued
      */
@@ -212,7 +214,7 @@ public final class Executor<O extends ISceneOps> {
     /**
      * Stops execution and clears all queued and active animation state.
      *
-     * <p>This should be called when the owning scene/session is being destroyed.</p>
+     * <p>This should be called when the owning scene or session is being destroyed.</p>
      */
     public void onCleanup() {
         paused = false;

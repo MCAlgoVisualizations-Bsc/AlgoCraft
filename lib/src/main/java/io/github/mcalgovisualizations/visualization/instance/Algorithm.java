@@ -34,6 +34,9 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         @NotNull IAlgorithmUI runningLayout,
         boolean supportsPOV
 ) {
+    /**
+     * Creates a validated algorithm record and copies the handler registry defensively.
+     */
     public Algorithm {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(ctor, "ctor");
@@ -46,6 +49,15 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         handlerRegistry = Map.copyOf(handlerRegistry);
     }
 
+    /**
+     * Starts building a new algorithm definition for the given model.
+     *
+     * @param model the initial model snapshot used to build playback traces
+     * @param <T> model value type
+     * @param <C> context type
+     * @param <O> scene type
+     * @return a new builder for the algorithm
+     */
     public static <T, C extends AlgorithmContext<T>, O extends ISceneOps>
     @NotNull Builder<T, C, O> builder(@NotNull C model) {
         return new Builder<>(model);
@@ -65,10 +77,22 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
         private IAlgorithmUI runningLayout = new AlgorithmUI();
         private boolean supportsPOV = false;
 
+        /**
+         * Creates a builder seeded with the model to visualize.
+         *
+         * @param model the initial model snapshot
+         */
         private Builder(@NotNull C model) {
             this.model = Objects.requireNonNull(model, "model");
         }
 
+        /**
+         * Sets the algorithm identity and constructor.
+         *
+         * @param id algorithm id shown in the UI
+         * @param ctor constructor for the algorithm implementation
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> withIdentity(
                 @NotNull String id,
                 @NotNull Supplier<? extends IPlayerSort<C>> ctor
@@ -78,6 +102,12 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        /**
+         * Sets the layout strategy used to place model values in the world.
+         *
+         * @param layout layout implementation
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> positioning(
                 @NotNull ILayout<T> layout
         ) {
@@ -87,6 +117,13 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
 
 
         @SuppressWarnings("unchecked")
+        /**
+         * Sets the scene factory used to create the runtime scene.
+         *
+         * @param scene scene factory
+         * @param <NO> concrete scene type
+         * @return this builder with the new scene type
+         */
         public <NO extends ISceneOps> @NotNull Builder<T, C, NO> withScene(
                 @NotNull Function<SceneContext, NO> scene
         ) {
@@ -94,6 +131,14 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return (Builder<T, C, NO>) this;
         }
 
+        /**
+         * Registers an event handler for a concrete event class.
+         *
+         * @param event the event class to handle
+         * @param handler the handler that converts the event into animation steps
+         * @param <E> event type
+         * @return this builder
+         */
         public <E extends IAlgorithmEvent> @NotNull Builder<T, C, O> onEvent(
                 @NotNull Class<E> event,
                 @NotNull IAnimationHandler<E> handler
@@ -105,6 +150,12 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        /**
+         * Sets the animation plan to run after the algorithm finishes.
+         *
+         * @param handler completion animation factory
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> onCompletion(
                 @NotNull Function<C, ? extends AnimationPlan<O>> handler
         ) {
@@ -112,6 +163,12 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        /**
+         * Sets the UI presentation metadata for the algorithm.
+         *
+         * @param presentation selector presentation, or null for the default icon/name
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> withPresentation(
                 @Nullable AlgorithmPresentation presentation
         ) {
@@ -119,16 +176,34 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             return this;
         }
 
+        /**
+         * Sets the running-state inventory layout.
+         *
+         * @param runningLayout inventory layout shown while the visualization is active
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> withRunningLayout(@NotNull IAlgorithmUI runningLayout) {
             this.runningLayout = Objects.requireNonNull(runningLayout, "runningLayout");
             return this;
         }
 
+        /**
+         * Enables or disables villager POV support for the algorithm.
+         *
+         * @param supportsPOV whether the algorithm exposes POV mode
+         * @return this builder
+         */
         public @NotNull Builder<T, C, O> withPOVSupport(boolean supportsPOV) {
             this.supportsPOV = supportsPOV;
             return this;
         }
 
+        /**
+         * Builds the immutable algorithm definition.
+         *
+         * @return the finished algorithm definition
+         * @throws IllegalStateException if no event handlers were registered
+         */
         public @NotNull Algorithm<T, C, O> create() {
             if (handlers.isEmpty()) {
                 throw new IllegalStateException("Missing at least 1 event handler");
@@ -148,6 +223,9 @@ public record Algorithm<T, C extends AlgorithmContext<T>, O extends ISceneOps>(
             );
         }
 
+        /**
+         * Returns the default completion animation used when none is provided.
+         */
         private static <C extends AlgorithmContext<?>, O extends ISceneOps>
         @NotNull Function<C, AnimationPlan<O>> defaultOnComplete() {
             return ignored -> AnimationPlan.<O>builder()

@@ -15,7 +15,10 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A controller of time so forwards, back, adjusting speed belongs here.
+ * Coordinates trace playback, stepping, speed changes, and user feedback for a visualization session.
+ *
+ * <p>This controller owns the session state machine and bridges the trace builder,
+ * renderer, and player feedback layer.</p>
  */
 public class VisualizationController<I, C extends AlgorithmContext<I>> implements PlayerControls {
     private enum State { NEW, INITIALIZED, RUNNING, PAUSED, COMPLETED, CLEARED }
@@ -33,6 +36,13 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     private Task runningTask = null;
     private State state = State.NEW;
 
+    /**
+     * Creates a new visualization controller.
+     *
+     * @param renderer the renderer that executes animation events
+     * @param traceBuilder the trace builder used to rebuild playback state
+     * @param audience the player feedback bridge
+     */
     public VisualizationController(
             @NotNull Renderer<I, ?> renderer,
             @NotNull AlgorithmTraceBuilder<I, C> traceBuilder,
@@ -44,6 +54,11 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         this.audience = audience;
     }
 
+    /**
+     * Builds the initial trace and initializes the renderer with the first model snapshot.
+     *
+     * @return a future that completes when initialization finishes
+     */
     public CompletableFuture<Void> startVisualization() throws NullPointerException {
         assertNotCleared();
         applyPlaybackSpeed();
@@ -52,6 +67,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Starts automatic playback, or resumes it if the controller is currently paused.
+     */
     public void start() {
         if (state == State.RUNNING) return;
 
@@ -77,6 +95,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         audience.start();
     }
 
+    /**
+     * Resumes automatic playback from the paused state.
+     */
     public void resume() {
         if (state != State.PAUSED) {
             throw new IllegalStateException("VisualizationController is not paused");
@@ -88,6 +109,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Pauses automatic playback and cancels the scheduler task.
+     */
     public void pause() {
         if (state == State.CLEARED) return;
         if (state == State.PAUSED) return;
@@ -102,6 +126,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Advances playback by a single event.
+     */
     public void step() {
         assertSteppable();
 
@@ -122,6 +149,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Steps playback backwards by one event.
+     */
     public void back() {
         if (state == State.NEW || state == State.CLEARED) {
             throw new IllegalStateException("VisualizationController is not initialized");
@@ -167,6 +197,11 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Cycles the playback speed between the configured tick values.
+     *
+     * @return the new tick delay per step
+     */
     public int changeSpeed() {
         // Lower ticks/step means faster stepping + faster animation playback.
         int nextSpeed = this.delayPerStep - 1;
@@ -192,6 +227,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Clears the current visualization state and resets playback.
+     */
     public void clear() {
         cancelRunningTask();
         renderer.onCleanup();
@@ -200,6 +238,9 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     @Override
+    /**
+     * Regenerates the trace from a randomized starting model.
+     */
     public void randomize() {
         cancelRunningTask();
         renderer.onCleanup();

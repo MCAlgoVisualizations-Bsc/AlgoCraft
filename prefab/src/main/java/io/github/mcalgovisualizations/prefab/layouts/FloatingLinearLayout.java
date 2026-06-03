@@ -36,6 +36,9 @@ public record FloatingLinearLayout<T>(
      * </ul>
      * Useful for testing
      */
+    /**
+     * Creates a default floating layout with a 2-block horizontal spacing.
+     */
     public FloatingLinearLayout() { this(2.0, 0.0, 0.0); }
 
     /**
@@ -57,6 +60,14 @@ public record FloatingLinearLayout<T>(
      */
     @SuppressWarnings("unchecked")
     @Override
+    /**
+     * Computes a straight-line layout for the provided list.
+     *
+     * @param model list of values to display
+     * @param origin anchor position of the layout
+     * @param instance target instance used for world-aware placement
+     * @return positioned layout results
+     */
     public LayoutResult[] compute(List<T> model, Pos origin, Instance instance) {
 
         if((List<?>) model == null || ((List<?>) model).isEmpty()) {

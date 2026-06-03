@@ -22,6 +22,13 @@ import static io.github.mcalgovisualizations.visualization.ui.Tags.*;
 public class AlgorithmUI implements IAlgorithmUI {
     private static final int MAX_SELECTOR_ITEMS = 54;
 
+        /**
+         * Opens the algorithm selection inventory.
+         *
+         * @param algorithms registered algorithm ids
+         * @param presentationResolver resolves UI metadata for each algorithm id
+         * @return the inventory shown to the player
+         */
     @Override
     public Inventory openSelector(Set<String> algorithms, Function<String, AlgorithmPresentation> presentationResolver) {
         if (algorithms.size() > MAX_SELECTOR_ITEMS) throw new IllegalArgumentException("Too many algorithms");
@@ -77,7 +84,13 @@ public class AlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyRunningLayout(Player player, boolean supportsPOV) {
+        /**
+         * Applies the hotbar layout used while a visualization is running.
+         *
+         * @param player the player whose inventory should be updated
+         * @param supportsPOV whether to include the POV toggle item
+         */
+        public void applyRunningLayout(Player player, boolean supportsPOV) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
 
@@ -112,7 +125,13 @@ public class AlgorithmUI implements IAlgorithmUI {
     }
 
     @Override
-    public void applyDefaultLayout(Player player, Instance spawnInstance) {
+        /**
+         * Applies the default hub layout.
+         *
+         * @param player the player whose inventory should be updated
+         * @param spawnInstance the instance the player can return to
+         */
+        public void applyDefaultLayout(Player player, Instance spawnInstance) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
 

@@ -6,7 +6,16 @@ import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationP
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+/**
+ * Converts message events into simple text output.
+ */
 public class MessageHandler implements IAnimationHandler<Message> {
+    /**
+     * Builds the animation plan for a message event.
+     *
+     * @param event message event to render
+     * @return animation plan that sends the message to the scene
+     */
     @Override
     public AnimationPlan handle(Message event) {
         NamedTextColor color = switch (event.type()) {

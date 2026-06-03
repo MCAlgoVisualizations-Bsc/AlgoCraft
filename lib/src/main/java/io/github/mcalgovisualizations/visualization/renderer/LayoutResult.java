@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents the result of placing a model value in the visual layout.
  *
- * <p>A {@code LayoutResult} connects a source value to a world position and,
- * optionally, an existing display element assigned to that position.</p>
+ * <p>A {@code LayoutResult} connects a source value to a world position and the
+ * display object that should represent it.</p>
  *
  * @param value the model value represented by this layout entry
  * @param pos the computed world position for the value

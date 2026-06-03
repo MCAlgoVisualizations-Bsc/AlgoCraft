@@ -17,6 +17,9 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockHandler;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Display that renders a block state with an optional floating label.
+ */
 public class BlockDisplay implements IBlockStateDisplay {
     private static final double TEXT_Y_OFFSET = 2.0;
 
@@ -25,10 +28,16 @@ public class BlockDisplay implements IBlockStateDisplay {
 
     private Pos pos;
 
+    /**
+     * Creates a labeled block display.
+     */
     public BlockDisplay(Instance instance, Pos pos, Block block, String text) {
         this(instance, pos, block, text, true);
     }
 
+    /**
+     * Creates a block display with optional label visibility.
+     */
     public BlockDisplay(Instance instance, Pos pos, Block block, String text, boolean showLabel) {
         if (block == null) throw new NullPointerException("block cannot be null");
         if (instance == null) throw new NullPointerException("instance cannot be null");
@@ -46,10 +55,16 @@ public class BlockDisplay implements IBlockStateDisplay {
 
     }
 
+    /**
+     * Creates a labeled block display without setting the instance immediately.
+     */
     public BlockDisplay(Pos pos, Block block, String text) {
         this(pos, block, text, true);
     }
 
+    /**
+     * Creates a block display without setting the instance immediately.
+     */
     public BlockDisplay(Pos pos, Block block, String text, boolean showLabel) {
         if (block == null) throw new NullPointerException("block cannot be null");
         if (showLabel && (text == null || text.isBlank())) throw new IllegalArgumentException("text cannot be blank");
@@ -64,6 +79,9 @@ public class BlockDisplay implements IBlockStateDisplay {
         }
     }
 
+    /**
+     * Returns the current display position.
+     */
     public Pos getPos() {
         return pos;
     }
@@ -112,6 +130,9 @@ public class BlockDisplay implements IBlockStateDisplay {
         }
     }
 
+    /**
+     * Removes the block and label entities from the world.
+     */
     public void remove() {
         this.blockEntity.remove();
         if (textEntity != null) {
@@ -119,6 +140,9 @@ public class BlockDisplay implements IBlockStateDisplay {
         }
     }
 
+    /**
+     * Moves the display to a new position.
+     */
     public void teleport(Pos pos) {
         this.pos = pos;
         this.blockEntity.teleport(pos);
@@ -127,6 +151,9 @@ public class BlockDisplay implements IBlockStateDisplay {
         }
     }
 
+    /**
+     * Updates the label text.
+     */
     public void setText(String text) {
         if (textEntity == null) return;
         var meta = (TextDisplayMeta) textEntity.getEntityMeta();
@@ -141,6 +168,9 @@ public class BlockDisplay implements IBlockStateDisplay {
     }
 
 
+    /**
+     * Updates the displayed block state.
+     */
     public void setBlock(Block block) {
         if (block == null) return;
         var meta = (BlockDisplayMeta) blockEntity.getEntityMeta();
