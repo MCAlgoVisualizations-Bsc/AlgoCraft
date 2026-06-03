@@ -118,11 +118,15 @@ implements <a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisua
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyDefaultLayout(net.minestom.server.entity.Player,net.minestom.server.instance.Instance)" class="member-name-link">applyDefaultLayout</a><wbr>(net.minestom.server.entity.Player&nbsp;player,
  net.minestom.server.instance.Instance&nbsp;spawnInstance)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Applies the default hub layout.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyRunningLayout(net.minestom.server.entity.Player,boolean)" class="member-name-link">applyRunningLayout</a><wbr>(net.minestom.server.entity.Player&nbsp;player,
  boolean&nbsp;supportsPOV)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Applies the hotbar layout used while a visualization is running.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>net.minestom.server.inventory.Inventory</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#openSelector(java.util.Set,java.util.function.Function)" class="member-name-link">openSelector</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;algorithms,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AlgorithmPresentation.html" title="class in io.github.mcalgovisualizations.visualization.ui">AlgorithmPresentation</a>&gt;&nbsp;presentationResolver)</code></div>
@@ -187,9 +191,13 @@ implements <a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisua
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyRunningLayout</span><wbr><span class="parameters">(net.minestom.server.entity.Player&nbsp;player,
  boolean&nbsp;supportsPOV)</span></div>
+<div class="block">Applies the hotbar layout used while a visualization is running.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="IAlgorithmUI.html#applyRunningLayout(net.minestom.server.entity.Player,boolean)">applyRunningLayout</a></code>&nbsp;in interface&nbsp;<code><a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>player</code> - the player whose inventory should be updated</dd>
+<dd><code>supportsPOV</code> - whether to include the POV toggle item</dd>
 </dl>
 </div>
 </section>
@@ -200,9 +208,13 @@ implements <a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisua
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyDefaultLayout</span><wbr><span class="parameters">(net.minestom.server.entity.Player&nbsp;player,
  net.minestom.server.instance.Instance&nbsp;spawnInstance)</span></div>
+<div class="block">Applies the default hub layout.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="IAlgorithmUI.html#applyDefaultLayout(net.minestom.server.entity.Player,net.minestom.server.instance.Instance)">applyDefaultLayout</a></code>&nbsp;in interface&nbsp;<code><a href="IAlgorithmUI.html" title="interface in io.github.mcalgovisualizations.visualization.ui">IAlgorithmUI</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>player</code> - the player whose inventory should be updated</dd>
+<dd><code>spawnInstance</code> - the instance the player can return to</dd>
 </dl>
 </div>
 </section>

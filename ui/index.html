@@ -10,11 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://mcalgovisualizations-bsc.github.io/AlgoCraft/architecture/">
+        <link rel="canonical" href="https://mcalgovisualizations-bsc.github.io/AlgoCraft/ui/">
       
       
-        <link rel="prev" href="../events-and-handlers/">
+        <link rel="prev" href="../getting-started/">
       
+      
+        <link rel="next" href="../making-your-first-algorithm/">
       
       
         
@@ -25,7 +27,7 @@
     
     
       
-        <title>Architecture & Engine - AlgoCraft WikiHub</title>
+        <title>UI - AlgoCraft WikiHub</title>
       
     
     
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#architecture-and-engine" class="md-skip">
+        <a href="#ui" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Architecture & Engine
+              UI
             
           </span>
         </div>
@@ -401,10 +403,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../ui/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -420,6 +449,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#selector-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selector UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related API
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -541,37 +645,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture & Engine
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -587,48 +664,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#runtime-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Runtime Flow
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-goals" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design Goals
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -755,10 +790,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#runtime-flow" class="md-nav__link">
+  <a href="#selector-ui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Runtime Flow
+        Selector UI
       
     </span>
   </a>
@@ -766,10 +801,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-goals" class="md-nav__link">
+  <a href="#running-ui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design Goals
+        Running UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related API
       
     </span>
   </a>
@@ -793,24 +861,54 @@
 
 
 
-<h1 id="architecture-and-engine">Architecture and Engine</h1>
-<p>AlgoCraft is organized as a multi-module Gradle project:</p>
-<ul>
-<li>lib: Shared engine and API logic for algorithm visualizations.</li>
-<li>prefab: Runnable Minestom-based server layer that consumes lib.</li>
-</ul>
-<h2 id="runtime-flow">Runtime Flow</h2>
+<h1 id="ui">UI</h1>
+<p>AlgoCraft has two layers of user interface:</p>
 <ol>
-<li>The server starts from the prefab module entrypoint.</li>
-<li>Visualization components from lib are initialized.</li>
-<li>Player events trigger algorithm scene updates.</li>
-<li>Rendering and lifecycle hooks run through Minestom event pipelines.</li>
+<li>The algorithm selector UI, which lets players choose what to run.</li>
+<li>The running UI, which gives the active player controls while a visualization is playing.</li>
 </ol>
-<h2 id="design-goals">Design Goals</h2>
+<p>Both are provided by the framework by default through AlgorithmUI.</p>
+<h2 id="selector-ui">Selector UI</h2>
+<p>When a player uses the selector item in the hub, AlgoCraft opens an inventory listing every registered algorithm.</p>
+<p>What appears in the selector comes from AlgorithmPresentation:</p>
 <ul>
-<li>Keep visualization logic reusable and testable in lib.</li>
-<li>Isolate deployment/runtime specifics to prefab.</li>
-<li>Publish JavaDoc as the authoritative API reference.</li>
+<li>Algorithm id</li>
+<li>Icon</li>
+<li>Complexity text</li>
+<li>Short description</li>
+</ul>
+<p>If you do not provide a presentation, the framework falls back to a default stick icon and the algorithm id.</p>
+<h2 id="running-ui">Running UI</h2>
+<p>When a visualization starts, the player's hotbar is replaced with the running layout.</p>
+<p>Default controls are:</p>
+<ul>
+<li>Randomize</li>
+<li>Start</li>
+<li>Stop</li>
+<li>Step Forward</li>
+<li>Step Back</li>
+<li>Change Speed</li>
+<li>Clear Algorithm</li>
+</ul>
+<p>If the algorithm supports POV mode, a Villager POV item is also added.</p>
+<h2 id="default-behavior">Default behavior</h2>
+<p>The default running UI is already wired in the algorithm builder:</p>
+<pre><code class="language-java">.withRunningLayout(new AlgorithmUI())
+</code></pre>
+<p>So in most cases, UI is on by default. You only need to override it if you want a custom selector or different hotbar controls.</p>
+<h2 id="customization">Customization</h2>
+<p>Use a custom implementation of <code>IAlgorithmUI</code> when you want to change:</p>
+<ul>
+<li>how the selector inventory is laid out</li>
+<li>what items appear during playback</li>
+<li>the text or icons shown to the player</li>
+</ul>
+<p>The framework will still handle the actual playback logic. The UI only changes how players interact with the session.</p>
+<h2 id="related-api">Related API</h2>
+<ul>
+<li>AlgorithmPresentation</li>
+<li>IAlgorithmUI</li>
+<li>AlgorithmUI</li>
 </ul>
 
 
