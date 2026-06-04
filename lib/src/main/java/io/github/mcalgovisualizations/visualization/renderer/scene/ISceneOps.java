@@ -1,24 +1,33 @@
 package io.github.mcalgovisualizations.visualization.renderer.scene;
 
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
+import org.jetbrains.annotations.Nullable;
 
-public interface ISceneOps {
+import java.util.concurrent.CompletableFuture;
 
-    void setLayout(LayoutResult<?>[] model);
+public interface ISceneOps extends AudienceChannel {
+
+    void setLayout(LayoutResult[] model);
 
     Pos getOrigin();
 
-    void setValue(int slot, int value);
     void setHighlighted(int slot, boolean highlighted);
     void clearGlowing();
     void hoverDisplay(int slot, boolean hover);
 
     void moveSlotTo(int slot, Pos position);
+    default CompletableFuture<Void> walkSlotTo(int slot, Pos position) {
+        moveSlotTo(slot, position);
+        return CompletableFuture.completedFuture(null);
+    }
     void swapSlots(int a, int b);
     void addDisplay(int slot, IDisplayValue display);
+
+    @Nullable IDisplayValue getDisplay(int slot);
 
     void playSound(String key, float volume, float pitch);
     void sendMessage(Component message);
@@ -26,4 +35,3 @@ public interface ISceneOps {
 
     void cleanUp();
 }
-

@@ -1,16 +1,30 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
-import io.github.mcalgovisualizations.visualization.IStylingProfile;
-import io.github.mcalgovisualizations.visualization.models.Data;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.NotNull;
 
-public record LayoutResult<T extends Comparable<T>>(@NotNull Data<T> value, @NotNull Pos pos, @NotNull IStylingProfile styling) {
+/**
+ * Represents the result of placing a model value in the visual layout.
+ *
+ * <p>A {@code LayoutResult} connects a source value to a world position and the
+ * display object that should represent it.</p>
+ *
+ * @param value the model value represented by this layout entry
+ * @param pos the computed world position for the value
+ * @param displayValue the display element associated with this value, or {@code null} if none has been assigned
+ */
+public record LayoutResult(
+        @NotNull Object value,
+        @NotNull Pos pos,
+        IDisplayValue displayValue
+) {
+    /**
+     * Returns a concise debug representation of this layout entry.
+     *
+     * @return debug string containing the position and value
+     */
     @Override
     public @NotNull String toString() {
-        return "LayoutEntry{" + "pos=" + pos + ", idx=" + value.value() + '}';
-    }
-    public @NotNull IDisplayValue getDisplayValue() {
-        return styling.applyStyle(value().toString(), pos());
+        return "LayoutEntry{" + "pos=" + pos + ", idx=" + value + '}';
     }
 }

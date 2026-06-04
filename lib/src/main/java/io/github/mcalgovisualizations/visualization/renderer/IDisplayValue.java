@@ -3,14 +3,83 @@ package io.github.mcalgovisualizations.visualization.renderer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.component.AttributeList;
 
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * Represents a visual element in the world that can be positioned, displayed,
+ * and controlled for one or more viewers.
+ *
+ * <p>Implementations may wrap one or more underlying Minestom entities or composite
+ * render objects.</p>
+ */
 public interface IDisplayValue {
+
+    /**
+     * Returns the current position of this display element.
+     *
+     * @return the world position
+     */
     Pos getPos();
-    void setValue(int value);
+
+    /**
+     * Sets the instance (world) this display belongs to.
+     *
+     * @param instance the target instance
+     */
     void setInstance(Instance instance);
+
+    /**
+     * Sets the instance and position for this display.
+     *
+     * @param instance the target instance
+     * @param pos the target position
+     */
+    void setInstance(Instance instance, Pos pos);
+
+    /**
+     * Adds a player as a viewer of this display.
+     *
+     * @param player the player to add
+     */
     void addViewer(Player player);
+
+    /**
+     * Removes this display from the world.
+     *
+     * <p>This should clean up any underlying entities and free associated resources.</p>
+     */
     void remove();
+
+    /**
+     * Teleports this display to a new position.
+     *
+     * @param pos the target position
+     */
     void teleport(Pos pos);
+
+    /**
+     * Requests the display to move to a new position, potentially using pathfinding.
+     *
+     * @param pos the target position
+     * @return a future that completes when the target is reached
+     */
+    default CompletableFuture<Void> walkTo(Pos pos) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Sets whether this display is visually highlighted (e.g. glowing).
+     *
+     * @param highlighted {@code true} to enable highlighting, {@code false} to disable
+     */
     void setGlowing(boolean highlighted);
+
+    /**
+     * Returns whether this display is currently spawned in an instance.
+     *
+     * @return {@code true} if spawned, otherwise {@code false}
+     */
     boolean isSpawned();
 }

@@ -10,7 +10,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set environment variables
         id: vars
         run: |
@@ -21,6 +20,19 @@ jobs:
             echo "CONTAINER=minecraft-dev" >> $GITHUB_OUTPUT
             echo "BRANCH=dev" >> $GITHUB_OUTPUT
           fi
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build project and generate Javadoc
+        run: ./gradlew --no-daemon clean javadoc
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3

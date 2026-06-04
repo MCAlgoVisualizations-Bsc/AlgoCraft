@@ -1,0 +1,28 @@
+site_name: AlgoCraft WikiHub
+site_description: Documentation for the AlgoCraft 3D Visualization Framework
+site_url: https://mcalgovisualizations-bsc.github.io/AlgoCraft/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: teal
+      accent: teal
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Guide:
+      - Getting Started: getting-started.md
+      - UI: ui.md
+      - Making Your First Algorithm: making-your-first-algorithm.md
+      - Scenes: scenes.md
+      - Layouts and Displays: layouts-and-displays.md
+      - Events and Handlers: events-and-handlers.md
+      - Architecture & Engine: architecture.md
+  - JAVADOC API References:
+      - JavaDoc Engine: javadoc/index.html

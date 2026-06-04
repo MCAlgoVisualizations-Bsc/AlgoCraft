@@ -2,33 +2,36 @@ package io.github.mcalgovisualizations.visualization.renderer;
 
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
-import io.github.mcalgovisualizations.visualization.algorithms.IAlgorithmEvent;
-import io.github.mcalgovisualizations.visualization.ILayout;
-import io.github.mcalgovisualizations.visualization.models.Data;
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.Dispatcher;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
-public final class Renderer<O extends ISceneOps> {
-    private final ISceneOps scene;
+public final class Renderer<I, O extends ISceneOps> {
+    private final O scene;
     private final Instance instance;
     private final Dispatcher<O> dispatcher;
     private final Executor<O> executor;
     private final AnimationPlan<O> complete;
     private final Pos origin;
-    private final ILayout layout;
+    private final ILayout<I> layout;
     private boolean collapseAnimationDelays = false;
 
+    /**
+     * Creates a renderer for a model/layout pair and a specific runtime scene.
+     */
     public Renderer(
             @NotNull Instance instance,
             @NotNull Pos origin,
-            @NotNull ILayout layout,
+            @NotNull ILayout<I> layout,
             @NotNull AudienceChannel audience,
             @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
             @NotNull AnimationPlan<O> complete,
@@ -38,30 +41,40 @@ public final class Renderer<O extends ISceneOps> {
         this.executor = new Executor<>(scene);
         this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
-
-        // make these into context?
         this.instance = instance;
         this.layout = layout;
         this.origin = origin;
     }
 
+    /**
+     * Updates the animation playback speed.
+     *
+     * @param ticksPerStep ticks between scheduled steps
+     */
     public void setSpeed(int ticksPerStep) {
         this.collapseAnimationDelays = ticksPerStep <= 1;
         executor.setSpeed(ticksPerStep);
     }
 
     /**
-     * Stop animation activity but keep the scene alive so you can resume.
-     * Typical use: controller.pause().
+     * Pauses queued animation playback.
      */
     public void pause() {
         executor.pause();
     }
 
+    /**
+     * Resumes queued animation playback.
+     */
     public void resume() {
         executor.resume();
     }
 
+    /**
+     * Dispatches a single algorithm event into the scene.
+     *
+     * @param event the event to render
+     */
     public void render(IAlgorithmEvent event) {
         if (event == null) {
             System.err.println("Received null event");
@@ -78,37 +91,51 @@ public final class Renderer<O extends ISceneOps> {
         }
     }
 
+    /**
+     * Enqueues the algorithm completion animation.
+     */
     public void complete() {
         executor.add(normalizePlan(complete));
         executor.startIfIdle();
     }
 
+    /**
+     * Returns whether the executor still has queued or active animation work.
+     *
+     * @return {@code true} if animations are still pending
+     */
     public boolean hasPendingAnimations() {
         return !executor.isIdle();
     }
 
     /**
-     * Full teardown. Not resumable.
-     * Typical use: application shutdown / leaving visualization.
+     * Releases the scene and cancels any pending playback state.
      */
     public void onCleanup() {
-        executor.onCleanup();   // kill tick loop + clear queue
-        scene.cleanUp();   // despawn entities
+        executor.onCleanup();
+        scene.cleanUp();
     }
 
-    public <T extends Comparable<T>> void initialize(List<Data<T>> initialModel) {
-        final var layoutResult = this.layout.compute(initialModel, origin, instance);
-        requireChunksLoaded(layoutResult);
-        scene.setLayout(layoutResult);
-    }
+    /**
+     * Computes the initial layout and spawns all displays into the scene.
+     *
+     * @param initialModel the initial model snapshot
+     * @return a future that completes once chunk loading and layout setup finish
+     */
+    public CompletableFuture<Void> initialize(I initialModel) {
+        Objects.requireNonNull(instance, "Renderer.instance is null");
+        final var layoutResults = Objects.requireNonNull(
+                this.layout.compute(initialModel, origin, instance),
+                "layout.compute returned null"
+        );
 
-    private <T extends Comparable<T>> void requireChunksLoaded(LayoutResult<T>[] layoutResult) {
-        final var allLoaded = Arrays.stream(layoutResult)
-                .allMatch(r -> instance.isChunkLoaded(r.pos().chunkX(), r.pos().chunkZ()));
+        final var futures = Arrays.stream(layoutResults)
+                .filter(Objects::nonNull)
+                .map(key -> instance.loadChunk(key.pos().chunkX(), key.pos().chunkZ()))
+                .toArray(CompletableFuture<?>[]::new);
 
-        if (!allLoaded) {
-            throw new IllegalStateException("Visualization area is not loaded yet.");
-        }
+        return CompletableFuture.allOf(futures)
+                .thenRun(() -> scene.setLayout(layoutResults));
     }
 
     private AnimationPlan<O> normalizePlan(AnimationPlan<O> plan) {
@@ -116,11 +143,12 @@ public final class Renderer<O extends ISceneOps> {
             return plan;
         }
 
-        AnimationPlan.Builder<O> builder = AnimationPlan.builder();
+        var builder = AnimationPlan.<O>builder();
+
         for (var step : plan.steps()) {
-            builder.step(0, step.op());
+            builder.stepAsync(0, step.op());
         }
+
         return builder.build();
     }
-
 }

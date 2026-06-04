@@ -11,12 +11,26 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
+/**
+ * Executes queued {@link AnimationPlan}s against a scene over time.
+ *
+ * <p>The executor advances one plan step at a time using Minestom's scheduler. It
+ * waits between steps according to each step's tick delay, and it can also bridge
+ * asynchronous scene operations without blocking the server thread.</p>
+ *
+ * <p>Zero-wait steps are processed in the same tick, up to {@link #MAX_OPS_PER_TICK},
+ * to avoid infinite loops or excessive work in a single server tick.</p>
+ *
+ * @param <O> the type of scene operations this executor can apply
+ */
 public final class Executor<O extends ISceneOps> {
 
     private static final int MAX_OPS_PER_TICK = 256;
 
     private final O scene;
     private Task runningTask = null;
+    private boolean waitingForAsyncStep = false;
+    private int executionId = 0;
 
     private final Queue<AnimationPlan<O>> queue = new LinkedList<>();
 
@@ -27,45 +41,82 @@ public final class Executor<O extends ISceneOps> {
 
     private boolean paused = false;
 
-    private int SPEED = 1;
+    private int speed = 1;
 
+    /**
+     * Creates a new executor for a specific scene.
+     *
+     * @param scene the scene that animation plans will act on
+     */
     public Executor(O scene) {
         this.scene = Objects.requireNonNull(scene, "scene");
     }
 
+    /**
+     * Adds an animation plan to the execution queue.
+     *
+     * <p>Empty plans are ignored.</p>
+     *
+     * @param plan the plan to enqueue
+     */
     public void add(@NotNull AnimationPlan<O> plan) {
         if (plan.isEmpty()) return;
         queue.add(plan);
     }
 
+    /**
+     * Starts the scheduler if the executor is not paused and no scheduler task is running.
+     */
     public void startIfIdle() {
         if (paused) return;
         if (runningTask != null) return;
 
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::tick)
-                .repeat(Duration.ofMillis(SPEED * 50L))
+                .repeat(Duration.ofMillis(speed * 50L))
                 .schedule();
     }
 
+    /**
+     * Pauses execution and stops the scheduler.
+     *
+     * <p>The current plan, step index, remaining wait time, and queued plans are preserved.</p>
+     */
     public void pause() {
         paused = true;
         stopScheduler();
     }
 
+    /**
+     * Resumes execution if currently paused.
+     */
     public void resume() {
         if (!paused) return;
         paused = false;
         startIfIdle();
     }
 
+    /**
+     * Returns whether this executor has no active scheduler, no active plan, and no queued plans.
+     *
+     * @return {@code true} if there is no work currently running or queued
+     */
     public boolean isIdle() {
         return currentPlan == null && queue.isEmpty() && runningTask == null;
     }
 
+    /**
+     * Sets the scheduler interval multiplier.
+     *
+     * <p>A value of {@code 1} runs every server tick, {@code 2} runs every two ticks,
+     * and so on.</p>
+     *
+     * @param speed scheduler interval multiplier; must be greater than {@code 0}
+     * @throws IllegalArgumentException if {@code speed <= 0}
+     */
     public void setSpeed(int speed) {
         if (speed <= 0) throw new IllegalArgumentException("speed must be > 0");
-        this.SPEED = speed;
+        this.speed = speed;
 
         if (runningTask != null) {
             stopScheduler();
@@ -73,18 +124,27 @@ public final class Executor<O extends ISceneOps> {
         }
     }
 
+    /**
+     * Processes animation work for one scheduler execution.
+     *
+     * <p>This method advances the current plan until it either reaches a step with a
+     * positive wait duration, runs out of work, or reaches {@link #MAX_OPS_PER_TICK}
+     * operations for this tick.</p>
+     */
     private void tick() {
         if (paused) return;
+        if (waitingForAsyncStep) return;
 
         int opsThisTick = 0;
+
         while (opsThisTick < MAX_OPS_PER_TICK) {
-            // If we're waiting inside a step, consume one tick and return.
+            if (waitingForAsyncStep) return;
+
             if (ticksRemaining > 0) {
                 ticksRemaining--;
                 return;
             }
 
-            // Ensure we have a plan.
             if (currentPlan == null) {
                 currentPlan = queue.poll();
                 stepIndex = 0;
@@ -96,7 +156,6 @@ public final class Executor<O extends ISceneOps> {
                 }
             }
 
-            // Finished plan?
             if (stepIndex >= currentPlan.steps().size()) {
                 finishCurrentPlan();
                 continue;
@@ -104,23 +163,35 @@ public final class Executor<O extends ISceneOps> {
 
             if (stepJustEntered) {
                 AnimationPlan.Step<O> step = currentPlan.steps().get(stepIndex);
-                step.op().accept(scene);
-                ticksRemaining = step.ticks();
 
+                waitingForAsyncStep = true;
                 stepJustEntered = false;
-                stepIndex++;
-                stepJustEntered = true;
-                opsThisTick++;
 
-                // Stay in the loop to consume zero-wait steps immediately.
-                if (ticksRemaining > 0) {
-                    return;
-                }
+                final int currentExecutionId = executionId;
+                step.run(scene).whenComplete((_, throwable) -> {
+                    if (currentExecutionId != executionId) return;
+
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                        onCleanup();
+                        return;
+                    }
+
+                    ticksRemaining = step.ticks();
+                    stepIndex++;
+                    stepJustEntered = true;
+                    waitingForAsyncStep = false;
+                });
+
+                opsThisTick++;
+                return;
             }
         }
-
     }
 
+    /**
+     * Clears the active plan state and stops the scheduler if there is no queued work.
+     */
     private void finishCurrentPlan() {
         currentPlan = null;
         stepIndex = 0;
@@ -130,6 +201,9 @@ public final class Executor<O extends ISceneOps> {
         if (queue.isEmpty()) stopScheduler();
     }
 
+    /**
+     * Cancels the active scheduler task, if one exists.
+     */
     private void stopScheduler() {
         if (runningTask != null) {
             runningTask.cancel();
@@ -137,6 +211,11 @@ public final class Executor<O extends ISceneOps> {
         }
     }
 
+    /**
+     * Stops execution and clears all queued and active animation state.
+     *
+     * <p>This should be called when the owning scene or session is being destroyed.</p>
+     */
     public void onCleanup() {
         paused = false;
         stopScheduler();
@@ -144,6 +223,8 @@ public final class Executor<O extends ISceneOps> {
         stepIndex = 0;
         ticksRemaining = 0;
         stepJustEntered = false;
+        waitingForAsyncStep = false;
+        executionId++;
         queue.clear();
     }
 }

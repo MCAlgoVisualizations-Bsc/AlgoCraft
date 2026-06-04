@@ -3,16 +3,19 @@ package io.github.mcalgovisualizations.visualization.renderer.scene;
 import com.google.common.collect.Maps;
 import io.github.mcalgovisualizations.visualization.renderer.IDisplayValue;
 import io.github.mcalgovisualizations.visualization.renderer.LayoutResult;
-import io.github.mcalgovisualizations.visualization.ui.AudienceChannel;
+import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractScene implements ISceneOps {
 
@@ -29,17 +32,11 @@ public abstract class AbstractScene implements ISceneOps {
         this.origin = context.origin();
     }
 
-    public abstract void setLayout(LayoutResult<?>[] layoutResults);
+    public abstract void setLayout(LayoutResult[] layoutResults);
 
     @Override
     public Pos getOrigin() {
         return this.origin;
-    }
-
-    @Override
-    public void setValue(int slot, int value) {
-        var display = requireDisplay(slot);
-        display.setValue(value);
     }
 
     @Override
@@ -77,6 +74,12 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
+    public CompletableFuture<Void> walkSlotTo(int slot, Pos pos) {
+        var display = requireDisplay(slot);
+        return display.walkTo(pos);
+    }
+
+    @Override
     public void swapSlots(int a, int b) {
         var da = requireDisplay(a);
         var db = requireDisplay(b);
@@ -84,11 +87,14 @@ public abstract class AbstractScene implements ISceneOps {
         displaysBySlot.put(a, db);
         displaysBySlot.put(b, da);
 
-        var posA = da.getPos();
-        var posB = db.getPos();
+        var oldPosA = da.getPos();
+        var oldPosB = db.getPos();
 
-        da.teleport(posB);
-        db.teleport(posA);
+        // update pos
+        da.getPos();
+
+        da.teleport(oldPosB);
+        db.teleport(oldPosA);
     }
 
     @Override
@@ -118,9 +124,25 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
+    public @Nullable IDisplayValue getDisplay(int slot) {
+        return displaysBySlot.get(slot);
+    }
+
+    @Override
     public void sendMessage(@NotNull Component message) {
         audience.sendMessage(message);
     }
+
+    @Override
+    public void sendMessage(@NotNull final String message) {
+        audience.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(@NotNull final String message, final NamedTextColor color) {
+        audience.sendMessage(message, color);
+    }
+
 
     @Override
     public void sendActionBar(@NotNull Component message) {
@@ -128,11 +150,18 @@ public abstract class AbstractScene implements ISceneOps {
     }
 
     @Override
-    public void cleanUp() {
-        for (var display : displaysBySlot.values()) {
-            safeRemove(display);
-        }
+    public void sendActionBar(@NotNull final String message) {
+        audience.sendActionBar(message);
+    }
 
+    @Override
+    public void sendActionBar(@NotNull final String message, final NamedTextColor color) {
+        audience.sendActionBar(message, color);
+    }
+
+    @Override
+    public void cleanUp() {
+        displaysBySlot.values().forEach(this::safeRemove);
         clearGlowing();
         displaysBySlot.clear();
     }

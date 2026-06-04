@@ -1,34 +1,37 @@
-# Algorithm Visualization Bsc Minecraft Server (Minestom)
+# AlgoCraft Framework
 
-This is a custom Minecraft server built using the **Minestom** framework. It's purpose is to display various visualizations of different algorithms. It runs on a multi-container setup via Docker and DigitalOcean.
+AlgoCraft is a Java framework for building interactive algorithm visualizations in Minecraft using Minestom.
 
----
+This repository is primarily the framework codebase, with a runnable example application included.
 
-## 🎮 How to Join
+## Repository Purpose
 
-To join, open Minecraft Java Edition (Version 1.21 or newer) and use **Direct Connect** with the addresses below.
+- Provide reusable visualization contracts and engine components.
+- Provide event-driven rendering primitives for algorithm playback.
+- Provide a prefab app module showing how to wire algorithms, events, handlers, layouts, and displays.
 
-### 🚀 Production Server (Official)
-The stable version of the project.
-- **Address:** `lukv.dev`
+## Modules
 
+- `lib`: Core framework and public API surface.
+- `prefab`: Example Minestom application built on top of `lib`.
 
-### 🛠️ Development Server (Beta)
-Where we test the latest features. Expect bugs!
-- **Address:** `lukv.dev:25566`
+## Documentation
 
----
+- WikiHub: https://mcalgovisualizations-bsc.github.io/AlgoCraft/
+- JavaDoc: https://mcalgovisualizations-bsc.github.io/AlgoCraft/javadoc/
 
-## 🛠️ Technical Info
-- **Engine:** Minestom (Non-Mojang rewrite)
-- **Language:** Kotlin / Java
-- **OS:** CachyOS (Local) / Ubuntu (Server)
-- **Infrastructure:** Docker Containers on DigitalOcean
+For a full demo world, see: https://github.com/MCAlgoVisualizations-Bsc/Demo
 
----
+## Local Development
 
-## 🚀 Local Development
-1. Clone the repository.
-2. Run `./gradlew shadowJar` to build the "fat" jar.
-3. Run `java -jar build/libs/*-all.jar` to start the server locally.
-4. Connect via `localhost:25565`.
+1. Build and run tests:
+	- `./gradlew test`
+2. Build the runnable prefab jar:
+	- `./gradlew :prefab:shadowJar`
+3. Run the example app:
+	- `java -jar prefab/build/libs/minecraft-server-all.jar`
+
+## Notes
+
+- Minestom powers the runtime world/entity layer.
+- Visualization flow is event-driven: algorithms emit events, handlers convert events to animation plans, and scenes execute those plans.

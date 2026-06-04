@@ -1,34 +1,31 @@
 package io.github.mcalgovisualizations.visualization.engine;
 
-import io.github.mcalgovisualizations.visualization.PlayerControls;
-import io.github.mcalgovisualizations.visualization.algorithms.*;
-import io.github.mcalgovisualizations.visualization.models.ISort;
+import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmStepper;
+import io.github.mcalgovisualizations.visualization.algorithm.AlgorithmTraceBuilder;
+import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
+import io.github.mcalgovisualizations.visualization.models.AlgorithmContext;
 import io.github.mcalgovisualizations.visualization.renderer.Renderer;
-import io.github.mcalgovisualizations.visualization.ui.PlayerFeedback;
+import io.github.mcalgovisualizations.visualization.instance.PlayerFeedback;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * A controller of time so forwards, back, adjusting speed belongs here.
+ * Coordinates trace playback, stepping, speed changes, and user feedback for a visualization session.
+ *
+ * <p>This controller owns the session state machine and bridges the trace builder,
+ * renderer, and player feedback layer.</p>
  */
-public class VisualizationController implements PlayerControls {
-    private enum State {
-        NEW,
-        INITIALIZED,
-        RUNNING,
-        PAUSED,
-        COMPLETED,
-        CLEARED
-    }
+public class VisualizationController<I, C extends AlgorithmContext<I>> implements PlayerControls {
+    private enum State { NEW, INITIALIZED, RUNNING, PAUSED, COMPLETED, CLEARED }
 
-    private final AlgorithmTraceBuilder<?> traceBuilder;
+    private final AlgorithmTraceBuilder<I, C> traceBuilder;
     private AlgorithmStepper algorithmStepper;
-    private final Renderer<?> renderer;
+    private final Renderer<I, ?> renderer;
     private final PlayerFeedback audience;
 
     private static final int MIN_TICKS_PER_STEP = 1;
@@ -39,26 +36,40 @@ public class VisualizationController implements PlayerControls {
     private Task runningTask = null;
     private State state = State.NEW;
 
+    /**
+     * Creates a new visualization controller.
+     *
+     * @param renderer the renderer that executes animation events
+     * @param traceBuilder the trace builder used to rebuild playback state
+     * @param audience the player feedback bridge
+     */
     public VisualizationController(
-            @NotNull IPlayerSort algorithm,
-            @NotNull Renderer<?> renderer,
-            @NotNull ISort<?> collection,
+            @NotNull Renderer<I, ?> renderer,
+            @NotNull AlgorithmTraceBuilder<I, C> traceBuilder,
             @NotNull PlayerFeedback audience
     ) {
-        this.traceBuilder = new AlgorithmTraceBuilder<>(algorithm, collection);
+        this.traceBuilder = traceBuilder;
         this.algorithmStepper = new AlgorithmStepper(traceBuilder.build().history());
         this.renderer = renderer;
         this.audience = audience;
     }
 
-    public void startVisualization() throws NullPointerException {
+    /**
+     * Builds the initial trace and initializes the renderer with the first model snapshot.
+     *
+     * @return a future that completes when initialization finishes
+     */
+    public CompletableFuture<Void> startVisualization() throws NullPointerException {
         assertNotCleared();
         applyPlaybackSpeed();
-        renderer.initialize(traceBuilder.getInitialData());
         state = State.INITIALIZED;
+        return renderer.initialize(traceBuilder.getInitialData());
     }
 
     @Override
+    /**
+     * Starts automatic playback, or resumes it if the controller is currently paused.
+     */
     public void start() {
         if (state == State.RUNNING) return;
 
@@ -84,6 +95,9 @@ public class VisualizationController implements PlayerControls {
         audience.start();
     }
 
+    /**
+     * Resumes automatic playback from the paused state.
+     */
     public void resume() {
         if (state != State.PAUSED) {
             throw new IllegalStateException("VisualizationController is not paused");
@@ -95,6 +109,9 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Pauses automatic playback and cancels the scheduler task.
+     */
     public void pause() {
         if (state == State.CLEARED) return;
         if (state == State.PAUSED) return;
@@ -109,6 +126,9 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Advances playback by a single event.
+     */
     public void step() {
         assertSteppable();
 
@@ -129,6 +149,9 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Steps playback backwards by one event.
+     */
     public void back() {
         if (state == State.NEW || state == State.CLEARED) {
             throw new IllegalStateException("VisualizationController is not initialized");
@@ -145,9 +168,10 @@ public class VisualizationController implements PlayerControls {
         }
     }
 
+
     private void scheduleSteppingTask() {
         cancelRunningTask();
-        int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
+        final int schedulerTicks = Math.max(MIN_TICKS_PER_STEP, delayPerStep);
         runningTask = MinecraftServer.getSchedulerManager()
                 .buildTask(this::autoStep)
                 .repeat(Duration.ofMillis(schedulerTicks * 50L))
@@ -173,6 +197,11 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Cycles the playback speed between the configured tick values.
+     *
+     * @return the new tick delay per step
+     */
     public int changeSpeed() {
         // Lower ticks/step means faster stepping + faster animation playback.
         int nextSpeed = this.delayPerStep - 1;
@@ -198,6 +227,9 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Clears the current visualization state and resets playback.
+     */
     public void clear() {
         cancelRunningTask();
         renderer.onCleanup();
@@ -206,11 +238,15 @@ public class VisualizationController implements PlayerControls {
     }
 
     @Override
+    /**
+     * Regenerates the trace from a randomized starting model.
+     */
     public void randomize() {
         cancelRunningTask();
         renderer.onCleanup();
 
-        var trace = traceBuilder.randomizeAndBuild(ThreadLocalRandom.current().nextInt());
+        final var trace = traceBuilder.randomizeAndBuild();
+        
         this.algorithmStepper = new AlgorithmStepper(trace.history());
         renderer.initialize(trace.initialData());
         audience.randomize();
