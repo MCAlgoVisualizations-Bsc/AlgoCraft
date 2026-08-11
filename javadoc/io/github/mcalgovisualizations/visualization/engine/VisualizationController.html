@@ -132,27 +132,27 @@ renderer, and player feedback layer.</p></div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#back()" class="member-name-link">back</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Moves execution one step backward.</div>
+<div class="block">Steps playback backwards by one event.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#changeSpeed()" class="member-name-link">changeSpeed</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Cycles the playback speed.</div>
+<div class="block">Cycles the playback speed between the configured tick values.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Clears the visualization.</div>
+<div class="block">Clears the current visualization state and resets playback.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pause()" class="member-name-link">pause</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Pauses automatic playback.</div>
+<div class="block">Pauses automatic playback and cancels the scheduler task.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#randomize()" class="member-name-link">randomize</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Regenerates the visualization from a randomized starting state.</div>
+<div class="block">Regenerates the trace from a randomized starting model.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resume()" class="member-name-link">resume</a>()</code></div>
@@ -162,7 +162,7 @@ renderer, and player feedback layer.</p></div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start()" class="member-name-link">start</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Starts or resumes automatic playback.</div>
+<div class="block">Starts automatic playback or resumes it if the controller is currently paused.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startVisualization()" class="member-name-link">startVisualization</a>()</code></div>
@@ -172,7 +172,7 @@ renderer, and player feedback layer.</p></div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#step()" class="member-name-link">step</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Advances execution by a single step.</div>
+<div class="block">Advances playback by a single event.</div>
 </div>
 </div>
 </div>
@@ -205,7 +205,7 @@ renderer, and player feedback layer.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>renderer</code> - the renderer that executes animation events</dd>
-<dd><code>traceBuilder</code> - the trace builder used to rebuild playback state</dd>
+<dd><code>traceBuilder</code> - the trace builder used to rebuild the playback state</dd>
 <dd><code>audience</code> - the player feedback bridge</dd>
 </dl>
 </div>
@@ -240,8 +240,7 @@ renderer, and player feedback layer.</p></div>
 <h3>start</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#start()">PlayerControls</a></code></span></div>
-<div class="block">Starts or resumes automatic playback.</div>
+<div class="block">Starts automatic playback or resumes it if the controller is currently paused.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#start()">start</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -263,8 +262,7 @@ renderer, and player feedback layer.</p></div>
 <h3>pause</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#pause()">PlayerControls</a></code></span></div>
-<div class="block">Pauses automatic playback.</div>
+<div class="block">Pauses automatic playback and cancels the scheduler task.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#pause()">pause</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -277,8 +275,7 @@ renderer, and player feedback layer.</p></div>
 <h3>step</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">step</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#step()">PlayerControls</a></code></span></div>
-<div class="block">Advances execution by a single step.</div>
+<div class="block">Advances playback by a single event.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#step()">step</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -291,8 +288,7 @@ renderer, and player feedback layer.</p></div>
 <h3>back</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">back</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#back()">PlayerControls</a></code></span></div>
-<div class="block">Moves execution one step backward.</div>
+<div class="block">Steps playback backwards by one event.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#back()">back</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -305,13 +301,12 @@ renderer, and player feedback layer.</p></div>
 <h3>changeSpeed</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">changeSpeed</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#changeSpeed()">PlayerControls</a></code></span></div>
-<div class="block">Cycles the playback speed.</div>
+<div class="block">Cycles the playback speed between the configured tick values.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#changeSpeed()">changeSpeed</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
 <dt>Returns:</dt>
-<dd>the new speed value, where smaller values mean faster playback</dd>
+<dd>the new tick delay per step</dd>
 </dl>
 </div>
 </section>
@@ -321,8 +316,7 @@ renderer, and player feedback layer.</p></div>
 <h3>clear</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">clear</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#clear()">PlayerControls</a></code></span></div>
-<div class="block">Clears the visualization.</div>
+<div class="block">Clears the current visualization state and resets playback.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#clear()">clear</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
@@ -335,8 +329,7 @@ renderer, and player feedback layer.</p></div>
 <h3>randomize</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">randomize</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="PlayerControls.html#randomize()">PlayerControls</a></code></span></div>
-<div class="block">Regenerates the visualization from a randomized starting state.</div>
+<div class="block">Regenerates the trace from a randomized starting model.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="PlayerControls.html#randomize()">randomize</a></code>&nbsp;in interface&nbsp;<code><a href="PlayerControls.html" title="interface in io.github.mcalgovisualizations.visualization.engine">PlayerControls</a></code></dd>
