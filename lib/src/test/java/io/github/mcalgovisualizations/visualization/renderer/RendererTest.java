@@ -37,8 +37,8 @@ class RendererTest {
     private ISceneOps mockScene;
 
     @Mock private AudienceChannel mockAudience;
-    @Mock private IAnimationHandler<?> mockHandler;
-    @Mock private IAnimationHandler<?> mockExceptionHandler;
+    @Mock private IAnimationHandler<FirstTestEvent> mockHandler;
+    @Mock private IAnimationHandler<SecondTestEvent> mockExceptionHandler;
     @Mock private TaskScheduler mockTaskScheduler;
 
     private AnimationPlan<ISceneOps> emptyPlan;
@@ -49,8 +49,8 @@ class RendererTest {
     void setUp() {
         Pos origin = new Pos(0, 0, 0);
 
-        emptyPlan = AnimationPlan.builder().build();
-        nonEmptyPlan = AnimationPlan.builder()
+        emptyPlan = AnimationPlan.<ISceneOps>builder().build();
+        nonEmptyPlan = AnimationPlan.<ISceneOps>builder()
                 .step(10)
                 .build();
 
@@ -72,6 +72,20 @@ class RendererTest {
                 mockScene,
                 executor
         );
+    }
+
+    @Test
+    void defaultConstructor_InstantiatesWithoutProvidedExecutor() {
+        Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
+        assertDoesNotThrow(() -> new Renderer<>(
+                mockInstance,
+                new Pos(0, 0, 0),
+                mockLayout,
+                mockAudience,
+                handlers,
+                emptyPlan,
+                mockScene
+        ));
     }
 
     @Test
@@ -106,5 +120,44 @@ class RendererTest {
     void render_IgnoresNullEvents() {
         assertDoesNotThrow(() -> renderer.render(null));
         assertFalse(renderer.hasPendingAnimations());
+    }
+
+    @Test
+    void render_ProcessesValidEventAndNormalizesPlan() {
+        FirstTestEvent event = new FirstTestEvent(0);
+        when(mockHandler.handle(event)).thenReturn(nonEmptyPlan);
+
+        renderer.render(event);
+
+        verify(mockHandler).handle(event);
+        assertTrue(renderer.hasPendingAnimations());
+    }
+
+    @Test
+    void render_CatchesExceptionFromDispatcherHandler() {
+        FirstTestEvent event = new FirstTestEvent(0);
+        when(mockHandler.handle(event)).thenThrow(new IllegalStateException("Dispatch failed"));
+
+        assertDoesNotThrow(() -> renderer.render(event));
+    }
+
+    @Test
+    void complete_EnqueuesCompletionPlan() {
+        assertDoesNotThrow(() -> renderer.complete());
+    }
+
+    @Test
+    void pause_DelegatesToExecutor() {
+        assertDoesNotThrow(() -> renderer.pause());
+    }
+
+    @Test
+    void resume_DelegatesToExecutor() {
+        assertDoesNotThrow(() -> renderer.resume());
+    }
+
+    @Test
+    void onCleanup_DelegatesToExecutorAndScene() {
+        assertDoesNotThrow(() -> renderer.onCleanup());
     }
 }
