@@ -21,8 +21,6 @@ import java.util.concurrent.CompletableFuture;
  * renderer, and player feedback layer.</p>
  */
 public class VisualizationController<I, C extends AlgorithmContext<I>> implements PlayerControls {
-    private enum State { NEW, INITIALIZED, RUNNING, PAUSED, COMPLETED, CLEARED }
-
     private final AlgorithmTraceBuilder<I, C> traceBuilder;
     private AlgorithmStepper algorithmStepper;
     private final Renderer<I, ?> renderer;
@@ -34,13 +32,13 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
 
     private int delayPerStep = MAX_TICKS_PER_STEP;
     private Task runningTask = null;
-    private State state = State.NEW;
+    private ControllerState state = ControllerState.NEW;
 
     /**
      * Creates a new visualization controller.
      *
      * @param renderer the renderer that executes animation events
-     * @param traceBuilder the trace builder used to rebuild playback state
+     * @param traceBuilder the trace builder used to rebuild the playback state
      * @param audience the player feedback bridge
      */
     public VisualizationController(
@@ -62,36 +60,36 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     public CompletableFuture<Void> startVisualization() throws NullPointerException {
         assertNotCleared();
         applyPlaybackSpeed();
-        state = State.INITIALIZED;
+        state = ControllerState.INITIALIZED;
         return renderer.initialize(traceBuilder.getInitialData());
     }
 
-    @Override
     /**
-     * Starts automatic playback, or resumes it if the controller is currently paused.
+     * Starts automatic playback or resumes it if the controller is currently paused.
      */
+    @Override
     public void start() {
-        if (state == State.RUNNING) return;
+        if (state == ControllerState.RUNNING) return;
 
-        if(state == State.PAUSED) {
+        if(state == ControllerState.PAUSED) {
             resume();
             return;
         }
 
-        if (state == State.COMPLETED) {
+        if (state == ControllerState.COMPLETED) {
             // Allow START to act as resume if playback was paused during completion.
             renderer.resume();
             audience.start();
             return;
         }
 
-        if (state != State.INITIALIZED) {
+        if (state != ControllerState.INITIALIZED) {
             throw new IllegalStateException("VisualizationController must be initialized, paused, or completed before starting: " + state);
         }
 
         renderer.resume();
         scheduleSteppingTask();
-        state = State.RUNNING;
+        state = ControllerState.RUNNING;
         audience.start();
     }
 
@@ -99,36 +97,36 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
      * Resumes automatic playback from the paused state.
      */
     public void resume() {
-        if (state != State.PAUSED) {
+        if (state != ControllerState.PAUSED) {
             throw new IllegalStateException("VisualizationController is not paused");
         }
 
         renderer.resume();
         scheduleSteppingTask();
-        state = State.RUNNING;
+        state = ControllerState.RUNNING;
     }
 
-    @Override
     /**
      * Pauses automatic playback and cancels the scheduler task.
      */
+    @Override
     public void pause() {
-        if (state == State.CLEARED) return;
-        if (state == State.PAUSED) return;
+        if (state == ControllerState.CLEARED) return;
+        if (state == ControllerState.PAUSED) return;
 
         cancelRunningTask();
         renderer.pause();
         audience.pause();
 
-        if (state != State.COMPLETED) {
-            state = State.PAUSED;
+        if (state != ControllerState.COMPLETED) {
+            state = ControllerState.PAUSED;
         }
     }
 
-    @Override
     /**
      * Advances playback by a single event.
      */
+    @Override
     public void step() {
         assertSteppable();
 
@@ -148,12 +146,12 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         }
     }
 
-    @Override
     /**
      * Steps playback backwards by one event.
      */
+    @Override
     public void back() {
-        if (state == State.NEW || state == State.CLEARED) {
+        if (state == ControllerState.NEW || state == ControllerState.CLEARED) {
             throw new IllegalStateException("VisualizationController is not initialized");
         }
 
@@ -163,8 +161,8 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
             audience.back();
         }
 
-        if (state == State.COMPLETED) {
-            state = State.PAUSED;
+        if (state == ControllerState.COMPLETED) {
+            state = ControllerState.PAUSED;
         }
     }
 
@@ -179,7 +177,7 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     private void autoStep() {
-        if (state != State.RUNNING) {
+        if (state != ControllerState.RUNNING) {
             cancelRunningTask();
             return;
         }
@@ -196,14 +194,14 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         step();
     }
 
-    @Override
     /**
      * Cycles the playback speed between the configured tick values.
      *
      * @return the new tick delay per step
      */
+    @Override
     public int changeSpeed() {
-        // Lower ticks/step means faster stepping + faster animation playback.
+        // Lower ticks/step means faster stepping plus faster animation playback.
         int nextSpeed = this.delayPerStep - 1;
         if (nextSpeed < MIN_TICKS_PER_STEP) {
             nextSpeed = MAX_TICKS_PER_STEP;
@@ -216,7 +214,7 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     private void setSpeed(int ticksPerStep) {
         this.delayPerStep = Math.clamp(ticksPerStep, MIN_TICKS_PER_STEP, MAX_TICKS_PER_STEP);
         applyPlaybackSpeed();
-        if (state == State.RUNNING) {
+        if (state == ControllerState.RUNNING) {
             scheduleSteppingTask();
         }
     }
@@ -226,21 +224,21 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         renderer.setSpeed(schedulerTicks);
     }
 
-    @Override
     /**
      * Clears the current visualization state and resets playback.
      */
+    @Override
     public void clear() {
         cancelRunningTask();
         renderer.onCleanup();
         audience.clear();
-        state = State.CLEARED;
+        state = ControllerState.CLEARED;
     }
 
-    @Override
     /**
      * Regenerates the trace from a randomized starting model.
      */
+    @Override
     public void randomize() {
         cancelRunningTask();
         renderer.onCleanup();
@@ -250,14 +248,14 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
         this.algorithmStepper = new AlgorithmStepper(trace.history());
         renderer.initialize(trace.initialData());
         audience.randomize();
-        state = State.INITIALIZED;
+        state = ControllerState.INITIALIZED;
     }
 
     // private helpers to ensure state transitions are correct
     private void completeVisualization() {
         cancelRunningTask();
         renderer.complete();
-        state = State.COMPLETED;
+        state = ControllerState.COMPLETED;
     }
 
     private void cancelRunningTask() {
@@ -268,13 +266,13 @@ public class VisualizationController<I, C extends AlgorithmContext<I>> implement
     }
 
     private void assertSteppable() {
-        if (state == State.NEW || state == State.CLEARED) {
+        if (state == ControllerState.NEW || state == ControllerState.CLEARED) {
             throw new IllegalStateException("VisualizationController is not initialized");
         }
     }
 
     private void assertNotCleared() {
-        if (state == State.CLEARED) {
+        if (state == ControllerState.CLEARED) {
             throw new IllegalStateException("VisualizationController has been cleared");
         }
     }

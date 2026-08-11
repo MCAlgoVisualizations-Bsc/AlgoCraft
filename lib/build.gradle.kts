@@ -9,19 +9,20 @@ repositories {
 }
 
 dependencies {
-    // JUnit 5 (Jupiter)
+    // JUnit 5
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // Minestom available to lib tests
+    // Mockito Core (Enables inline mock maker for final classes on JDK 17+)
+    testImplementation("org.mockito:mockito-core:5.14.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.14.0")
+
+    // Minestom
     testImplementation("net.minestom:minestom:2026.01.08-1.21.11")
 
-    // Library deps
     api(libs.commons.math3)
     implementation(libs.guava)
-
-    // Compile against Minestom without exporting it to consumers
     compileOnly("net.minestom:minestom:2026.01.08-1.21.11")
 }
 
@@ -33,6 +34,10 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs(
+        "-XX:+EnableDynamicAgentLoading",
+        "-Dnet.bytebuddy.experimental=true"
+    )
 }
 
 jacoco {

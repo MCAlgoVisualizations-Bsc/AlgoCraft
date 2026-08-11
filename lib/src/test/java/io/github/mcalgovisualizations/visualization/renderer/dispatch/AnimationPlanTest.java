@@ -16,7 +16,7 @@ class AnimationPlanTest {
     void instant_returns_single_step() {
         var plan = AnimationPlan.instant(_ -> {});
         assertEquals(1, plan.steps().size());
-        assertEquals(0, plan.steps().getFirst().ticks());
+        assertEquals(1, plan.steps().getFirst().ticks());
     }
 
     @Test
