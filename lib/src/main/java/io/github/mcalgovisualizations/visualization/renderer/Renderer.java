@@ -19,11 +19,11 @@ public final class Renderer<I, O extends ISceneOps> {
     private final O scene;
     private final Instance instance;
     private final Dispatcher<O> dispatcher;
-    private final Executor<O> executor;
     private final AnimationPlan<O> complete;
     private final Pos origin;
     private final ILayout<I> layout;
     private boolean collapseAnimationDelays = false;
+    private Executor<O> executor;
 
     /**
      * Creates a renderer for a model/layout pair and a specific runtime scene.
@@ -37,13 +37,27 @@ public final class Renderer<I, O extends ISceneOps> {
             @NotNull AnimationPlan<O> complete,
             @NotNull O scene
     ) {
+        this.instance = instance;
+        this.origin = origin;
         this.scene = scene;
-        this.executor = new Executor<>(scene);
+        this.layout = layout;
         this.dispatcher = new Dispatcher<>(handlers);
         this.complete = complete;
-        this.instance = instance;
-        this.layout = layout;
-        this.origin = origin;
+        this.executor = new Executor<>(scene);
+    }
+
+    public Renderer(
+            @NotNull Instance instance,
+            @NotNull Pos origin,
+            @NotNull ILayout<I> layout,
+            @NotNull AudienceChannel audience,
+            @NotNull Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers,
+            @NotNull AnimationPlan<O> complete,
+            @NotNull O scene,
+            @NotNull Executor<O> executor
+    ) {
+        this(instance, origin, layout, audience, handlers, complete, scene);
+        this.executor = executor;
     }
 
     /**

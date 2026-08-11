@@ -1,6 +1,6 @@
 package io.github.mcalgovisualizations.visualization.algorithm;
 
-import io.github.mcalgovisualizations.visualization.utils.TestEvent;
+import io.github.mcalgovisualizations.visualization.utils.FirstTestEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ class AlgorithmStepperTest {
     @Test
     void constructor_copies_list_defensively() {
         var mutableList = new ArrayList<IAlgorithmEvent>();
-        mutableList.add(new TestEvent(1));
+        mutableList.add(new FirstTestEvent(1));
 
         var stepper = new AlgorithmStepper(mutableList);
         mutableList.clear();
@@ -40,8 +40,8 @@ class AlgorithmStepperTest {
 
     @Test
     void step_advances_pointer_and_returns_events_in_order() {
-        var event1 = new TestEvent(10);
-        var event2 = new TestEvent(20);
+        var event1 = new FirstTestEvent(10);
+        var event2 = new FirstTestEvent(20);
         var stepper = new AlgorithmStepper(List.of(event1, event2));
 
         assertTrue(stepper.isAtBeginning());
@@ -60,8 +60,8 @@ class AlgorithmStepperTest {
 
     @Test
     void back_moves_pointer_backwards_and_returns_previous_event() {
-        var event1 = new TestEvent(1);
-        var event2 = new TestEvent(2);
+        var event1 = new FirstTestEvent(1);
+        var event2 = new FirstTestEvent(2);
         var stepper = new AlgorithmStepper(List.of(event1, event2));
 
         assertNull(stepper.back());
@@ -77,7 +77,7 @@ class AlgorithmStepperTest {
 
     @Test
     void reset_resets_pointer_to_start() {
-        var event1 = new TestEvent(5);
+        var event1 = new FirstTestEvent(5);
         var stepper = new AlgorithmStepper(List.of(event1));
 
         stepper.step();
