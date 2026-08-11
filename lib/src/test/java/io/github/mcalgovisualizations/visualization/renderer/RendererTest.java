@@ -1,10 +1,13 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.TaskScheduler;
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.instance.AudienceChannel;
 import io.github.mcalgovisualizations.visualization.layout.ILayout;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
+import io.github.mcalgovisualizations.visualization.utils.FirstTestEvent;
+import io.github.mcalgovisualizations.visualization.utils.SecondTestEvent;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,27 +39,29 @@ class RendererTest {
     @Mock private AudienceChannel mockAudience;
     @Mock private IAnimationHandler<?> mockHandler;
     @Mock private IAnimationHandler<?> mockExceptionHandler;
+    @Mock private TaskScheduler mockTaskScheduler;
 
     private AnimationPlan<ISceneOps> emptyPlan;
     private AnimationPlan<ISceneOps> nonEmptyPlan;
     private Renderer<String, ISceneOps> renderer;
 
-    private record TestEvent() implements IAlgorithmEvent {}
-    private record ExceptionEvent() implements IAlgorithmEvent {}
-
     @BeforeEach
     void setUp() {
         Pos origin = new Pos(0, 0, 0);
 
-        emptyPlan = AnimationPlan.<ISceneOps>builder().build();
-        nonEmptyPlan = AnimationPlan.<ISceneOps>builder()
+        emptyPlan = AnimationPlan.builder().build();
+        nonEmptyPlan = AnimationPlan.builder()
                 .step(10)
                 .build();
 
         Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = new HashMap<>();
-        handlers.put(TestEvent.class, mockHandler);
-        handlers.put(ExceptionEvent.class, mockExceptionHandler);
+        handlers.put(FirstTestEvent.class, mockHandler);
+        handlers.put(SecondTestEvent.class, mockExceptionHandler);
 
+        TaskScheduler.TaskHandle mockTaskHandle = mock(TaskScheduler.TaskHandle.class);
+        lenient().when(mockTaskScheduler.schedule(any(), any())).thenReturn(mockTaskHandle);
+
+        var executor = new Executor<>(mockScene, mockTaskScheduler);
         renderer = new Renderer<>(
                 mockInstance,
                 origin,
@@ -64,7 +69,8 @@ class RendererTest {
                 mockAudience,
                 handlers,
                 emptyPlan,
-                mockScene
+                mockScene,
+                executor
         );
     }
 
@@ -101,18 +107,4 @@ class RendererTest {
         assertDoesNotThrow(() -> renderer.render(null));
         assertFalse(renderer.hasPendingAnimations());
     }
-
-//    @Test
-//    void render_CatchesIllegalStateExceptionFromDispatcher() {
-//        ExceptionEvent event = new ExceptionEvent();
-//        doThrow(new IllegalStateException("Dispatch failed")).when(mockExceptionHandler).handle(any());
-//
-//        assertDoesNotThrow(() -> renderer.render(event));
-//    }
-//
-//    @Test
-//    void complete_EnqueuesCompletionPlan() {
-//        assertDoesNotThrow(() -> renderer.complete());
-//    }
-
 }

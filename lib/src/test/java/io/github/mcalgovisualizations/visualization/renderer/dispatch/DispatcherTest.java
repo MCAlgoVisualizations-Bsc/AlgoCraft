@@ -2,7 +2,7 @@ package io.github.mcalgovisualizations.visualization.renderer.dispatch;
 
 import io.github.mcalgovisualizations.visualization.algorithm.IAlgorithmEvent;
 import io.github.mcalgovisualizations.visualization.renderer.IAnimationHandler;
-import io.github.mcalgovisualizations.visualization.utils.TestEvent;
+import io.github.mcalgovisualizations.visualization.utils.FirstTestEvent;
 import io.github.mcalgovisualizations.visualization.utils.TestEventHandler;
 import io.github.mcalgovisualizations.visualization.utils.TestSceneOps;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,11 @@ class DispatcherTest {
     void dispatch_executes_handler_for_registered_event() {
         var handler = new TestEventHandler();
         Map<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>> handlers = Map.of(
-                TestEvent.class, handler
+                FirstTestEvent.class, handler
         );
 
         var dispatcher = new Dispatcher<TestSceneOps>(handlers);
-        var plan = dispatcher.dispatch(new TestEvent(42));
+        var plan = dispatcher.dispatch(new FirstTestEvent(42));
 
         assertNotNull(plan);
         assertTrue(plan.isEmpty());
@@ -59,13 +59,13 @@ class DispatcherTest {
     @Test
     void constructor_copies_handlers_defensively() {
         var mutableMap = new HashMap<Class<? extends IAlgorithmEvent>, IAnimationHandler<?>>();
-        mutableMap.put(TestEvent.class, new TestEventHandler());
+        mutableMap.put(FirstTestEvent.class, new TestEventHandler());
 
         var dispatcher = new Dispatcher<TestSceneOps>(mutableMap);
 
         mutableMap.clear();
 
-        assertNotNull(dispatcher.dispatch(new TestEvent(10)));
+        assertNotNull(dispatcher.dispatch(new FirstTestEvent(10)));
     }
 
     @Test

@@ -15,8 +15,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Mockito Core (Enables inline mock maker for final classes on JDK 17+)
-    testImplementation("org.mockito:mockito-core:5.14.0")
+    testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.14.0")
+    testImplementation("org.mockito:mockito-subclass:5.11.0")
 
     // Minestom
     testImplementation("net.minestom:minestom:2026.01.08-1.21.11")

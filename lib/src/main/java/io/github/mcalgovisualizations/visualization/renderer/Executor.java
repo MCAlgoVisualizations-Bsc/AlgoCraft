@@ -1,9 +1,9 @@
 package io.github.mcalgovisualizations.visualization.renderer;
 
+import io.github.mcalgovisualizations.visualization.TaskScheduler;
 import io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan;
 import io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -11,24 +11,14 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
-/**
- * Executes queued {@link AnimationPlan}s against a scene over time.
- *
- * <p>The executor advances one plan step at a time using Minestom's scheduler. It
- * waits between steps according to each step's tick delay, and it can also bridge
- * asynchronous scene operations without blocking the server thread.</p>
- *
- * <p>Zero-wait steps are processed in the same tick, up to {@link #MAX_OPS_PER_TICK},
- * to avoid infinite loops or excessive work in a single server tick.</p>
- *
- * @param <O> the type of scene operations this executor can apply
- */
 public final class Executor<O extends ISceneOps> {
 
     private static final int MAX_OPS_PER_TICK = 256;
 
     private final O scene;
-    private Task runningTask = null;
+    private final TaskScheduler scheduler;
+
+    private TaskScheduler.TaskHandle runningTask = null;
     private boolean waitingForAsyncStep = false;
     private int executionId = 0;
 
@@ -43,77 +33,48 @@ public final class Executor<O extends ISceneOps> {
 
     private int speed = 1;
 
-    /**
-     * Creates a new executor for a specific scene.
-     *
-     * @param scene the scene that animation plans will act on
-     */
-    public Executor(O scene) {
+    public Executor(O scene, TaskScheduler scheduler) {
         this.scene = Objects.requireNonNull(scene, "scene");
+        this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
     }
 
-    /**
-     * Adds an animation plan to the execution queue.
-     *
-     * <p>Empty plans are ignored.</p>
-     *
-     * @param plan the plan to enqueue
-     */
+    public Executor(O scene) {
+        this(scene, (runnable, period) -> {
+            var task = MinecraftServer.getSchedulerManager()
+                    .buildTask(runnable)
+                    .repeat(period)
+                    .schedule();
+            return task::cancel;
+        });
+    }
+
     public void add(@NotNull AnimationPlan<O> plan) {
         if (plan.isEmpty()) return;
         queue.add(plan);
     }
 
-    /**
-     * Starts the scheduler if the executor is not paused and no scheduler task is running.
-     */
     public void startIfIdle() {
         if (paused) return;
         if (runningTask != null) return;
 
-        runningTask = MinecraftServer.getSchedulerManager()
-                .buildTask(this::tick)
-                .repeat(Duration.ofMillis(speed * 50L))
-                .schedule();
+        runningTask = scheduler.schedule(this::tick, Duration.ofMillis(speed * 50L));
     }
 
-    /**
-     * Pauses execution and stops the scheduler.
-     *
-     * <p>The current plan, step index, remaining wait time, and queued plans are preserved.</p>
-     */
     public void pause() {
         paused = true;
         stopScheduler();
     }
 
-    /**
-     * Resumes execution if currently paused.
-     */
     public void resume() {
         if (!paused) return;
         paused = false;
         startIfIdle();
     }
 
-    /**
-     * Returns whether this executor has no active scheduler, no active plan, and no queued plans.
-     *
-     * @return {@code true} if there is no work currently running or queued
-     */
     public boolean isIdle() {
         return currentPlan == null && queue.isEmpty() && runningTask == null;
     }
 
-    /**
-     * Sets the scheduler interval multiplier.
-     *
-     * <p>A value of {@code 1} runs every server tick, {@code 2} runs every two ticks,
-     * and so on.</p>
-     *
-     * @param speed scheduler interval multiplier; must be greater than {@code 0}
-     * @throws IllegalArgumentException if {@code speed <= 0}
-     */
     public void setSpeed(int speed) {
         if (speed <= 0) throw new IllegalArgumentException("speed must be > 0");
         this.speed = speed;
@@ -124,13 +85,6 @@ public final class Executor<O extends ISceneOps> {
         }
     }
 
-    /**
-     * Processes animation work for one scheduler execution.
-     *
-     * <p>This method advances the current plan until it either reaches a step with a
-     * positive wait duration, runs out of work, or reaches {@link #MAX_OPS_PER_TICK}
-     * operations for this tick.</p>
-     */
     private void tick() {
         if (paused) return;
         if (waitingForAsyncStep) return;
@@ -189,9 +143,6 @@ public final class Executor<O extends ISceneOps> {
         }
     }
 
-    /**
-     * Clears the active plan state and stops the scheduler if there is no queued work.
-     */
     private void finishCurrentPlan() {
         currentPlan = null;
         stepIndex = 0;
@@ -201,9 +152,6 @@ public final class Executor<O extends ISceneOps> {
         if (queue.isEmpty()) stopScheduler();
     }
 
-    /**
-     * Cancels the active scheduler task, if one exists.
-     */
     private void stopScheduler() {
         if (runningTask != null) {
             runningTask.cancel();
@@ -211,11 +159,6 @@ public final class Executor<O extends ISceneOps> {
         }
     }
 
-    /**
-     * Stops execution and clears all queued and active animation state.
-     *
-     * <p>This should be called when the owning scene or session is being destroyed.</p>
-     */
     public void onCleanup() {
         paused = false;
         stopScheduler();
