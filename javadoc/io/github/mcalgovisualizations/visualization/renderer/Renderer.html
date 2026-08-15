@@ -58,6 +58,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos,io.github.mcalgovisualizations.visualization.layout.ILayout,io.github.mcalgovisualizations.visualization.instance.AudienceChannel,java.util.Map,io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan,O)" tabindex="0">Renderer(Instance, Pos, ILayout, AudienceChannel, Map, AnimationPlan, O)</a></li>
+<li><a href="#%3Cinit%3E(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos,io.github.mcalgovisualizations.visualization.layout.ILayout,io.github.mcalgovisualizations.visualization.instance.AudienceChannel,java.util.Map,io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan,O,io.github.mcalgovisualizations.visualization.renderer.Executor)" tabindex="0">Renderer(Instance, Pos, ILayout, AudienceChannel, Map, AnimationPlan, O, Executor)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -109,6 +110,15 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Creates a renderer for a model/layout pair and a specific runtime scene.</div>
 </div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos,io.github.mcalgovisualizations.visualization.layout.ILayout,io.github.mcalgovisualizations.visualization.instance.AudienceChannel,java.util.Map,io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan,O,io.github.mcalgovisualizations.visualization.renderer.Executor)" class="member-name-link">Renderer</a><wbr>(@NotNull net.minestom.server.instance.Instance&nbsp;instance,
+ @NotNull net.minestom.server.coordinate.Pos&nbsp;origin,
+ @NotNull <a href="../layout/ILayout.html" title="interface in io.github.mcalgovisualizations.visualization.layout">ILayout</a>&lt;<a href="#type-param-I" title="type parameter in Renderer">I</a>&gt;&nbsp;layout,
+ @NotNull <a href="../instance/AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a>&nbsp;audience,
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;, <a href="IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;?&gt;&gt;&nbsp;handlers,
+ @NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;complete,
+ <a href="#type-param-O" title="type parameter in Renderer">O</a>&nbsp;scene,
+ @NotNull <a href="Executor.html" title="class in io.github.mcalgovisualizations.visualization.renderer">Executor</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;executor)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -199,6 +209,29 @@ loadScripts(document, 'script');</script>
  @NotNull
  <a href="#type-param-O" title="type parameter in Renderer">O</a>&nbsp;scene)</span></div>
 <div class="block">Creates a renderer for a model/layout pair and a specific runtime scene.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos,io.github.mcalgovisualizations.visualization.layout.ILayout,io.github.mcalgovisualizations.visualization.instance.AudienceChannel,java.util.Map,io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan,O,io.github.mcalgovisualizations.visualization.renderer.Executor)">
+<h3 id="&lt;init&gt;(net.minestom.server.instance.Instance,net.minestom.server.coordinate.Pos,io.github.mcalgovisualizations.visualization.layout.ILayout,io.github.mcalgovisualizations.visualization.instance.AudienceChannel,java.util.Map,io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan,io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps,io.github.mcalgovisualizations.visualization.renderer.Executor)">Renderer</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Renderer</span><wbr><span class="parameters">(@NotNull
+ @NotNull net.minestom.server.instance.Instance&nbsp;instance,
+ @NotNull
+ @NotNull net.minestom.server.coordinate.Pos&nbsp;origin,
+ @NotNull
+ @NotNull <a href="../layout/ILayout.html" title="interface in io.github.mcalgovisualizations.visualization.layout">ILayout</a>&lt;<a href="#type-param-I" title="type parameter in Renderer">I</a>&gt;&nbsp;layout,
+ @NotNull
+ @NotNull <a href="../instance/AudienceChannel.html" title="interface in io.github.mcalgovisualizations.visualization.instance">AudienceChannel</a>&nbsp;audience,
+ @NotNull
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="../algorithm/IAlgorithmEvent.html" title="interface in io.github.mcalgovisualizations.visualization.algorithm">IAlgorithmEvent</a>&gt;, <a href="IAnimationHandler.html" title="interface in io.github.mcalgovisualizations.visualization.renderer">IAnimationHandler</a>&lt;?&gt;&gt;&nbsp;handlers,
+ @NotNull
+ @NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;complete,
+ @NotNull
+ <a href="#type-param-O" title="type parameter in Renderer">O</a>&nbsp;scene,
+ @NotNull
+ @NotNull <a href="Executor.html" title="class in io.github.mcalgovisualizations.visualization.renderer">Executor</a>&lt;<a href="#type-param-O" title="type parameter in Renderer">O</a>&gt;&nbsp;executor)</span></div>
 </div>
 </section>
 </li>

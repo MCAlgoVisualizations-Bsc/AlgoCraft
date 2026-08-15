@@ -57,6 +57,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
+<li><a href="#%3Cinit%3E(O,io.github.mcalgovisualizations.visualization.TaskScheduler)" tabindex="0">Executor(O, TaskScheduler)</a></li>
 <li><a href="#%3Cinit%3E(O)" tabindex="0">Executor(O)</a></li>
 </ol>
 </li>
@@ -76,28 +77,16 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Class Executor" class="title">Class Executor&lt;O extends <a href="scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</h1>
+<h1 title="Class Executor" class="title">Class Executor&lt;<span id="type-param-O">O extends <a href="scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a></span>&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance">io.github.mcalgovisualizations.visualization.renderer.Executor&lt;O&gt;</div>
 </div>
 <section class="class-description" id="class-description">
-<dl class="notes">
-<dt>Type Parameters:</dt>
-<dd><span id="type-param-O"><code>O</code> - the type of scene operations this executor can apply</span></dd>
-</dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">Executor&lt;O extends <a href="scene/ISceneOps.html" title="interface in io.github.mcalgovisualizations.visualization.renderer.scene">ISceneOps</a>&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Executes queued <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch"><code>AnimationPlan</code></a>s against a scene over time.
-
-<p>The executor advances one plan step at a time using Minestom's scheduler. It
-waits between steps according to each step's tick delay, and it can also bridge
-asynchronous scene operations without blocking the server thread.</p>
-
-<p>Zero-wait steps are processed in the same tick, up to <code>MAX_OPS_PER_TICK</code>,
-to avoid infinite loops or excessive work in a single server tick.</p></div>
 </div>
 </section>
 <section class="summary">
@@ -111,9 +100,10 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(O)" class="member-name-link">Executor</a><wbr>(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Creates a new executor for a specific scene.</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(O,io.github.mcalgovisualizations.visualization.TaskScheduler)" class="member-name-link">Executor</a><wbr>(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene,
+ <a href="../TaskScheduler.html" title="interface in io.github.mcalgovisualizations.visualization">TaskScheduler</a>&nbsp;scheduler)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -130,39 +120,25 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#add(io.github.mcalgovisualizations.visualization.renderer.dispatch.AnimationPlan)" class="member-name-link">add</a><wbr>(@NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Executor">O</a>&gt;&nbsp;plan)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Adds an animation plan to the execution queue.</div>
-</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isIdle()" class="member-name-link">isIdle</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether this executor has no active scheduler, no active plan, and no queued plans.</div>
-</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCleanup()" class="member-name-link">onCleanup</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Stops execution and clears all queued and active animation state.</div>
-</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pause()" class="member-name-link">pause</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Pauses execution and stops the scheduler.</div>
-</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resume()" class="member-name-link">resume</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Resumes execution if currently paused.</div>
-</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(int)" class="member-name-link">setSpeed</a><wbr>(int&nbsp;speed)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the scheduler interval multiplier.</div>
-</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#startIfIdle()" class="member-name-link">startIfIdle</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is running.</div>
-</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -181,15 +157,19 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="&lt;init&gt;(O,io.github.mcalgovisualizations.visualization.TaskScheduler)">
+<h3 id="&lt;init&gt;(io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps,io.github.mcalgovisualizations.visualization.TaskScheduler)">Executor</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Executor</span><wbr><span class="parameters">(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene,
+ <a href="../TaskScheduler.html" title="interface in io.github.mcalgovisualizations.visualization">TaskScheduler</a>&nbsp;scheduler)</span></div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="&lt;init&gt;(O)">
 <h3 id="&lt;init&gt;(io.github.mcalgovisualizations.visualization.renderer.scene.ISceneOps)">Executor</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Executor</span><wbr><span class="parameters">(<a href="#type-param-O" title="type parameter in Executor">O</a>&nbsp;scene)</span></div>
-<div class="block">Creates a new executor for a specific scene.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>scene</code> - the scene that animation plans will act on</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -207,13 +187,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">add</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="dispatch/AnimationPlan.html" title="class in io.github.mcalgovisualizations.visualization.renderer.dispatch">AnimationPlan</a>&lt;<a href="#type-param-O" title="type parameter in Executor">O</a>&gt;&nbsp;plan)</span></div>
-<div class="block">Adds an animation plan to the execution queue.
-
-<p>Empty plans are ignored.</p></div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>plan</code> - the plan to enqueue</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -222,7 +195,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h3>startIfIdle</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">startIfIdle</span>()</div>
-<div class="block">Starts the scheduler if the executor is not paused and no scheduler task is running.</div>
 </div>
 </section>
 </li>
@@ -231,9 +203,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h3>pause</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pause</span>()</div>
-<div class="block">Pauses execution and stops the scheduler.
-
-<p>The current plan, step index, remaining wait time, and queued plans are preserved.</p></div>
 </div>
 </section>
 </li>
@@ -242,7 +211,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h3>resume</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">resume</span>()</div>
-<div class="block">Resumes execution if currently paused.</div>
 </div>
 </section>
 </li>
@@ -251,11 +219,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h3>isIdle</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isIdle</span>()</div>
-<div class="block">Returns whether this executor has no active scheduler, no active plan, and no queued plans.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd><code>true</code> if there is no work currently running or queued</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -264,16 +227,6 @@ to avoid infinite loops or excessive work in a single server tick.</p></div>
 <h3>setSpeed</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSpeed</span><wbr><span class="parameters">(int&nbsp;speed)</span></div>
-<div class="block">Sets the scheduler interval multiplier.
-
-<p>A value of <code>1</code> runs every server tick, <code>2</code> runs every two ticks,
-and so on.</p></div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>speed</code> - scheduler interval multiplier; must be greater than <code>0</code></dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalArgumentException.html" title="class or interface in java.lang" class="external-link">IllegalArgumentException</a></code> - if <code>speed &lt;= 0</code></dd>
-</dl>
 </div>
 </section>
 </li>
@@ -282,9 +235,6 @@ and so on.</p></div>
 <h3>onCleanup</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onCleanup</span>()</div>
-<div class="block">Stops execution and clears all queued and active animation state.
-
-<p>This should be called when the owning scene or session is being destroyed.</p></div>
 </div>
 </section>
 </li>
