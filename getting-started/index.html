@@ -1089,14 +1089,30 @@ public final class Main {
 <li>Layouts and Displays</li>
 <li>Events and Handlers</li>
 </ul>
-<h2 id="5-build-and-run-this-repository-locally">5) Build and run this repository locally</h2>
+<h2 id="5-use-the-demo-world">5) Use the demo world</h2>
+<p>The demo world is the quickest way to try AlgoCraft without building your own custom server first.</p>
+<p>From the repository root, start the packaged demo server:</p>
+<pre><code class="language-bash">./gradlew :prefab:shadowJar
+java -jar prefab/build/libs/minecraft-server-all.jar
+</code></pre>
+<p>Then join in Minecraft at localhost:25565.</p>
+<p>When you connect, the hub instance is the lobby area where the selector item is available. Use that selector to choose an algorithm, and the framework will create the matching visualization instance for you. Once the algorithm is running, use the hotbar controls to:</p>
+<ul>
+<li>randomize the data</li>
+<li>start or stop playback</li>
+<li>step forward and backward</li>
+<li>adjust the animation speed</li>
+<li>clear the active algorithm</li>
+</ul>
+<p>The demo world is designed to show the full player flow: join the hub, select a visualization, play it, and observe the animated scene without needing to write extra bootstrap code.</p>
+<h2 id="6-build-and-run-this-repository-locally">6) Build and run this repository locally</h2>
 <pre><code class="language-bash">./gradlew test
 ./gradlew :prefab:shadowJar
 java -jar prefab/build/libs/minecraft-server-all.jar
 </code></pre>
 <p>Then join from Minecraft with localhost:25565.</p>
 <p>Open the selector item, choose your algorithm, and use the running-layout controls to start/step/randomize.</p>
-<h2 id="6-build-docs-locally">6) Build docs locally</h2>
+<h2 id="7-build-docs-locally">7) Build docs locally</h2>
 <pre><code class="language-bash">./gradlew :lib:javadoc
 mkdocs build
 </code></pre>
