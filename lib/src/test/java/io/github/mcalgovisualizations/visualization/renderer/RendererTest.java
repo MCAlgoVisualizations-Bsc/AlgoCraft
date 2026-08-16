@@ -49,8 +49,8 @@ class RendererTest {
     void setUp() {
         Pos origin = new Pos(0, 0, 0);
 
-        emptyPlan = AnimationPlan.<ISceneOps>builder().build();
-        nonEmptyPlan = AnimationPlan.<ISceneOps>builder()
+        emptyPlan = AnimationPlan.builder().build();
+        nonEmptyPlan = AnimationPlan.builder()
                 .step(10)
                 .build();
 
@@ -106,6 +106,40 @@ class RendererTest {
 
         verify(mockInstance).loadChunk(1, 1);
         verify(mockScene).setLayout(layoutResults);
+    }
+
+    @Test
+    void render_NormalizesPlan_WhenDelaysCollapsedAndPlanHasSteps() {
+        renderer.setSpeed(1); // Sets collapseAnimationDelays = true (1 <= 1)
+
+        AnimationPlan<ISceneOps> planWithSteps = AnimationPlan.builder()
+                .step(10, scene -> {})
+                .stepAsync(5, scene -> { return CompletableFuture.completedFuture(null); })
+                .build();
+
+        FirstTestEvent event = new FirstTestEvent(1);
+        when(mockHandler.handle(event)).thenReturn(planWithSteps);
+
+        renderer.render(event);
+
+        assertTrue(renderer.hasPendingAnimations());
+        verify(mockHandler).handle(event);
+    }
+
+    @Test
+    void render_BypassesNormalization_WhenDelaysNotCollapsed() {
+        renderer.setSpeed(5); // Sets collapseAnimationDelays = false (5 > 1)
+
+        AnimationPlan<ISceneOps> planWithSteps = AnimationPlan.builder()
+                .step(10, scene -> {})
+                .build();
+
+        FirstTestEvent event = new FirstTestEvent(1);
+        when(mockHandler.handle(event)).thenReturn(planWithSteps);
+
+        renderer.render(event);
+
+        assertTrue(renderer.hasPendingAnimations());
     }
 
     @Test
