@@ -28,8 +28,6 @@ For a full demo world, see: https://github.com/MCAlgoVisualizations-Bsc/Demo
 	- `./gradlew test`
 2. Build the runnable prefab jar:
 	- `./gradlew :prefab:shadowJar`
-3. Run the example app:
-	- `java -jar prefab/build/libs/minecraft-server-all.jar`
 
 ## Notes
 
